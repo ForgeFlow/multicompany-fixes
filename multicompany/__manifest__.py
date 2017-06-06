@@ -11,7 +11,7 @@
     'website': 'http://www.creublanca.es',
     'depends': ['base'],
     'data': [
-        'views/res_partner.xml'
+        'views/partner.xml'
     ],
     'installable': True,
     'application': False,

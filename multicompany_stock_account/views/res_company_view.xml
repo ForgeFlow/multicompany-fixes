@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form" model="ir.ui.view">
+        <field name="name">res.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page name="stock" string="Stock">
+                    <group>
+                        <group>
+                            <field name="default_stock_account_input_categ_id"
+                                   domain="[('deprecated', '=', False),('company_id','=',id)]"/>
+                            <field name="default_stock_account_output_categ_id"
+                                   domain="[('deprecated', '=', False),('company_id','=',id)]"/>
+                            <field name="default_stock_valuation_account_id"
+                                   domain="[('deprecated', '=', False),('company_id','=',id)]"/>
+                            <field name="default_stock_journal" domain="[('company_id','=',id)]"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

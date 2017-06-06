@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'Multi Company',
+    'name': 'Multi Company Stock',
     'version': '1',
     'summary': 'Creu Blanca configuration',
     'author': 'Creu Blanca',
@@ -9,11 +9,13 @@
     'description': "",
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['base'],
+    'depends': ['multicompany_account', 'multicompany_stock'],
     'data': [
-        'views/res_partner.xml'
+        'views/product.xml',
+        'views/product_category.xml',
+        'views/res_company_view.xml'
     ],
     'installable': True,
     'application': False,
-    'auto_install': False,
+    'auto_install': True,
 }
