@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="invoice_supplier_form" model="ir.ui.view">
+        <field name="name">account.invoice.supplier.multicompany</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <button name="%(account.action_account_invoice_payment)d" position="replace">
+                <button name="action_account_invoice_payment" type="object" states="open" string="Register Payment"
+                        groups="account.group_account_invoice" class="oe_highlight"/>
+            </button>
+            <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="replace">
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account.action_invoice__supplier_tree1_view2" model="ir.actions.act_window.view">
+        <field name="view_id" ref="invoice_supplier_form"/>
+    </record>
+
+    <record id="invoice_form" model="ir.ui.view">
+        <field name="name">account.invoice.multicompany</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <button name="%(account.action_account_invoice_payment)d" position="replace">
+                <button name="action_account_invoice_payment" type="object" states="open" string="Register Payment"
+                        groups="account.group_account_invoice" class="oe_highlight"/>
+            </button>
+            <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="replace">
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
