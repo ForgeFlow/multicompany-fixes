@@ -7,15 +7,15 @@
         <field name="arch" type="xml">
             <field name="property_account_position_id" position="replace">
                 <field name="property_account_position_id" options="{'no_create': True, 'no_open': True}"
-                       domain="[('company_id','=',context.get('company_id',False))]"/>
+                       domain="[('company_id','=',current_company_id)]"/>
             </field>
             <field name="property_account_receivable_id" position="replace">
                 <field name="property_account_receivable_id"
-                       domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False),('company_id','=',context.get('company_id',False))]"/>
+                       domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False),('company_id','=',current_company_id)]"/>
             </field>
             <field name="property_account_payable_id" position="replace">
                 <field name="property_account_payable_id"
-                       domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False),('company_id','=',context.get('company_id',False))]"/>
+                       domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False),('company_id','=',current_company_id)]"/>
             </field>
         </field>
     </record>

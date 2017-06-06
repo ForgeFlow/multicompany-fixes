@@ -9,12 +9,12 @@
         <field name="arch" type="xml">
             <field name="property_account_income_id" position="replace">
                 <field name="property_account_income_id"
-                       domain="[('internal_type','=','other'),('deprecated','=',False),('company_id','=',context.get('company_id',False))]"
+                       domain="[('internal_type','=','other'),('deprecated','=',False),('company_id','=',current_company_id)]"
                        groups="account.group_account_user"/>
             </field>
             <field name="property_account_expense_id" position="replace">
                 <field name="property_account_expense_id"
-                       domain="[('internal_type','=','other'),('deprecated','=',False),('company_id','=',context.get('company_id',False))]"
+                       domain="[('internal_type','=','other'),('deprecated','=',False),('company_id','=',current_company_id)]"
                        groups="account.group_account_user"/>
             </field>
         </field>
