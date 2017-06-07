@@ -13,7 +13,7 @@
     'data': [
         'views/account_move.xml',
         'views/account_invoice.xml',
-        'views/account.xml',
+        'views/account_budget_views.xml',
         'views/account_tax.xml',
         'views/account_payment.xml',
         'views/product.xml',
