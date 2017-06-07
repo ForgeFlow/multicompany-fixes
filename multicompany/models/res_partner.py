@@ -2,20 +2,7 @@ from odoo import fields, models, api
 
 
 class ResPartner(models.Model):
-    _name = 'res.partner'
-    _inherit = ['res.partner', 'multicompany.abstract']
-
-    @api.one
-    def get_properties(self):
-        self.property = self.env['res.partner.property'].search(
-            [('partner_id', '=', self.id), ('company_id', '=', self.current_company_id.id)], limit=1)
-
-    property = fields.Many2one(
-        comodel_name='res.partner.property',
-        default=get_properties,
-        compute='get_properties',
-        store=False
-    )
+    _inherit = 'res.partner'
 
     property_ids = fields.One2many(
         comodel_name='res.partner.property',
@@ -26,12 +13,7 @@ class ResPartner(models.Model):
 
 class ResPartnerProperties(models.Model):
     _name = 'res.partner.property'
-
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True
-    )
+    _inherit = 'multicompany.property.abstract'
 
     partner_id = fields.Many2one(
         comodel_name='res.partner',
@@ -42,3 +24,20 @@ class ResPartnerProperties(models.Model):
                          'UNIQUE(company_id, partner_id)',
                          "The company must be unique"),
                         ]
+
+    @api.model
+    def create(self, vals):
+        self.set_properties(self.env['res.partner'].browse(vals.get('partner_id', False)), vals,
+                            self.env['ir.property'].with_context(force_company=self.company_id.id))
+        return super(ResPartnerProperties, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        for record in self:
+            record.set_properties(record.partner_id, vals,
+                                  self.env['ir.property'].with_context(force_company=record.company_id.id))
+        return super(ResPartnerProperties, self).write(vals)
+
+    @api.model
+    def set_properties(self, object, vals, properties=False):
+        return

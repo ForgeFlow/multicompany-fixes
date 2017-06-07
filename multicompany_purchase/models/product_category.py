@@ -2,17 +2,9 @@ from odoo import fields, models, api
 
 
 class ProductCategory(models.Model):
-    _name = 'product.category'
-    _inherit = ['product.category', 'multicompany.abstract']
+    _inherit = 'product.category'
 
-    @api.one
-    def get_properties(self):
-        super(ProductCategory, self).get_properties()
-        self.property_account_creditor_price_difference_categ = self.get_property(
-            self.property, 'property_account_creditor_price_difference_categ', False)
-
-    property_account_creditor_price_difference_categ = fields.Many2one(
-        'account.account', compute='get_properties', default=get_properties,company_dependent=False)
+    property_account_creditor_price_difference_categ = fields.Many2one(readonly=True)
 
 
 class ProductCategoryProperty(models.Model):
@@ -22,3 +14,10 @@ class ProductCategoryProperty(models.Model):
         'account.account', string="Price Difference Account",
         company_dependent=False,
         help="This account will be used to value price difference between purchase price and accounting cost.")
+
+    @api.model
+    def set_properties(self, object, vals, properties=False):
+        if vals.get('property_account_creditor_price_difference_categ', False):
+            self.set_property(object, 'property_account_creditor_price_difference_categ',
+                              vals.get('property_account_creditor_price_difference_categ', False), properties)
+        return super(ProductCategoryProperty, self).set_properties(object, vals, properties)

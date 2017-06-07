@@ -2,34 +2,10 @@ from odoo import fields, models, api
 
 
 class ProductCategory(models.Model):
-    _name = 'product.category'
-    _inherit = ['product.category', 'multicompany.abstract']
+    _inherit = 'product.category'
 
-    @api.one
-    def get_properties(self):
-        super(ProductCategory, self).get_properties()
-        self.property_account_income_categ_id = self.get_property(
-            self.property, 'property_account_income_categ_id', self.current_company_id.default_account_income_id)
-        self.property_account_expense_categ_id = self.get_property(
-            self.property, 'property_account_expense_categ_id', self.current_company_id.default_account_expense_id)
-
-    property_account_income_categ_id = fields.Many2one(
-        comodel_name='account.account', company_dependent=False,
-        string="Income Account", oldname="property_account_income_categ",
-        domain=[('deprecated', '=', False)],
-        help="This account will be used for invoices to value sales.",
-        store=False,
-        default=get_properties,
-        compute='get_properties')
-    property_account_expense_categ_id = fields.Many2one(
-        comodel_name='account.account', company_dependent=False,
-        string="Expense Account",
-        oldname="property_account_expense_categ",
-        domain=[('deprecated', '=', False)],
-        help="This account will be used for invoices to value expenses.",
-        store=False,
-        default=get_properties,
-        compute='get_properties')
+    property_account_income_categ_id = fields.Many2one(readonly=True)
+    property_account_expense_categ_id = fields.Many2one(readonly=True)
 
 
 class ProductCategoryProperty(models.Model):
@@ -46,3 +22,13 @@ class ProductCategoryProperty(models.Model):
         oldname="property_account_expense_categ",
         domain=[('deprecated', '=', False)],
         help="This account will be used for invoices to value expenses.")
+
+    @api.model
+    def set_properties(self, object, vals, properties=False):
+        if vals.get('property_account_income_categ_id', False):
+            self.set_property(object, 'property_account_income_categ_id',
+                              vals.get('property_account_income_categ_id', False), properties)
+        if vals.get('property_account_expense_categ_id', False):
+            self.set_property(object, 'property_account_expense_categ_id',
+                              vals.get('property_account_expense_categ_id', False), properties)
+        return super(ProductCategoryProperty, self).set_properties(object, vals, properties)

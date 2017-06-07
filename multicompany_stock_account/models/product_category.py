@@ -2,67 +2,14 @@ from odoo import models, fields, api
 
 
 class ProductCategory(models.Model):
-    _name = 'product.category'
-    _inherit = ['product.category', 'multicompany.abstract']
+    _inherit = 'product.category'
 
-    @api.one
-    def get_properties(self):
-        super(ProductCategory, self).get_properties()
-        ir_property_obj = self.env['ir.property']
-        self.property_valuation = self.get_property(
-            self.property, 'property_valuation', ir_property_obj.get('property_valuation', 'product.category'))
-        self.property_cost_method = self.get_property(
-            self.property, 'property_cost_method', ir_property_obj.get('property_cost_method', 'product.category'))
-        self.property_stock_journal = self.get_property(
-            self.property, 'property_stock_journal', self.current_company_id.default_stock_journal)
-        self.property_stock_account_input_categ_id = self.get_property(
-            self.property, 'property_stock_account_input_categ_id',
-            self.current_company_id.default_stock_account_input_categ_id)
-        self.property_stock_account_output_categ_id = self.get_property(
-            self.property, 'property_stock_account_output_categ_id',
-            self.current_company_id.default_stock_account_output_categ_id)
-        self.property_stock_valuation_account_id = self.get_property(
-            self.property, 'property_stock_valuation_account_id',
-            self.current_company_id.default_stock_valuation_account_id)
-
-    property_valuation = fields.Selection(
-        copy=False, required=False,
-        company_dependent=False,
-        store=False,
-        compute='get_properties',
-        default=get_properties)
-
-    property_cost_method = fields.Selection(
-        company_dependent=False, copy=False, required=False,
-        store=False,
-        compute='get_properties',
-        default=get_properties)
-    property_stock_journal = fields.Many2one(
-        comodel_name='account.journal',
-        company_dependent=False,
-        store=False,
-        compute='get_properties',
-        default=get_properties
-    )
-    property_stock_account_input_categ_id = fields.Many2one(
-        comodel_name='account.account',
-        company_dependent=False,
-        store=False,
-        compute='get_properties',
-        default=get_properties)
-    property_stock_account_output_categ_id = fields.Many2one(
-        comodel_name='account.account',
-        company_dependent=False,
-        store=False,
-        compute='get_properties',
-        default=get_properties
-    )
-    property_stock_valuation_account_id = fields.Many2one(
-        comodel_name='account.account',
-        company_dependent=False,
-        store=False,
-        compute='get_properties',
-        default=get_properties)
+    property_valuation = fields.Selection(readonly=True)
+    property_cost_method = fields.Selection(readonly=True)
+    property_stock_journal = fields.Many2one(readonly=True)
+    property_stock_account_input_categ_id = fields.Many2one(readonly=True)
+    property_stock_account_output_categ_id = fields.Many2one(readonly=True)
+    property_stock_valuation_account_id = fields.Many2one(readonly=True)
 
 
 class ProductCategoryProperty(models.Model):
@@ -112,3 +59,19 @@ class ProductCategoryProperty(models.Model):
         'account.account', 'Stock Valuation Account',
         domain=[('deprecated', '=', False)],
         help="When real-time inventory valuation is enabled on a product, this account will hold the current value of the products.", )
+
+    @api.model
+    def set_properties(self, object, vals, properties=False):
+        if vals.get('property_valuation', False):
+            self.set_property(object, 'property_valuation', vals.get('property_valuation', False), properties)
+        if vals.get('property_cost_method', False):
+            self.set_property(object, 'property_cost_method', vals.get('property_cost_method', False), properties)
+        if vals.get('property_stock_journal', False):
+            self.set_property(object, 'property_stock_journal', vals.get('property_stock_journal', False), properties)
+        if vals.get('property_stock_account_input_categ_id', False):
+            self.set_property(object, 'property_stock_account_input_categ_id', vals.get('property_stock_account_input_categ_id', False), properties)
+        if vals.get('property_stock_account_output_categ_id', False):
+            self.set_property(object, 'property_stock_account_output_categ_id', vals.get('property_stock_account_output_categ_id', False), properties)
+        if vals.get('property_stock_valuation_account_id', False):
+            self.set_property(object, 'property_stock_valuation_account_id', vals.get('property_stock_valuation_account_id', False), properties)
+        return super(ProductCategoryProperty, self).set_properties(object, vals, properties)

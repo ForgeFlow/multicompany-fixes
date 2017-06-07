@@ -24,7 +24,7 @@
         <field name="model">product.template.property</field>
         <field name="arch" type="xml">
             <tree string="Properties">
-                <field name="product_id" invisible="1"/>
+                <field name="product_template_id" invisible="1"/>
                 <field name="company_id"/>
                 <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
             </tree>
@@ -37,7 +37,7 @@
         <field name="arch" type="xml">
             <form>
                 <group>
-                    <field name="product_id" invisible="1"/>
+                    <field name="product_template_id" invisible="1"/>
                     <field name="company_id"/>
                     <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}"/>
                 </group>

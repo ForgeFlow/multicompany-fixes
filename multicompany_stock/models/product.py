@@ -1,45 +1,12 @@
-from odoo import models, api, fields
+from odoo import models, fields, api
 
 
 class ProductTemplate(models.Model):
-    _name = 'product.template'
-    _inherit = ['product.template', 'multicompany.abstract']
+    _inherit = 'product.template'
 
-    @api.one
-    def get_properties(self):
-        super(ProductTemplate, self).get_properties()
-        ir_property_obj = self.env['ir.property']
-        self.property_stock_procurement = self.get_property(
-            self.property,
-            'property_stock_procurement',
-            ir_property_obj.get('property_stock_procurement', 'product.template'))
-        self.property_stock_production = self.get_property(
-            self.property,
-            'property_stock_production',
-            ir_property_obj.get('property_stock_production', 'product.template'))
-        self.property_stock_inventory = self.get_property(
-            self.property,
-            'property_stock_inventory',
-            ir_property_obj.get('property_stock_inventory', 'product.template'))
-
-    property_stock_procurement = fields.Many2one(
-        'stock.location',
-        company_dependent=False,
-        compute='get_properties',
-        default=get_properties
-    )
-    property_stock_production = fields.Many2one(
-        'stock.location',
-        company_dependent=False,
-        compute='get_properties',
-        default=get_properties
-    )
-    property_stock_inventory = fields.Many2one(
-        'stock.location',
-        company_dependent=False,
-        compute='get_properties',
-        default=get_properties
-    )
+    property_stock_procurement = fields.Many2one(readonly=True)
+    property_stock_production = fields.Many2one(readonly=True)
+    property_stock_inventory = fields.Many2one(readonly=True)
 
 
 class ProductProperty(models.Model):
@@ -57,3 +24,13 @@ class ProductProperty(models.Model):
         'stock.location', "Inventory Location",
         company_dependent=False, domain=[('usage', 'like', 'inventory')],
         help="This stock location will be used, instead of the default one, as the source location for stock moves generated when you do an inventory.")
+
+    @api.model
+    def set_properties(self, object, vals, properties=False):
+        if vals.get('property_stock_procurement', False):
+            self.set_property(object, 'property_stock_procurement', vals.get('property_stock_procurement', False), properties)
+        if vals.get('property_stock_production', False):
+            self.set_property(object, 'property_stock_production', vals.get('property_stock_production', False), properties)
+        if vals.get('property_stock_inventory', False):
+            self.set_property(object, 'property_stock_inventory', vals.get('property_stock_inventory', False), properties)
+        return super(ProductProperty, self).set_properties(object, vals, properties)

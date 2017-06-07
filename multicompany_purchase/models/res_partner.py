@@ -2,24 +2,21 @@ from odoo import fields, models, api
 
 
 class ResPartner(models.Model):
-    _name = 'res.partner'
-    _inherit = ['res.partner', 'multicompany.abstract']
+    _inherit = 'res.partner'
 
-    @api.one
-    def get_properties(self):
-        super(ResPartner,self).get_properties()
-
-        self.property_purchase_currency_id = self.get_property(
-            self.property, 'property_purchase_currency_id', self.current_company_id.currency_id)
-
-    property_purchase_currency_id = fields.Many2one(
-        'res.currency',
-        company_dependent=False, default=get_properties, compute='get_properties')
+    property_purchase_currency_id = fields.Many2one(readonly=True)
 
 
 class ResPartnerProperties(models.Model):
     _inherit = 'res.partner.property'
 
     property_purchase_currency_id = fields.Many2one(
-        'res.currency', string="Supplier Currency", company_dependent=False,
+        'res.currency', string="Supplier Currency",
         help="This currency will be used, instead of the default one, for purchases from the current partner")
+
+    @api.model
+    def set_properties(self, object, vals, properties=False):
+        if vals.get('property_purchase_currency_id', False):
+            self.set_property(object, 'property_purchase_currency_id', vals.get('property_purchase_currency_id', False),
+                              properties)
+        return super(ResPartnerProperties, self).set_properties(object, vals, properties)

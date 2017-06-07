@@ -2,43 +2,14 @@ from odoo import models, api, fields
 
 
 class ProductTemplate(models.Model):
-    _name = 'product.template'
-    _inherit = ['product.template', 'multicompany.abstract']
+    _inherit = 'product.template'
 
-    @api.one
-    def get_properties(self):
-        super(ProductTemplate, self).get_properties()
+    property_valuation = fields.Selection(readonly=True)
 
-        self.property_valuation = self.get_property(
-            self.property, 'property_valuation', self.categ_id.property_valuation)
-        self.property_cost_method = self.get_property(
-            self.property, 'property_cost_method', self.categ_id.property_cost_method)
-        self.property_stock_account_input = self.get_property(
-            self.property, 'property_stock_account_input', self.categ_id.property_stock_account_input_categ_id)
-        self.property_stock_account_output = self.get_property(
-            self.property, 'property_stock_account_output', self.categ_id.property_stock_account_output_categ_id)
+    property_cost_method = fields.Selection(readonly=True)
 
-    property_valuation = fields.Selection(
-        company_dependent=False,
-        default=get_properties,
-        compute='get_properties')
-
-    property_cost_method = fields.Selection(
-        company_dependent=False,
-        default=get_properties,
-        compute='get_properties'
-    )
-
-    property_stock_account_input = fields.Many2one(
-        'account.account',
-        company_dependent=False,
-        default=get_properties,
-        compute='get_properties')
-    property_stock_account_output = fields.Many2one(
-        'account.account',
-        company_dependent=False,
-        default=get_properties,
-        compute='get_properties')
+    property_stock_account_input = fields.Many2one(readonly=True)
+    property_stock_account_output = fields.Many2one(readonly=True)
 
 
 class ProductProperty(models.Model):
@@ -65,3 +36,15 @@ class ProductProperty(models.Model):
         'account.account', 'Stock Output Account', domain=[('deprecated', '=', False)],
         help="When doing real-time inventory valuation, counterpart journal items for all outgoing stock moves will be posted in this account, unless "
              "there is a specific valuation account set on the destination location. When not set on the product, the one from the product category is used.")
+
+    @api.model
+    def set_properties(self, object, vals, properties=False):
+        if vals.get('property_valuation', False):
+            self.set_property(object, 'property_valuation', vals.get('property_valuation', False), properties)
+        if vals.get('property_cost_method', False):
+            self.set_property(object, 'property_cost_method', vals.get('property_cost_method', False), properties)
+        if vals.get('property_stock_account_input', False):
+            self.set_property(object, 'property_stock_account_input', vals.get('property_stock_account_input', False), properties)
+        if vals.get('property_stock_account_output', False):
+            self.set_property(object, 'property_stock_account_output', vals.get('property_stock_account_output', False), properties)
+        return super(ProductProperty, self).set_properties(object, vals, properties)
