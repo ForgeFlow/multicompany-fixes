@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="view_budget_post_form">
+        <field name="name">account.budget.post.form</field>
+        <field name="model">account.budget.post</field>
+        <field name="inherit_id" ref="account_budget.view_budget_post_form"/>
+        <field name="arch" type="xml">
+            <field name="account_ids" position="attributes">
+                <attribute name="domain">[('deprecated', '=', False), ('company_id','=',company_id)]</attribute>
+            </field>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="crossovered_budget_view_form">
+        <field name="name">crossovered.budget.view.form</field>
+        <field name="model">crossovered.budget</field>
+        <field name="inherit_id" ref="account_budget.crossovered_budget_view_form"/>
+        <field name="arch" type="xml">
+            <field name="company_id" position="attributes">
+                <attribute name="attrs">{'readonly':[('state','!=','draft')]}</attribute>
+            </field>
+            <xpath expr="//field[@name='crossovered_budget_line']/form/group/group/field[@name='general_budget_id']"
+                   position="attributes">
+                <attribute name="domain">[('company_id','=',parent.company_id)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='crossovered_budget_line']/form/group/group/field[@name='analytic_account_id']"
+                   position="attributes">
+                <attribute name="domain">[('company_id','=',parent.company_id)]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_crossovered_budget_line_form">
+        <field name="name">crossovered.budget.line.form</field>
+        <field name="model">crossovered.budget.lines</field>
+        <field name="inherit_id" ref="account_budget.view_crossovered_budget_line_form"/>
+        <field name="arch" type="xml">
+            <field name="analytic_account_id" position="attributes">
+                <attribute name="domain">[('company_id','=',company_id)]</attribute>
+            </field>
+            <field name="general_budget_id" position="attributes">
+                <attribute name="domain">[('company_id','=',company_id)]</attribute>
+            </field>
+        </field>
+    </record>
+</odoo>
