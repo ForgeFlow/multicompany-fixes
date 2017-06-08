@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_template_property_form" model="ir.ui.view">
+        <field name="name">product.template.property.form</field>
+        <field name="model">product.template.property</field>
+        <field name="inherit_id" ref="multicompany_product.view_product_template_property_form"/>
+        <field name="arch" type="xml">
+            <field name="standard_price" position="after">
+                <field name="type" invisible="1"/>
+                <field name="track_service" invisible="1"/>
+                <field name="project_id"
+                       attrs="{'invisible':['|', ('type','!=','service'), ('track_service', '&lt;&gt;', 'task')]}"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
