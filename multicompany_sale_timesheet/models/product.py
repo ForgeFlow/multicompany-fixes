@@ -7,19 +7,24 @@ class ProductTemplate(models.Model):
     project_id = fields.Many2one(readonly=True)
 
 
-class ProductProperty(models.Model):
+class ProductProperty(models.TransientModel):
     _inherit = 'product.template.property'
 
     project_id = fields.Many2one(
-        'project.project', 'Project',
+        comodel_name='project.project', string='Project',
+        compute='get_properties',
+        readonly=False,
         help='Create a task under this project on sale order validation. This setting must be set for each company.')
 
     type = fields.Selection(related='product_template_id.type')
     track_service = fields.Selection(related='product_template_id.track_service')
 
+    @api.one
+    def get_property_fields(self, object, properties):
+        super(ProductProperty, self).get_property_fields(object, properties)
+        self.project_id = self.get_property_value('project_id', object, properties)
+
     @api.model
-    def set_properties(self, object, vals, properties=False):
-        if vals.get('project_id', False):
-            self.set_property(object, 'project_id',
-                              vals.get('project_id', False), properties)
-        return super(ProductProperty, self).set_properties(object, vals, properties)
+    def set_properties(self, object, properties=False):
+        super(ProductProperty, self).set_properties(object, properties)
+        self.set_property(object, 'project_id', self.project_id.id, properties)

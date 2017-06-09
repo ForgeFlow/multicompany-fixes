@@ -8,27 +8,33 @@ class ProductCategory(models.Model):
     property_account_expense_categ_id = fields.Many2one(readonly=True)
 
 
-class ProductCategoryProperty(models.Model):
+class ProductCategoryProperty(models.TransientModel):
     _inherit = 'product.category.property'
 
     property_account_income_categ_id = fields.Many2one(
         comodel_name='account.account',
         string="Income Account", oldname="property_account_income_categ",
         domain=[('deprecated', '=', False)],
+        compute='get_properties',
+        readonly=False,store=False,
         help="This account will be used for invoices to value sales.")
     property_account_expense_categ_id = fields.Many2one(
         comodel_name='account.account',
         string="Expense Account",
         oldname="property_account_expense_categ",
         domain=[('deprecated', '=', False)],
+        compute='get_properties',
+        readonly=False,store=False,
         help="This account will be used for invoices to value expenses.")
 
+    @api.one
+    def get_property_fields(self, object, properties):
+        super(ProductCategoryProperty, self).get_property_fields(object, properties)
+        self.property_account_income_categ_id = self.get_property_value('property_account_income_categ_id', object, properties)
+        self.property_account_expense_categ_id = self.get_property_value('property_account_expense_categ_id', object, properties)
+
     @api.model
-    def set_properties(self, object, vals, properties=False):
-        if vals.get('property_account_income_categ_id', False):
-            self.set_property(object, 'property_account_income_categ_id',
-                              vals.get('property_account_income_categ_id', False), properties)
-        if vals.get('property_account_expense_categ_id', False):
-            self.set_property(object, 'property_account_expense_categ_id',
-                              vals.get('property_account_expense_categ_id', False), properties)
-        return super(ProductCategoryProperty, self).set_properties(object, vals, properties)
+    def set_properties(self, object, properties=False):
+        super(ProductCategoryProperty, self).set_properties(object, properties)
+        self.set_property(object, 'property_account_income_categ_id', self.property_account_income_categ_id.id, properties)
+        self.set_property(object, 'property_account_expense_categ_id', self.property_account_expense_categ_id.id, properties)

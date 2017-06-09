@@ -6,12 +6,34 @@ class ResPartner(models.Model):
 
     property_ids = fields.One2many(
         comodel_name='res.partner.property',
-        inverse_name='partner_id',
+        compute='_get_properties',
+        inverse='_set_properties',
         string='Properties'
     )
 
+    @api.multi
+    def _set_properties(self):
+        prop_obj = self.env['ir.property'].with_context(force_company=self.company_id.id)
+        for record in self:
+            for property in record.property_ids:
+                property.set_properties(record, prop_obj)
 
-class ResPartnerProperties(models.Model):
+    @api.multi
+    def _get_properties(self):
+        for record in self:
+            property_obj = self.env['res.partner.property']
+            values = []
+            companies = self.env['res.company'].search([])
+            for company in companies:
+                val = property_obj.create({
+                    'partner_id': record.id,
+                    'company_id': company.id
+                })
+                values.append(val.id)
+            record.property_ids = values
+
+
+class ResPartnerProperty(models.TransientModel):
     _name = 'res.partner.property'
     _inherit = 'multicompany.property.abstract'
 
@@ -20,24 +42,15 @@ class ResPartnerProperties(models.Model):
         string='Partner'
     )
 
-    _sql_constraints = [('company_partner_unique',
-                         'UNIQUE(company_id, partner_id)',
-                         "The company must be unique"),
-                        ]
+    @api.one
+    def get_properties(self):
+        self.get_property_fields(self.partner_id,
+                                 self.env['ir.property'].with_context(force_company=self.company_id.id))
+
+    @api.one
+    def get_property_fields(self, object, properties):
+        return
 
     @api.model
-    def create(self, vals):
-        self.set_properties(self.env['res.partner'].browse(vals.get('partner_id', False)), vals,
-                            self.env['ir.property'].with_context(force_company=self.company_id.id))
-        return super(ResPartnerProperties, self).create(vals)
-
-    @api.multi
-    def write(self, vals):
-        for record in self:
-            record.set_properties(record.partner_id, vals,
-                                  self.env['ir.property'].with_context(force_company=record.company_id.id))
-        return super(ResPartnerProperties, self).write(vals)
-
-    @api.model
-    def set_properties(self, object, vals, properties=False):
+    def set_properties(self, object, properties=False):
         return

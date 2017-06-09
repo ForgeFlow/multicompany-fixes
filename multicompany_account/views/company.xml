@@ -1,39 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_company_form" model="ir.ui.view">
-        <field name="name">res.company.multicompany_account</field>
-        <field name="model">res.company</field>
-        <field name="inherit_id" ref="base.view_company_form"/>
-        <field name="arch" type="xml">
-            <notebook position="inside">
-                <page name="accounting_page" string="Accounting">
-                    <group name="accounting_group">
-                        <group>
-                        <field name="default_account_payable_id"
-                               domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False), ('company_id', '=', id)]"
-                               class="oe_inline"/>
-                        <field name="default_account_receivable_id"
-                               domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False), ('company_id', '=', id)]"
-                               class="oe_inline"/>
-                        <field name="default_account_income_id"
-                               domain="[('company_id', '=', id)]"
-                               class="oe_inline"/>
-                        <field name="default_account_expense_id"
-                               domain="[('company_id', '=', id)]"
-                               class="oe_inline"/>
-                        </group>
-                        <group>
-                        <field name="default_account_position_id"
-                               domain="[('company_id', '=', id)]"
-                               class="oe_inline"/>
-                        <field name="default_payment_term_id"
-                               class="oe_inline"/>
-                        <field name="default_supplier_payment_term_id"
-                               class="oe_inline"/>
-                        </group>
-                    </group>
-                </page>
-            </notebook>
-        </field>
-    </record>
+
 </odoo>

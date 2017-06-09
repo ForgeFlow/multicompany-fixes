@@ -13,10 +13,6 @@
                                domain="[('deprecated', '=', False),('company_id','=',company_id)]"/>
                         <field name="property_account_expense_id"
                                domain="[('deprecated', '=', False),('company_id','=',company_id)]"/>
-                        <field name="taxes_id" widget="many2many_tags"
-                               domain="[('type_tax_use', '=', 'sale'),('company_id','=',company_id)]"/>
-                        <field name="supplier_taxes_id" widget="many2many_tags"
-                               domain="[('type_tax_use', '=', 'purchase'),('company_id','=',company_id)]"/>
                     </group>
                 </page>
             </notebook>
