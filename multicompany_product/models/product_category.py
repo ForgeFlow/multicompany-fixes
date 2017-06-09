@@ -13,7 +13,8 @@ class ProductCategory(models.Model):
 
     @api.multi
     def _set_properties(self):
-        prop_obj = self.env['ir.property'].with_context(force_company=self.company_id.id)
+        prop_obj = self.env['ir.property'].with_context(
+            force_company=self.company_id.id)
         for record in self:
             for property in record.property_ids:
                 property.set_properties(record, prop_obj)
@@ -44,7 +45,9 @@ class ProductCategoryProperty(models.TransientModel):
 
     @api.one
     def get_properties(self):
-        self.get_property_fields(self.categ_id, self.env['ir.property'].with_context(force_company=self.company_id.id))
+        self.get_property_fields(self.categ_id,
+                                 self.env['ir.property'].with_context(
+                                     force_company=self.company_id.id))
 
     @api.one
     def get_property_fields(self, object, properties):

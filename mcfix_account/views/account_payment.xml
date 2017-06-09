@@ -8,11 +8,8 @@
             <field name="journal_id" position="before">
                 <field name="company_id" widget="selection" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
             </field>
-            <field name="destination_journal_id" position="replace">
-                <field name="destination_journal_id" widget="selection"
-                       domain="[('company_id','=', company_id)]"
-                       attrs="{'required': [('payment_type', '=', 'transfer')], 'invisible': [('payment_type', '!=', 'transfer')], 'readonly': [('state', '!=', 'draft')]}"/>
-
+            <field name="destination_journal_id" position="attributes">
+                <attribute name="domain">[('company_id','=', company_id)]</attribute>
             </field>
         </field>
     </record>

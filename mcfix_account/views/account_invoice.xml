@@ -5,14 +5,14 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_supplier_form"/>
         <field name="arch" type="xml">
-            <button name="%(account.action_account_invoice_payment)d" position="replace">
-                <button name="action_account_invoice_payment" type="object" states="open" string="Register Payment"
-                        groups="account.group_account_invoice" class="oe_highlight"/>
+            <button name="%(account.action_account_invoice_payment)d"
+                    position="attributes">
+                <attribute name="context">{'default_company_id': company_id}</attribute>
             </button>
-            <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="replace">
-            </xpath>
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="options">{'no_create': True}</attribute>
+                <attribute name="groups">base.group_multi_company</attribute>
             </xpath>
         </field>
     </record>
@@ -26,14 +26,14 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
-            <button name="%(account.action_account_invoice_payment)d" position="replace">
-                <button name="action_account_invoice_payment" type="object" states="open" string="Register Payment"
-                        groups="account.group_account_invoice" class="oe_highlight"/>
+            <button name="%(account.action_account_invoice_payment)d"
+                    position="attributes">
+                <attribute name="context">{default_company_id': company_id}</attribute>
             </button>
-            <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="replace">
-            </xpath>
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+            <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="attributes">
+                <attribute name="invisible">0</attribute>
+                <attribute name="options">{'no_create': True}</attribute>
+                <attribute name="groups">base.group_multi_company</attribute>
             </xpath>
         </field>
     </record>

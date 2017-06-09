@@ -17,7 +17,8 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def _set_properties(self):
-        prop_obj = self.env['ir.property'].with_context(force_company=self.company_id.id)
+        prop_obj = self.env['ir.property'].with_context(
+            force_company=self.company_id.id)
         for record in self:
             for property in record.property_ids:
                 property.set_properties(record, prop_obj)
@@ -52,20 +53,25 @@ class ProductProperty(models.TransientModel):
         'Cost',
         digits=dp.get_precision('Product Price'),
         groups="base.group_user",
-        help="Cost of the product template used for standard stock valuation in accounting and used as a base price on purchase orders. "
+        help="Cost of the product template used for "
+             "standard stock valuation in accounting "
+             "and used as a base price on purchase orders. "
              "Expressed in the default unit of measure of the product.",
-        compute='get_properties',
+        compute='_compute_property_fields',
         readonly=False)
 
     @api.one
     def get_properties(self):
         self.get_property_fields(self.product_template_id,
-                                 self.env['ir.property'].with_context(force_company=self.company_id.id))
+                                 self.env['ir.property'].with_context(
+                                     force_company=self.company_id.id))
 
     @api.one
     def get_property_fields(self, object, properties):
-        self.standard_price = self.get_property_value('standard_price', object, properties)
+        self.standard_price = self.get_property_value('standard_price',
+                                                      object, properties)
 
     @api.model
     def set_properties(self, object, properties=False):
-        self.set_property(object, 'standard_price', self.standard_price, properties)
+        self.set_property(object, 'standard_price', self.standard_price,
+                          properties)

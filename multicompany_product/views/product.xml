@@ -5,11 +5,8 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="account.product_template_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@name='standard_price_uom']" position="replace">
-                <div name="standard_price_uom" groups="base.group_user">
-                    <field name="standard_price" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="1" class="oe_inline"/>
-                </div>
+            <xpath expr="//field[@name='standard_price']" position="attributes">
+                <attribute name="readonly">1</attribute>
             </xpath>
             <xpath expr="//page[@name='invoicing']" position="after">
                 <page string="Multi company" name="multicompany">

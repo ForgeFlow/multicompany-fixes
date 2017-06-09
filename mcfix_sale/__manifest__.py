@@ -10,9 +10,6 @@
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
     'depends': ['sale', 'mcfix_account'],
-    'data': [
-        'views/sale_views.xml'
-    ],
     'installable': True,
     'application': False,
     'auto_install': True,

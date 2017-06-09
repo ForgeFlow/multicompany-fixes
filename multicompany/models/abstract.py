@@ -13,7 +13,7 @@ class MulticomanyPropertyAbstract(models.AbstractModel):
     )
 
     @api.one
-    def get_properties(self):
+    def _compute_property_fields(self):
         raise MissingError('It must be redefined')
 
     # This is the function we will extend in order to generate the information
@@ -25,15 +25,6 @@ class MulticomanyPropertyAbstract(models.AbstractModel):
     @api.model
     def set_properties(self, object, properties=False):
         raise MissingError('It must be redefined')
-
-    def set_property(self, object, fieldname, value):
-        self.env['ir.property'].with_context(force_company=self.company_id.id).set_multi(
-            fieldname, object._name, {object.id: value}
-        )
-
-    def get_property_value(self, field, object):
-        return self.get_property_value(
-            field, object, self.env['ir.property'].with_context(force_company=self.company_id.id))
 
     def set_property(self, object, fieldname, value, properties):
         properties.set_multi(fieldname, object._name, {object.id: value})

@@ -12,17 +12,21 @@ class ProductProperty(models.TransientModel):
 
     project_id = fields.Many2one(
         comodel_name='project.project', string='Project',
-        compute='get_properties',
+        compute='_compute_property_fields',
         readonly=False,
-        help='Create a task under this project on sale order validation. This setting must be set for each company.')
+        help='Create a task under this project on sale '
+             'order validation. This setting must be set for each company.')
 
     type = fields.Selection(related='product_template_id.type')
-    track_service = fields.Selection(related='product_template_id.track_service')
+    track_service = fields.Selection(
+        related='product_template_id.track_service')
 
     @api.one
     def get_property_fields(self, object, properties):
-        super(ProductProperty, self).get_property_fields(object, properties)
-        self.project_id = self.get_property_value('project_id', object, properties)
+        super(ProductProperty, self).get_property_fields(
+            object, properties)
+        self.project_id = self.get_property_value('project_id',
+                                                  object, properties)
 
     @api.model
     def set_properties(self, object, properties=False):

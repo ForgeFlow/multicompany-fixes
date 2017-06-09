@@ -17,41 +17,49 @@ class ResPartnerProperty(models.TransientModel):
     property_account_payable_id = fields.Many2one(
         comodel_name='account.account',
         string="Account Payable",
-        domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False)]",
-        compute='get_properties',
+        domain="[('internal_type', '=', 'payable'), "
+               "('deprecated', '=', False)]",
+        compute='_compute_property_fields',
         readonly=False, store=False,
-        help="This account will be used instead of the default one as the payable account for the current partner",
+        help="This account will be used instead of the default "
+             "one as the payable account for the current partner",
         required=True
     )
     property_account_receivable_id = fields.Many2one(
         comodel_name='account.account',
         string="Account Receivable",
-        domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False)]",
-        compute='get_properties',
+        domain="[('internal_type', '=', 'receivable'), "
+               "('deprecated', '=', False)]",
+        compute='_compute_property_fields',
         readonly=False, store=False,
-        help="This account will be used instead of the default one as the receivable account for the current partner",
+        help="This account will be used instead of "
+             "the default one as the receivable account "
+             "for the current partner",
         required=True
     )
     property_account_position_id = fields.Many2one(
         comodel_name='account.fiscal.position',
         string="Fiscal Position",
-        compute='get_properties',
+        compute='_compute_property_fields',
         readonly=False, store=False,
-        help="The fiscal position will determine taxes and accounts used for the partner."
+        help="The fiscal position will determine taxes "
+             "and accounts used for the partner."
     )
     property_payment_term_id = fields.Many2one(
         comodel_name='account.payment.term',
         string='Customer Payment Terms',
-        compute='get_properties',
+        compute='_compute_property_fields',
         readonly=False, store=False,
-        help="This payment term will be used instead of the default one for sale orders and customer invoices"
+        help="This payment term will be used instead of the "
+             "default one for sale orders and customer invoices"
     )
     property_supplier_payment_term_id = fields.Many2one(
         comodel_name='account.payment.term',
         string='Vendor Payment Terms',
-        compute='get_properties',
+        compute='_compute_property_fields',
         readonly=False, store=False,
-        help="This payment term will be used instead of the default one for purchase orders and vendor bills")
+        help="This payment term will be used instead of the "
+             "default one for purchase orders and vendor bills")
 
     @api.one
     def get_property_fields(self, object, properties):

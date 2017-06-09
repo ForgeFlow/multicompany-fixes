@@ -11,3 +11,10 @@ class AccountPayment(models.Model):
         res = super(AccountPayment, self)._onchange_payment_type()
         res['domain']['journal_id'].append(('company_id', '=', self.company_id.id))
         return res
+
+    def create(self, vals):
+        if 'company_id' not in vals:
+            journal_id = vals.get('journal_id')
+            journal = self.env['account.journal'].browse(journal_id)
+            vals['company_id'] = journal.company_id.id
+        return super(AccountPayment, self).create(vals)

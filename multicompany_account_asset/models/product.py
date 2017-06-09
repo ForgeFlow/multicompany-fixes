@@ -14,13 +14,13 @@ class ProductProperty(models.TransientModel):
     asset_category_id = fields.Many2one(
         'account.asset.category',
         string='Asset Type',
-        compute='get_properties',
+        compute='_compute_property_fields',
         readonly=False,
         ondelete="restrict")
     deferred_revenue_category_id = fields.Many2one(
         'account.asset.category',
         string='Deferred Revenue Type',
-        compute='get_properties',
+        compute='_compute_property_fields',
         readonly=False,
         ondelete="restrict")
 

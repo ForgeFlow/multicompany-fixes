@@ -20,8 +20,10 @@ class AccountInvoice(models.Model):
     def _onchange_partner_id(self):
         super(AccountInvoice, self)._onchange_partner_id()
         addr = self.partner_id.address_get(['delivery'])
-        self.fiscal_position_id = self.env['account.fiscal.position'].with_context(
-            force_company=self.company_id.id).get_fiscal_position(self.partner_id.id, delivery_id=addr['delivery'])
+        self.fiscal_position_id = \
+            self.env['account.fiscal.position'].with_context(
+            force_company=self.company_id.id).get_fiscal_position(
+                self.partner_id.id, delivery_id=addr['delivery'])
 
     @api.multi
     def action_account_invoice_payment(self):
@@ -36,7 +38,8 @@ class AccountInvoice(models.Model):
             'view_mode': action.view_mode,
             'target': action.target,
             'res_model': action.res_model,
-            "context": {'default_invoice_ids': [(4, self.id, None)], 'default_company_id': self.company_id.id}
+            "context": {'default_invoice_ids': [(4, self.id, None)],
+                        'default_company_id': self.company_id.id}
         }
 
 
