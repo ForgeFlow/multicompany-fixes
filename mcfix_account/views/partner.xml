@@ -5,13 +5,13 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="account.view_partner_property_form"/>
         <field name="arch" type="xml">
-            <field name="property_account_position_id" position="attribute">
+            <field name="property_account_position_id" position="attributes">
                 <attribute name="domain">[('company_id','=',current_company_id)]</attribute>
             </field>
-            <field name="property_account_receivable_id" position="attribute">
+            <field name="property_account_receivable_id" position="attributes">
                 <attribute name="domain">[('internal_type', '=', 'receivable'), ('deprecated', '=', False),('company_id','=',current_company_id)]</attribute>
             </field>
-            <field name="property_account_payable_id" position="attribute">
+            <field name="property_account_payable_id" position="attributes">
                 <attribute name="domain">[('internal_type', '=', 'payable'), ('deprecated', '=', False),('company_id','=',current_company_id)]</attribute>
             </field>
         </field>

@@ -7,7 +7,9 @@
         <field name="arch" type="xml">
             <button name="%(account.action_account_invoice_payment)d"
                     position="attributes">
-                <attribute name="context">{'default_company_id': company_id}</attribute>
+                <attribute name="context">
+                    {'default_company_id': company_id, 'default_invoice_ids': [(4, active_id, None)]}
+                </attribute>
             </button>
             <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="attributes">
                 <attribute name="invisible">0</attribute>
@@ -28,7 +30,9 @@
         <field name="arch" type="xml">
             <button name="%(account.action_account_invoice_payment)d"
                     position="attributes">
-                <attribute name="context">{default_company_id': company_id}</attribute>
+                <attribute name="context">
+                    {'default_company_id': company_id, 'default_invoice_ids': [(4, active_id, None)]}
+                </attribute>
             </button>
             <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="attributes">
                 <attribute name="invisible">0</attribute>
