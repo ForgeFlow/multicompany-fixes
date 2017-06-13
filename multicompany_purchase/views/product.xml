@@ -5,12 +5,11 @@
         <field name="model">product.template.property</field>
         <field name="inherit_id" ref="multicompany_account.view_product_template_property_form"/>
         <field name="arch" type="xml">
-            <field name="supplier_taxes_id" position="after">
+            <group name="accounting_group" position="inside">
                 <field name="purchase_ok" invisible="1"/>
-                <label string="" colspan="2"/>
                 <field name="property_account_creditor_price_difference" domain="[('deprecated','=',False)]"
                        attrs="{'readonly':[('purchase_ok', '=', 0)]}"/>
-            </field>
+            </group>
         </field>
     </record>
 

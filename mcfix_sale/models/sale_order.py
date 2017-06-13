@@ -1,9 +1,18 @@
-from odoo import models, api, _
-from odoo.exceptions import UserError
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
 
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
+
+    @api.model
+    def default_get(self, fields):
+        rec = super(SaleOrder, self).default_get(fields)
+        team = self.env['crm.team']._get_default_team_id()
+        if team.company_id:
+            rec.update({
+                'company_id': team.company_id.id})
+        return rec
 
     @api.multi
     def _prepare_invoice(self):
@@ -38,6 +47,17 @@ class SaleOrder(models.Model):
         for line in self.order_line:
             line.change_company()
         return {}
+
+    @api.multi
+    @api.constrains('team_id', 'company_id')
+    def _check_team_company(self):
+        for rec in self:
+            if (rec.team_id and rec.team_id.company_id and
+                    rec.team_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the sales team '
+                                        'must match with that of the '
+                                        'quote/sales order'))
 
 
 class SaleOrderLine(models.Model):

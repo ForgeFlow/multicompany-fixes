@@ -9,18 +9,13 @@
                 <attribute name="domain">[('company_id','=',company_id)]</attribute>
             </field>
             <field name="account_asset_id" position="attributes">
-                <attribute name="domain">[('internal_type','=','other'), ('deprecated', '=',
-                    False),('company_id','=',company_id)]
-                </attribute>
+                <attribute name="domain">[('company_id','=',company_id)]</attribute>
             </field>
             <field name="account_depreciation_id" position="attributes">
-                <attribute name="domain">[('internal_type','=','other'), ('deprecated', '=',
-                    False),('company_id','=',company_id)]
-                </attribute>
+                <attribute name="domain">[('company_id','=',company_id)]</attribute>
             </field>
             <field name="account_depreciation_expense_id" position="attributes">
-                <attribute name="domain">[('internal_type','=','other'), ('deprecated', '=',
-                    False),('company_id','=',company_id)]
+                <attribute name="domain">[('company_id','=',company_id)]
                 </attribute>
             </field>
             <field name="account_analytic_id" position="attributes">

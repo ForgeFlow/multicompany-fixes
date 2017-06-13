@@ -2,12 +2,14 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Multi Company Fix Accounting',
-    'version': '1',
-    'summary': 'Creu Blanca configuration',
-    'author': 'Creu Blanca',
+    'version': '9.0.1.0.0',
+    'summary': 'Fixes ',
+    'author': 'Creu Blanca,'
+              'Eficent,'
+              'Odoo Community Association (OCA)',
     'sequence': 30,
     'description': "",
-    'category': 'Creu Blanca',
+    'category': 'Multicompany',
     'website': 'http://www.creublanca.es',
     'depends': ['account', 'payment', 'mcfix_product'],
     'data': [

@@ -19,7 +19,8 @@ class ResPartnerProperties(models.TransientModel):
 
     @api.one
     def get_property_fields(self, object, properties):
-        super(ResPartnerProperties, self).get_property_fields()
+        super(ResPartnerProperties, self).get_property_fields(object,
+                                                              properties)
         self.property_purchase_currency_id = \
             self.get_property_value('property_purchase_currency_id',
                                     object, properties)
