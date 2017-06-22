@@ -6,8 +6,6 @@ from odoo import models, fields, api
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    standard_price = fields.Float(readonly=True)
-
     property_ids = fields.One2many(
         comodel_name='product.template.property',
         compute='_get_properties',
@@ -17,25 +15,22 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def _set_properties(self):
-        prop_obj = self.env['ir.property'].with_context(
-            force_company=self.company_id.id)
-        for record in self:
-            for property in record.property_ids:
-                property.set_properties(record, prop_obj)
+        ''' Hack here: We do not really store any value here.
+        But this allows us to have the fields of the transient
+        model editable, '''
+        return
 
     @api.multi
     def _get_properties(self):
         for record in self:
             property_obj = self.env['product.template.property']
-            values = []
             companies = self.env['res.company'].search([])
             for company in companies:
                 val = property_obj.create({
-                    'product_template_id': record.id,
-                    'company_id': company.id
+                    'company_id': company.id,
+                    'product_template_id': record.id
                 })
-                values.append(val.id)
-            record.property_ids = values
+                record.property_ids += val
 
 
 class ProductProperty(models.TransientModel):
@@ -61,17 +56,29 @@ class ProductProperty(models.TransientModel):
         readonly=False)
 
     @api.one
-    def get_properties(self):
+    def _compute_property_fields(self):
         self.get_property_fields(self.product_template_id,
                                  self.env['ir.property'].with_context(
                                      force_company=self.company_id.id))
 
     @api.one
     def get_property_fields(self, object, properties):
-        self.standard_price = self.get_property_value('standard_price',
-                                                      object, properties)
+        if len(self.product_template_id.product_variant_ids) == 1:
+            variant = object.product_variant_ids[0]
+            self.standard_price = self.get_property_value('standard_price',
+                                                          variant, properties)
+        else:
+            self.standard_price = 0.0
 
-    @api.model
-    def set_properties(self, object, properties=False):
-        self.set_property(object, 'standard_price', self.standard_price,
-                          properties)
+    @api.multi
+    def write(self, vals):
+        prop_obj = self.env['ir.property'].with_context(
+            force_company=self.company_id.id)
+        if 'standard_price' in vals:
+            for rec in self:
+                if len(rec.product_template_id.product_variant_ids) == 1:
+                    for pv in rec.product_template_id.product_variant_ids:
+                        self.set_property(pv, 'standard_price',
+                                          vals['standard_price'], prop_obj)
+
+        return super(ProductProperty, self).write(vals)
