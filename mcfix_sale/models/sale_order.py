@@ -5,6 +5,22 @@ from odoo.exceptions import UserError, ValidationError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    @api.onchange('team_id')
+    def onchange_team_id(self):
+        if self.team_id.company_id:
+            self.company_id = self.team_id.company_id
+
+    @api.onchange('company_id')
+    def onchange_company_id_change_team_fiscal_position(self):
+        if self.team_id and self.team_id.company_id != \
+                self.company_id:
+            self.team_id = False
+        if self.fiscal_position_id and self.fiscal_position_id.company_id and \
+                        self.fiscal_position_id.company_id != self.company_id:
+            self.fiscal_position_id = self.env[
+                'account.fiscal.position'].get_fiscal_position(
+                self.partner_id.id, self.partner_shipping_id.id)
+
     @api.model
     def default_get(self, fields):
         rec = super(SaleOrder, self).default_get(fields)

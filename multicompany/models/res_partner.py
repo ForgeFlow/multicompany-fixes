@@ -13,11 +13,11 @@ class ResPartner(models.Model):
 
     @api.multi
     def _set_properties(self):
-        prop_obj = self.env['ir.property'].with_context(
-            force_company=self.company_id.id)
-        for record in self:
-            for property in record.property_ids:
-                property.set_properties(record, prop_obj)
+        ''' Hack here: We do not really store any value here.
+        But this allows us to have the fields of the transient
+        model editable, '''
+        return
+
 
     @api.multi
     def _get_properties(self):

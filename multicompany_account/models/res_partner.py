@@ -72,12 +72,18 @@ class ResPartnerProperty(models.TransientModel):
         self.property_supplier_payment_term_id = self.get_property_value('property_supplier_payment_term_id', object,
                                                                          properties)
 
-    @api.model
-    def set_properties(self, object, properties=False):
-        super(ResPartnerProperty, self).set_properties(object, properties)
-        self.set_property(object, 'property_account_payable_id', self.property_account_payable_id.id, properties)
-        self.set_property(object, 'property_account_receivable_id', self.property_account_receivable_id.id, properties)
-        self.set_property(object, 'property_account_position_id', self.property_account_position_id.id, properties)
-        self.set_property(object, 'property_payment_term_id', self.property_payment_term_id.id, properties)
-        self.set_property(object, 'property_supplier_payment_term_id', self.property_supplier_payment_term_id.id,
-                          properties)
+    @api.multi
+    def write(self, vals):
+        prop_obj = self.env['ir.property'].with_context(
+            force_company=self.company_id.id)
+        fields = ['property_account_payable_id',
+                  'property_account_receivable_id',
+                  'property_account_position_id',
+                  'property_payment_term_id',
+                  'property_supplier_payment_term_id']
+        for field in fields:
+            if field in vals:
+                for rec in self:
+                    self.set_property(rec.partner_id, field,
+                                      vals[field], prop_obj)
+        return super(ResPartnerProperty, self).write(vals)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'Multi Company Accounting',
+    'name': 'Multi Company Fix Sales Team',
     'version': '1',
     'summary': 'Creu Blanca configuration',
     'author': 'Creu Blanca',
@@ -9,14 +9,7 @@
     'description': "",
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['account', 'multicompany', 'multicompany_product', 'payment'],
-    'data': [
-        'views/partner.xml',
-        'views/product.xml',
-        'views/product_category.xml',
-        'views/company.xml',
-        'views/account_payment_term_view.xml'
-    ],
+    'depends': ['sales_team'],
     'installable': True,
     'application': False,
     'auto_install': True,
