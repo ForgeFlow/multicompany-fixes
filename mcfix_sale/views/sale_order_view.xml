@@ -34,6 +34,9 @@
             <field name="fiscal_position_id" position="attributes">
                 <attribute name="domain">['|', ('company_id', '=', company_id),('company_id', '=', False)]</attribute>
             </field>
+            <field name="payment_term_id" position="attributes">
+                <attribute name="domain">[('company_id', '=', company_id)]</attribute>
+            </field>
         </field>
     </record>
 

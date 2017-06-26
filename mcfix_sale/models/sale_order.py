@@ -10,8 +10,11 @@ class SaleOrder(models.Model):
         if self.team_id.company_id:
             self.company_id = self.team_id.company_id
 
+    @api.multi
     @api.onchange('company_id')
-    def onchange_company_id_change_team_fiscal_position(self):
+    def onchange_company_id(self):
+        res = self.with_context(
+            force_company=self.company_id.id).onchange_partner_id()
         if self.team_id and self.team_id.company_id != \
                 self.company_id:
             self.team_id = False
@@ -20,6 +23,7 @@ class SaleOrder(models.Model):
             self.fiscal_position_id = self.env[
                 'account.fiscal.position'].get_fiscal_position(
                 self.partner_id.id, self.partner_shipping_id.id)
+        return res
 
     @api.model
     def default_get(self, fields):
@@ -57,9 +61,10 @@ class SaleOrder(models.Model):
         """
         Trigger the change of fiscal position when the shipping address is modified.
         """
-        self.fiscal_position_id = self.with_context(force_company=self.company_id.id).env[
-            'account.fiscal.position'].get_fiscal_position(self.partner_id.id,
-                                                           self.partner_shipping_id.id)
+        self.fiscal_position_id = self.with_context(
+            force_company=self.company_id.id).env[
+            'account.fiscal.position'].get_fiscal_position(
+            self.partner_id.id, self.partner_shipping_id.id)
         for line in self.order_line:
             line.change_company()
         return {}

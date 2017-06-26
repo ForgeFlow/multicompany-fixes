@@ -15,7 +15,6 @@
         'views/product.xml',
         'views/product_category.xml',
         'views/company.xml',
-        'views/account_payment_term_view.xml'
     ],
     'installable': True,
     'application': False,

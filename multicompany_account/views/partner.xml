@@ -29,8 +29,10 @@
                                domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False),('company_id','=',company_id)]"/>
                         <field name="property_account_position_id"
                                domain="[('company_id','=',company_id)]"/>
-                        <field name="property_payment_term_id"/>
-                        <field name="property_supplier_payment_term_id"/>
+                        <field name="property_payment_term_id"
+                               domain="[('company_id','=',company_id)]"/>
+                        <field name="property_supplier_payment_term_id"
+                               domain="[('company_id','=',company_id)]"/>
                     </group>
                 </page>
             </notebook>
