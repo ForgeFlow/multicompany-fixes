@@ -6,8 +6,8 @@ from odoo import _, api, models
 from odoo.exceptions import ValidationError
 
 
-class CrmTeam(models.Model):
-    _inherit = 'crm.team'
+class ProductPricelist(models.Model):
+    _inherit = 'product.pricelist'
 
     @api.multi
     @api.constrains('company_id')
@@ -15,9 +15,10 @@ class CrmTeam(models.Model):
         for rec in self:
             if rec.company_id:
                 orders = self.env['sale.order'].search(
-                    [('team_id', '=', rec.id), ('company_id', '!=',
-                                                rec.company_id.id)], limit=1)
+                    [('pricelist_id', '=', rec.id), ('company_id', '!=',
+                                                     rec.company_id.id)],
+                    limit=1)
                 if orders:
                     raise ValidationError(_('Sales orders already exist '
-                                            'referencing this team in other '
-                                            'companies.'))
+                                            'referencing this pricelist in '
+                                            'other companies.'))

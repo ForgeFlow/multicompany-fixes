@@ -11,16 +11,28 @@ class SaleOrder(models.Model):
             self.company_id = self.team_id.company_id
 
     @api.multi
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        self.env.context = self.with_context(
+            force_company=self.company_id.id).env.context
+        return super(SaleOrder, self).onchange_partner_id()
+
+    @api.multi
     @api.onchange('company_id')
     def onchange_company_id(self):
-        res = self.with_context(
-            force_company=self.company_id.id).onchange_partner_id()
+        res = {}
+        if self.partner_id and not self.env['res.partner'].search([(
+                'id', '=', self.partner_id.id)]):
+            self.partner_id = False
+        if self.partner_id:
+            if self.partner_id.company_id != self.company_id:
+                self.partner_id = False
+            res = self.onchange_partner_id()
+    
         if self.team_id and self.team_id.company_id != \
                 self.company_id:
             self.team_id = False
-        if self.fiscal_position_id and self.fiscal_position_id.company_id and \
-                        self.fiscal_position_id.company_id != self.company_id:
-            self.fiscal_position_id = self.env[
+        self.fiscal_position_id = self.env[
                 'account.fiscal.position'].get_fiscal_position(
                 self.partner_id.id, self.partner_shipping_id.id)
         return res
@@ -110,3 +122,24 @@ class SaleOrderLine(models.Model):
             account = fpos.map_account(account)
         res['account_id'] = account.id
         return res
+
+    @api.multi
+    @api.constrains('tax_id', 'company_id')
+    def _check_tax_company(self):
+        for rec in self.sudo():
+            if (rec.tax_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the tax %s '
+                                        'must match with that of the '
+                                        'quote/sales order') % rec.tax_id.name)
+
+    @api.multi
+    @api.constrains('product_id', 'company_id')
+    def _check_product_company(self):
+        for rec in self.sudo():
+            if (rec.product_id and rec.product_id.company_id and
+                    rec.product_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the product '
+                                        'must match with that of the '
+                                        'order line %s') % rec.name)
