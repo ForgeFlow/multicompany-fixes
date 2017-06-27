@@ -127,7 +127,8 @@ class SaleOrderLine(models.Model):
     @api.constrains('tax_id', 'company_id')
     def _check_tax_company(self):
         for rec in self.sudo():
-            if (rec.tax_id.company_id != rec.company_id):
+            if (rec.tax_id.company_id and rec.tax_id.company_id !=
+                    rec.company_id):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the tax %s '
                                         'must match with that of the '
@@ -137,7 +138,7 @@ class SaleOrderLine(models.Model):
     @api.constrains('product_id', 'company_id')
     def _check_product_company(self):
         for rec in self.sudo():
-            if (rec.product_id and rec.product_id.company_id and
+            if (rec.product_id.company_id and
                     rec.product_id.company_id != rec.company_id):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the product '
