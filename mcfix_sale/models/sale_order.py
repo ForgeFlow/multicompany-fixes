@@ -5,6 +5,16 @@ from odoo.exceptions import UserError, ValidationError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    @api.model
+    def create(self, vals):
+        ''' Influence the default values in related comodels, if we reach to
+        this point an no value has yet been provided '''
+        if 'company_id' in vals:
+            updated_self = self.with_context(force_company=vals['company_id'])
+        else:
+            updated_self = self
+        return super(SaleOrder, updated_self).create(vals)
+
     @api.onchange('team_id')
     def onchange_team_id(self):
         if self.team_id.company_id:

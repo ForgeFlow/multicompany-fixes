@@ -6,14 +6,26 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     @api.model
+    def _default_warehouse_id(self):
+        res =super(SaleOrder, self)._default_warehouse_id()
+        if self.env.context.get('force_company', False):
+            company = self.env.context.get('force_company')
+            warehouse = self.env['stock.warehouse'].search(
+                [('company_id', '=', company)], limit=1)
+            return warehouse
+        return res
+
+    warehouse_id = fields.Many2one(default=_default_warehouse_id)
+
+    @api.model
     def default_get(self, fields):
         rec = super(SaleOrder, self).default_get(fields)
         if 'company_id' in rec and rec['company_id']:
-            warehouse_ids = self.env['stock.warehouse'].search(
+            warehouses = self.env['stock.warehouse'].search(
                 [('company_id', '=', rec['company_id'])], limit=1)
-            if warehouse_ids:
+            if warehouses:
                 rec.update({
-                    'warehouse_id': warehouse_ids[0].id})
+                    'warehouse_id': warehouses[0].id})
         return rec
 
     @api.onchange('team_id')

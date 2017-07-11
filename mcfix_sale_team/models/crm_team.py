@@ -12,8 +12,13 @@ class CrmTeam(models.Model):
     @api.model
     @api.returns('self', lambda value: value.id if value else False)
     def _get_default_team_id(self, user_id=None):
-        ''' Fix to cover the scenario where a user is assigned to a sales
-        team of another company that he does not have permissions on '''
         team = super(CrmTeam, self)._get_default_team_id(user_id=user_id)
         team = self.search([('id', '=', team.id)])
+        forced_company_id = self.env.context('force_company', False)
+        if forced_company_id and team.company_id.id != forced_company_id:
+            team = self.env['crm.team'].sudo().search([
+                '|', ('user_id', '=', user_id), ('member_ids', '=', user_id),
+                '|', ('company_id', '=', False),
+                ('company_id', '=', forced_company_id)
+            ], limit=1)
         return team
