@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+# Copyright 2017 Creu Blanca.
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl.html).
+
 {
-    'name': 'Multi Company',
-    'version': '1',
-    'summary': 'Creu Blanca configuration',
-    'author': 'Creu Blanca',
-    'sequence': 30,
-    'description': "",
-    'category': 'Creu Blanca',
-    'website': 'http://www.creublanca.es',
+    'name': 'Mcfix Base',
+    'version': '10.0.1.0.0',
+    'summary': 'Provides a base fix for multi-company management',
+    'author': 'Creu Blanca,'
+              'Odoo Community Association (OCA)',
+    'category': 'base',
+    'website': 'https://github.com/OCA/multi-company',
     'depends': ['base'],
     'data': [
         'views/res_partner.xml'

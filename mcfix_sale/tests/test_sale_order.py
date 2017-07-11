@@ -18,6 +18,12 @@ class TestSaleOrderMC(TestSale):
         self.company_2 = self.env['res.company'].create({
             'name': 'Company 2',
         })
+
+        self.partner1 = self.env['res.partner'].create({
+            'name': 'Test partner',
+            'company_id': False,
+            'customer': True,
+        })
         # Multi-company access rights
         group_user = self.env.ref('sales_team.group_sale_salesman')
         group_mc = self.env.ref('base.group_multi_company')
@@ -99,7 +105,7 @@ class TestSaleOrderMC(TestSale):
 
     def _create_sale_order(self, company, team):
         sale = self.env['sale.order'].create({
-            'partner_id': self.partner.id,
+            'partner_id': self.partner1.id,
             'company_id': company.id,
             'team_id': team.id,
         })
@@ -110,8 +116,9 @@ class TestSaleOrderMC(TestSale):
         # User in company 1
         self.user.write({'company_id': self.company.id})
         so_ids = self.env['sale.order'].sudo(self.user).search([
-            ('company_id', self.company_2.id)
+            ('company_id', '=', self.company_2.id)
         ])
-        self.assertEqual(so_ids, [], "A user in company %s shouldn't be able "
-                                     "to see %s sales orders" % (
-            self.user.company_id.name, self.company_2.name))
+        self.assertEqual(so_ids, self.env['sale.order'],
+                         "A user in company %s shouldn't be able "
+                         "to see %s sales orders" % (
+                             self.user.company_id.name, self.company_2.name))
