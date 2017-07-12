@@ -14,7 +14,7 @@ class CrmTeam(models.Model):
     def _get_default_team_id(self, user_id=None):
         team = super(CrmTeam, self)._get_default_team_id(user_id=user_id)
         team = self.search([('id', '=', team.id)])
-        forced_company_id = self.env.context('force_company', False)
+        forced_company_id = self.env.context.get('force_company', False)
         if forced_company_id and team.company_id.id != forced_company_id:
             team = self.env['crm.team'].sudo().search([
                 '|', ('user_id', '=', user_id), ('member_ids', '=', user_id),
