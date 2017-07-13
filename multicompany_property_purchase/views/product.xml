@@ -3,7 +3,7 @@
     <record id="view_multicompany_property_product_form" model="ir.ui.view">
         <field name="name">multicompany.property.product.form</field>
         <field name="model">multicompany.property.product</field>
-        <field name="inherit_id" ref="multicompany_account.view_multicompany_property_product_form"/>
+        <field name="inherit_id" ref="multicompany_property_account.view_multicompany_property_product_form"/>
         <field name="arch" type="xml">
             <group name="accounting_group" position="inside">
                 <field name="purchase_ok" invisible="1"/>

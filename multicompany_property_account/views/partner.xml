@@ -4,7 +4,7 @@
     <record id="view_partner_property_tree" model="ir.ui.view">
         <field name="name">res.partner.property.tree</field>
         <field name="model">res.partner.property</field>
-        <field name="inherit_id" ref="multicompany.view_partner_property_tree"/>
+        <field name="inherit_id" ref="multicompany_property.view_partner_property_tree"/>
         <field name="arch" type="xml">
             <field name="company_id" position="after">
                 <field name="property_account_payable_id"
@@ -18,7 +18,7 @@
     <record id="view_partner_property_form" model="ir.ui.view">
         <field name="name">res.partner.property.form</field>
         <field name="model">res.partner.property</field>
-        <field name="inherit_id" ref="multicompany.view_partner_property_form"/>
+        <field name="inherit_id" ref="multicompany_property.view_partner_property_form"/>
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page name="accounting" string="Accounting">
