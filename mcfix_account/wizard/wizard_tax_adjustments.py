@@ -9,9 +9,11 @@ class TaxAdjustments(models.TransientModel):
         required=True,
         default=lambda self: self.env.user.company_id
     )
-    journal_id = fields.Many2one('account.journal', string='Journal', required=True, default=False,
+    journal_id = fields.Many2one('account.journal', string='Journal',
+                                 required=True, default=False,
                                  domain=[('type', '=', 'general')])
-    company_currency_id = fields.Many2one(default=False, compute='_get_currency')
+    company_currency_id = fields.Many2one(default=False,
+                                          compute='_get_currency')
 
     @api.depends('company_id')
     @api.one

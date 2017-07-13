@@ -9,7 +9,7 @@
     'description': "",
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['product','mcfix_base'],
+    'depends': ['product', 'mcfix_base'],
     'data': [
         'views/product_views.xml'
     ],

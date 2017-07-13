@@ -27,11 +27,16 @@ class ProductProperty(models.TransientModel):
     @api.one
     def get_property_fields(self, object, properties):
         super(ProductProperty, self).get_property_fields(object, properties)
-        self.asset_category_id = self.get_property_value('asset_category_id', object, properties)
-        self.deferred_revenue_category_id = self.get_property_value('deferred_revenue_category_id', object, properties)
+        self.asset_category_id = self.get_property_value('asset_category_id',
+                                                         object, properties)
+        self.deferred_revenue_category_id =\
+            self.get_property_value('deferred_revenue_category_id', object,
+                                    properties)
 
     @api.model
     def set_properties(self, object, properties=False):
         super(ProductProperty, self).set_properties(object, properties)
-        self.set_property(object, 'asset_category_id', self.asset_category_id.id, properties)
-        self.set_property(object, 'deferred_revenue_category_id', self.deferred_revenue_category_id.id, properties)
+        self.set_property(object, 'asset_category_id',
+                          self.asset_category_id.id, properties)
+        self.set_property(object, 'deferred_revenue_category_id',
+                          self.deferred_revenue_category_id.id, properties)

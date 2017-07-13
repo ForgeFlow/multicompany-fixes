@@ -32,7 +32,8 @@ class MulticomanyPropertyAbstract(models.AbstractModel):
             fieldname, object._name, {object.id: value})
 
     def get_property_value(self, field, object, prop_obj):
-        value = prop_obj.get(field, object._name, (object._name + ',%s') % object.id)
+        value = prop_obj.get(field, object._name, (object._name + ',%s') %
+                             object.id)
         if value:
             if isinstance(value, list):
                 return value[0]

@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import api, models
 from odoo.exceptions import UserError
 
 
@@ -26,4 +26,6 @@ class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
     def auto_reconcile_lines(self):
-        return super(AccountMoveLine, self.with_context(check_move_validity=False)).auto_reconcile_lines()
+        return super(AccountMoveLine,
+                     self.with_context(check_move_validity=False)).\
+                        auto_reconcile_lines()

@@ -18,7 +18,6 @@ class ResPartner(models.Model):
         model editable, '''
         return
 
-
     @api.multi
     def _get_properties(self):
         for record in self:
