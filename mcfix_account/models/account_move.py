@@ -28,4 +28,4 @@ class AccountMoveLine(models.Model):
     def auto_reconcile_lines(self):
         return super(AccountMoveLine,
                      self.with_context(check_move_validity=False)).\
-                        auto_reconcile_lines()
+                     auto_reconcile_lines()

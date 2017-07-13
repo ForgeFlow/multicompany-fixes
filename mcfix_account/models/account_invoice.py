@@ -22,8 +22,8 @@ class AccountInvoice(models.Model):
         addr = self.partner_id.address_get(['delivery'])
         self.fiscal_position_id = self.env['account.fiscal.position'].\
             with_context(force_company=self.company_id.id).\
-                get_fiscal_position(self.partner_id.id,
-                                    delivery_id=addr['delivery'])
+            get_fiscal_position(self.partner_id.id,
+                                delivery_id=addr['delivery'])
 
 
 class AccountInvoiceLine(models.Model):

@@ -9,7 +9,8 @@
     'description': "",
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['multicompany_property_account', 'multicompany_property_stock'],
+    'depends': ['multicompany_property_account',
+                'multicompany_property_stock'],
     'data': [
         'views/product.xml',
         'views/product_category.xml',

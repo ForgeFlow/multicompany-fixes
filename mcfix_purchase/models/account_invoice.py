@@ -29,7 +29,7 @@ class AccountInvoice(models.Model):
                 ('type', '=', 'purchase'),
                 ('company_id', '=', self.company_id.id),
                 ('currency_id', '=', self.partner_id.
-                 with_context(force_company=self.company_id.id).\
+                 with_context(force_company=self.company_id.id).
                  property_purchase_currency_id.id),
             ]
             default_journal_id = self.env['account.journal'].search(
