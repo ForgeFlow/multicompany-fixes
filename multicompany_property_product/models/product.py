@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 import odoo.addons.decimal_precision as dp
-
 from odoo import models, fields, api
 
 
@@ -8,20 +8,20 @@ class ProductTemplate(models.Model):
 
     property_ids = fields.One2many(
         comodel_name='multicompany.property.product',
-        compute='_get_properties',
-        inverse='_set_properties',
+        compute='_compute_properties',
+        inverse='_inverse_properties',
         string='Properties'
     )
 
     @api.multi
-    def _set_properties(self):
+    def _inverse_properties(self):
         ''' Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
         model editable, '''
         return
 
     @api.multi
-    def _get_properties(self):
+    def _compute_properties(self):
         for record in self:
             property_obj = self.env['multicompany.property.product']
             companies = self.env['res.company'].search([])
@@ -38,20 +38,20 @@ class ProductProduct(models.Model):
 
     property_ids = fields.One2many(
         comodel_name='multicompany.property.product',
-        compute='_get_properties',
-        inverse='_set_properties',
+        compute='_compute_properties',
+        inverse='_inverse_properties',
         string='Properties'
     )
 
     @api.multi
-    def _set_properties(self):
+    def _inverse_properties(self):
         ''' Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
         model editable, '''
         return
 
     @api.multi
-    def _get_properties(self):
+    def _compute_properties(self):
         for record in self:
             property_obj = self.env['multicompany.property.product']
             companies = self.env['res.company'].search([])

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 
@@ -13,13 +14,14 @@ class TaxAdjustments(models.TransientModel):
                                  required=True, default=False,
                                  domain=[('type', '=', 'general')])
     company_currency_id = fields.Many2one(default=False,
-                                          compute='_get_currency')
+                                          compute='_compute_currency')
 
+    @api.multi
     @api.depends('company_id')
-    @api.one
-    def _get_currency(self):
-        self.company_currency_id = self.company_id.currency_id
-        self.debit_account_id = False
-        self.credit_account_id = False
-        self.journal_id = False
-        self.tax_id = False
+    def _compute_currency(self):
+        for tax in self:
+            tax.company_currency_id = tax.company_id.currency_id
+            tax.debit_account_id = False
+            tax.credit_account_id = False
+            tax.journal_id = False
+            tax.tax_id = False
