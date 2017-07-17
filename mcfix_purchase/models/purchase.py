@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, api
 
 
@@ -12,13 +13,13 @@ class PurchaseOrder(models.Model):
                 self.env['account.fiscal.position'].with_context(
                     force_company=self.company_id.id).get_fiscal_position(
                     self.partner_id.id)
-            self.payment_term_id = self.partner_id.with_context(
-                force_company=
-                self.company_id.id).property_supplier_payment_term_id.id
-            self.currency_id = self.partner_id.with_context(
-                force_company=
-                self.company_id.id).property_purchase_currency_id.id or \
-                self.env.user.company_id.currency_id.id
+            self.payment_term_id = self.partner_id.\
+                with_context(force_company=self.company_id.id).\
+                property_supplier_payment_term_id.id
+            self.currency_id = self.partner_id.\
+                with_context(force_company=self.company_id.id).\
+                property_purchase_currency_id.id or self.env.user.company_id.\
+                currency_id.id
         for line in self.order_line:
             line.onchange_product_id()
         return res
@@ -39,9 +40,9 @@ class PurchaseOrderLine(models.Model):
             self.company_id = self.order_id.company_id
         result = super(PurchaseOrderLine, self).onchange_product_id()
 
-        fpos = self.order_id.fiscal_position_id or self.order_id.with_context(
-            force_company=
-            self.company_id.id).partner_id.property_account_position_id
+        fpos = self.order_id.fiscal_position_id or self.order_id.\
+            with_context(force_company=self.company_id.id).\
+            partner_id.property_account_position_id
         taxes = self.product_id.supplier_taxes_id.filtered(
             lambda r: not self.company_id or r.company_id == self.company_id)
         self.taxes_id = fpos.map_tax(

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 
@@ -34,10 +35,12 @@ class ProductProperty(models.TransientModel):
     @api.one
     def get_property_fields(self, object, properties):
         super(ProductProperty, self).get_property_fields(object, properties)
-        self.property_account_income_id = self.get_property_value(
-            'property_account_income_id', object, properties)
-        self.property_account_expense_id = self.get_property_value(
-            'property_account_expense_id', object, properties)
+        self.property_account_income_id =\
+            self.get_property_value('property_account_income_id', object,
+                                    properties)
+        self.property_account_expense_id =\
+            self.get_property_value('property_account_expense_id', object,
+                                    properties)
 
     @api.model
     def set_properties(self, object, properties=False):

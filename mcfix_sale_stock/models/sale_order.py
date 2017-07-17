@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
@@ -7,7 +8,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def _default_warehouse_id(self):
-        res =super(SaleOrder, self)._default_warehouse_id()
+        res = super(SaleOrder, self)._default_warehouse_id()
         if self.env.context.get('force_company', False):
             company = self.env.context.get('force_company')
             warehouse = self.env['stock.warehouse'].search(

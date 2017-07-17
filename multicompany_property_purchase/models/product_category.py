@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
 from odoo import fields, models, api
 
 
 class ProductCategory(models.Model):
     _inherit = 'product.category'
 
-    property_account_creditor_price_difference_categ = fields.Many2one(readonly=True)
+    property_account_creditor_price_difference_categ =\
+        fields.Many2one(readonly=True)
 
 
 class ProductCategoryProperty(models.TransientModel):

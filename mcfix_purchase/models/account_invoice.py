@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import api, models
 
 
@@ -22,15 +23,15 @@ class AccountInvoice(models.Model):
         if not self.env.context.get('default_journal_id') and\
             self.partner_id and self.currency_id and\
             self.type in ['in_invoice', 'in_refund'] and\
-            self.currency_id != self.partner_id.with_context(
-                    force_company=
-                    self.company_id.id).property_purchase_currency_id:
+            self.currency_id != self.partner_id.\
+                with_context(force_company=self.company_id.id).\
+                property_purchase_currency_id:
             journal_domain = [
                 ('type', '=', 'purchase'),
                 ('company_id', '=', self.company_id.id),
-                ('currency_id', '=', self.partner_id.with_context(
-                    force_company=
-                    self.company_id.id).property_purchase_currency_id.id),
+                ('currency_id', '=', self.partner_id.
+                 with_context(force_company=self.company_id.id).
+                 property_purchase_currency_id.id),
             ]
             default_journal_id = self.env['account.journal'].search(
                 journal_domain, limit=1)

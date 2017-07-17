@@ -28,11 +28,11 @@ class TestSaleOrderMC(TestSale):
         group_user = self.env.ref('sales_team.group_sale_salesman')
         group_mc = self.env.ref('base.group_multi_company')
         self.manager.write({
-           'groups_id': [(4, group_mc.id)]
+            'groups_id': [(4, group_mc.id)]
         })
         self.user.write({
-           'groups_id': [(4, group_mc.id)],
-           'company_ids': [(4, self.company_2.id )]
+            'groups_id': [(4, group_mc.id)],
+            'company_ids': [(4, self.company_2.id)]
         })
         self.user_2 = self.env['res.users'].create({
             'name': 'Daisy User',
@@ -51,7 +51,6 @@ class TestSaleOrderMC(TestSale):
         self.team_1 = self._create_crm_team(self.user.id, self.company)
         self.team_2 = self._create_crm_team(self.user_2.id, self.company_2)
 
-
         self.pricelist_1 = self._create_pricelist(self.company)
         self.pricelist_2 = self._create_pricelist(self.company_2)
 
@@ -65,7 +64,8 @@ class TestSaleOrderMC(TestSale):
         self.payment_terms_2 = self._create_payment_terms(self.company_2)
 
         self.sale_order_1 = self._create_sale_order(self.company, self.team_1)
-        self.sale_order_2 = self._create_sale_order(self.company_2, self.team_2)
+        self.sale_order_2 = self._create_sale_order(self.company_2,
+                                                    self.team_2)
 
     def _create_crm_team(self, uid, company):
         """Create a crm team."""
@@ -120,5 +120,5 @@ class TestSaleOrderMC(TestSale):
         ])
         self.assertEqual(so_ids, self.env['sale.order'],
                          "A user in company %s shouldn't be able "
-                         "to see %s sales orders" % (
-                             self.user.company_id.name, self.company_2.name))
+                         "to see %s sales orders" % (self.user.company_id.name,
+                                                     self.company_2.name))

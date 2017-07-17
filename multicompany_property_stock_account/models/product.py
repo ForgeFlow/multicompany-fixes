@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import models, api, fields
 
 
@@ -23,7 +24,7 @@ class ProductProperty(models.TransientModel):
         help="If perpetual valuation is enabled for a product, "
              "the system will automatically create journal entries "
              "corresponding to stock moves, with product price "
-             "as specified by the 'Costing Method'" \
+             "as specified by the 'Costing Method'"
              "The inventory variation account set on the product "
              "category will represent the current inventory value, "
              "and the stock input and stock output account will "
@@ -35,14 +36,12 @@ class ProductProperty(models.TransientModel):
         ('real', 'Real Price')], string='Costing Method',
         compute='_compute_property_fields',
         readonly=False,
-        help="""Standard Price: The cost price is manually updated 
+        help="""Standard Price: The cost price is manually updated
         at the end of a specific period (usually once a year).
-                        Average Price: The cost price is recomputed 
-                        at each incoming shipment and used for the 
-                        product valuation.
-                        Real Price: The cost price displayed is the 
-                        price of the last outgoing product (will be 
-                        use in case of inventory loss for example).""")
+        Average Price: The cost price is recomputed at each incoming shipment
+        and used for the product valuation. Real Price: The cost price
+        displayed is the price of the last outgoing product (will be use in
+        case of inventory loss for example).""")
     property_stock_account_input = fields.Many2one(
         'account.account', 'Stock Input Account',
         domain=[('deprecated', '=', False)],

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import fields, models, api
 
 
@@ -64,13 +65,21 @@ class ResPartnerProperty(models.TransientModel):
     @api.one
     def get_property_fields(self, object, properties):
         super(ResPartnerProperty, self).get_property_fields(object, properties)
-        self.property_account_payable_id = self.get_property_value('property_account_payable_id', object, properties)
-        self.property_account_receivable_id = self.get_property_value('property_account_receivable_id', object,
-                                                                      properties)
-        self.property_account_position_id = self.get_property_value('property_account_position_id', object, properties)
-        self.property_payment_term_id = self.get_property_value('property_payment_term_id', object, properties)
-        self.property_supplier_payment_term_id = self.get_property_value('property_supplier_payment_term_id', object,
-                                                                         properties)
+        self.property_account_payable_id =\
+            self.get_property_value('property_account_payable_id', object,
+                                    properties)
+        self.property_account_receivable_id =\
+            self.get_property_value('property_account_receivable_id', object,
+                                    properties)
+        self.property_account_position_id =\
+            self.get_property_value('property_account_position_id', object,
+                                    properties)
+        self.property_payment_term_id =\
+            self.get_property_value('property_payment_term_id', object,
+                                    properties)
+        self.property_supplier_payment_term_id =\
+            self.get_property_value('property_supplier_payment_term_id',
+                                    object, properties)
 
     @api.multi
     def write(self, vals):

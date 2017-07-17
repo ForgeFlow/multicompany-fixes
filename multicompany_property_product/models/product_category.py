@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import fields, models, api
 
 
@@ -6,21 +7,21 @@ class ProductCategory(models.Model):
 
     property_ids = fields.One2many(
         comodel_name='product.category.property',
-        compute='_get_properties',
-        inverse='_set_properties',
+        compute='_compute_properties',
+        inverse='_inverse_properties',
         string='Properties'
     )
 
     @api.multi
-    def _set_properties(self):
+    def _inverse_properties(self):
         prop_obj = self.env['ir.property'].with_context(
             force_company=self.company_id.id)
         for record in self:
-            for property in record.property_ids:
-                property.set_properties(record, prop_obj)
+            for rec_property in record.property_ids:
+                rec_property.set_properties(record, prop_obj)
 
     @api.multi
-    def _get_properties(self):
+    def _compute_properties(self):
         for record in self:
             property_obj = self.env['product.category.property']
             values = []
