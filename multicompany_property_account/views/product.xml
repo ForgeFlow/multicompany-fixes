@@ -4,7 +4,7 @@
     <record id="view_multicompany_property_product_form" model="ir.ui.view">
         <field name="name">multicompany.property.product.form</field>
         <field name="model">multicompany.property.product</field>
-        <field name="inherit_id" ref="multicompany_product.view_multicompany_property_product_form"/>
+        <field name="inherit_id" ref="multicompany_property_product.view_multicompany_property_product_form"/>
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page name="accounting" string="Accounting">
