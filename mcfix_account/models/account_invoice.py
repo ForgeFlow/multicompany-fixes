@@ -31,7 +31,7 @@ class AccountInvoice(models.Model):
     def _check_company_payment_term(self):
         for invoice in self:
             if invoice.company_id and invoice.payment_term_id and\
-                invoice.company_id != invoice.payment_term_id.company_id:
+                    invoice.company_id != invoice.payment_term_id.company_id:
                 raise UserError(_('The Company in the Invoice and in '
                                   'Payment Term must be the same.'))
         return True
@@ -41,7 +41,7 @@ class AccountInvoice(models.Model):
     def _check_company_fiscal_position(self):
         for invoice in self:
             if invoice.company_id and invoice.fiscal_position_id and\
-                invoice.company_id != invoice.fiscal_position_id.company_id:
+                    invoice.company_id != invoice.fiscal_position_id.company_id:
                 raise UserError(_('The Company in the Invoice and in '
                                   'Fiscal Position must be the same.'))
         return True
@@ -51,7 +51,7 @@ class AccountInvoice(models.Model):
     def _check_company_account(self):
         for invoice in self:
             if invoice.company_id and invoice.account_id and\
-                invoice.company_id != invoice.account_id.company_id:
+                    invoice.company_id != invoice.account_id.company_id:
                 raise UserError(_('The Company in the Invoice and in '
                                   'Account must be the same.'))
         return True
@@ -61,7 +61,7 @@ class AccountInvoice(models.Model):
     def _check_company_journal(self):
         for invoice in self:
             if invoice.company_id and invoice.journal_id and\
-                invoice.company_id != invoice.journal_id.company_id:
+                    invoice.company_id != invoice.journal_id.company_id:
                 raise UserError(_('The Company in the Invoice and in '
                                   'Journal must be the same.'))
         return True
