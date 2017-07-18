@@ -41,7 +41,8 @@ class AccountInvoice(models.Model):
     def _check_company_fiscal_position(self):
         for invoice in self:
             if invoice.company_id and invoice.fiscal_position_id and\
-                    invoice.company_id != invoice.fiscal_position_id.company_id:
+                    invoice.company_id != invoice.fiscal_position_id.\
+                    company_id:
                 raise UserError(_('The Company in the Invoice and in '
                                   'Fiscal Position must be the same.'))
         return True
