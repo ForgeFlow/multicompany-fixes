@@ -11,6 +11,15 @@
                     {'default_company_id': company_id, 'default_invoice_ids': [(4, active_id, None)]}
                 </attribute>
             </button>
+            <field name="partner_id" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', company_id),('company_id', '=', False)]</attribute>
+            </field>
+            <field name="fiscal_position_id" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', company_id),('company_id', '=', False)]</attribute>
+            </field>
+            <field name="payment_term_id" position="attributes">
+                <attribute name="domain">[('company_id', '=', company_id)]</attribute>
+            </field>
             <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="attributes">
                 <attribute name="invisible">0</attribute>
                 <attribute name="options">{'no_create': True}</attribute>
@@ -34,6 +43,15 @@
                     {'default_company_id': company_id, 'default_invoice_ids': [(4, active_id, None)]}
                 </attribute>
             </button>
+            <field name="partner_id" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', company_id),('company_id', '=', False)]</attribute>
+            </field>
+            <field name="fiscal_position_id" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', company_id),('company_id', '=', False)]</attribute>
+            </field>
+            <field name="payment_term_id" position="attributes">
+                <attribute name="domain">[('company_id', '=', company_id)]</attribute>
+            </field>
             <xpath expr="/form/sheet/notebook/page/group/group/field[@name='company_id']" position="attributes">
                 <attribute name="invisible">0</attribute>
                 <attribute name="options">{'no_create': True}</attribute>
