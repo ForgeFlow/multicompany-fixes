@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-from odoo import models, api
+from odoo import api, models, _
+from odoo.exceptions import UserError
 
 
 class AccountInvoice(models.Model):
@@ -25,6 +25,46 @@ class AccountInvoice(models.Model):
             with_context(force_company=self.company_id.id).\
             get_fiscal_position(self.partner_id.id,
                                 delivery_id=addr['delivery'])
+
+    @api.multi
+    @api.constrains('payment_term_id', 'company_id')
+    def _check_company_payment_term(self):
+        for invoice in self:
+            if invoice.company_id and invoice.payment_term_id and\
+                invoice.company_id != invoice.payment_term_id.company_id:
+                raise UserError(_('The Company in the Invoice and in '
+                                  'Payment Term must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('fiscal_position_id', 'company_id')
+    def _check_company_fiscal_position(self):
+        for invoice in self:
+            if invoice.company_id and invoice.fiscal_position_id and\
+                invoice.company_id != invoice.fiscal_position_id.company_id:
+                raise UserError(_('The Company in the Invoice and in '
+                                  'Fiscal Position must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('account_id', 'company_id')
+    def _check_company_account(self):
+        for invoice in self:
+            if invoice.company_id and invoice.account_id and\
+                invoice.company_id != invoice.account_id.company_id:
+                raise UserError(_('The Company in the Invoice and in '
+                                  'Account must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('journal_id', 'company_id')
+    def _check_company_journal(self):
+        for invoice in self:
+            if invoice.company_id and invoice.journal_id and\
+                invoice.company_id != invoice.journal_id.company_id:
+                raise UserError(_('The Company in the Invoice and in '
+                                  'Journal must be the same.'))
+        return True
 
 
 class AccountInvoiceLine(models.Model):
