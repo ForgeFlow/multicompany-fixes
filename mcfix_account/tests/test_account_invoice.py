@@ -11,6 +11,8 @@ class TestAccountInvoiceMC(AccountTestUsers):
     def setUp(self):
         super(TestAccountInvoiceMC, self).setUp()
         self.res_users_model = self.env['res.users']
+        self.account_model = self.env['account.account']
+        self.journal_model = self.env['account.journal']
 
         # Company
         self.company = self.env.ref('base.main_company')
@@ -18,6 +20,25 @@ class TestAccountInvoiceMC(AccountTestUsers):
         # Company 2
         self.company_2 = self.env['res.company'].create({
             'name': 'Company 2',
+        })
+
+        # Create a cash account
+        user_type = self.env.ref('account.data_account_type_liquidity')
+        self.cash_account_id = self.account_model.create({
+            'name': 'Cash 1 - Test',
+            'code': 'test_cash_1',
+            'user_type_id': user_type.id,
+            'company_id': self.company.id,
+        })
+
+        # Create a journal for cash account
+        self.cash_journal = self.journal_model.create({
+            'name': 'Cash Journal 1 - Test',
+            'code': 'test_cash_1',
+            'type': 'cash',
+            'company_id': self.company.id,
+            'default_debit_account_id': self.cash_account_id.id,
+            'default_credit_account_id': self.cash_account_id.id,
         })
 
         self.pricelist_1 = self._create_pricelist(self.company)
@@ -69,16 +90,20 @@ class TestAccountInvoiceMC(AccountTestUsers):
             'company_id': company.id,
             'fiscal_position_id': self.fiscal_position_1.id,
             'payment_term_id': self.payment_term_1.id,
+            'journal_id': self.cash_journal.id
         })
         return invoice
 
     def test_invoice_company_consistency(self):
         # Assertion on the constraints to ensure the consistency
         # for company dependent fields
-        # Result: Warning
         with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'fiscal_position_id': self.fiscal_position_2.id})
         with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'payment_term_id': self.payment_term_2.id})
+        self.cash_journal.company_id = self.company_2.id
+        with self.assertRaises(ValidationError):
+            self.account_invoice.\
+                write({'journal_id': self.cash_journal.id})
