@@ -1,5 +1,5 @@
 from odoo import api, models, _
-from odoo.exceptions import Warning
+from odoo.exceptions import ValidationError
 
 
 class AccountInvoice(models.Model):
@@ -32,7 +32,7 @@ class AccountInvoice(models.Model):
         for invoice in self:
             if invoice.company_id and invoice.payment_term_id and\
                     invoice.company_id != invoice.payment_term_id.company_id:
-                raise Warning(_('The Company in the Invoice and in '
+                raise ValidationError(_('The Company in the Invoice and in '
                                 'Payment Term must be the same.'))
         return True
 
@@ -43,7 +43,7 @@ class AccountInvoice(models.Model):
             if invoice.company_id and invoice.fiscal_position_id and\
                     invoice.company_id != invoice.fiscal_position_id.\
                     company_id:
-                raise Warning(_('The Company in the Invoice and in '
+                raise ValidationError(_('The Company in the Invoice and in '
                                 'Fiscal Position must be the same.'))
         return True
 
@@ -53,7 +53,7 @@ class AccountInvoice(models.Model):
         for invoice in self:
             if invoice.company_id and invoice.account_id and\
                     invoice.company_id != invoice.account_id.company_id:
-                raise Warning(_('The Company in the Invoice and in '
+                raise ValidationError(_('The Company in the Invoice and in '
                                 'Account must be the same.'))
         return True
 
@@ -63,7 +63,7 @@ class AccountInvoice(models.Model):
         for invoice in self:
             if invoice.company_id and invoice.journal_id and\
                     invoice.company_id != invoice.journal_id.company_id:
-                raise Warning(_('The Company in the Invoice and in '
+                raise ValidationError(_('The Company in the Invoice and in '
                                 'Journal must be the same.'))
         return True
 

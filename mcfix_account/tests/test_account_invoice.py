@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo.addons.account.tests.account_test_users import AccountTestUsers
-from odoo.exceptions import Warning
+from odoo.exceptions import ValidationError
 
 
 class TestAccountInvoiceMC(AccountTestUsers):
@@ -76,9 +76,9 @@ class TestAccountInvoiceMC(AccountTestUsers):
         # Assertion on the constraints to ensure the consistency
         # for company dependent fields
         # Result: Warning
-        with self.assertRaises(Warning):
+        with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'fiscal_position_id': self.fiscal_position_2.id})
-        with self.assertRaises(Warning):
+        with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'payment_term_id': self.payment_term_2.id})
