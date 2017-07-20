@@ -33,7 +33,7 @@ class AccountInvoice(models.Model):
             if invoice.company_id and invoice.payment_term_id and\
                     invoice.company_id != invoice.payment_term_id.company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
-                                'Payment Term must be the same.'))
+                                        'Payment Term must be the same.'))
         return True
 
     @api.multi
@@ -44,7 +44,7 @@ class AccountInvoice(models.Model):
                     invoice.company_id != invoice.fiscal_position_id.\
                     company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
-                                'Fiscal Position must be the same.'))
+                                        'Fiscal Position must be the same.'))
         return True
 
     @api.multi
@@ -54,7 +54,7 @@ class AccountInvoice(models.Model):
             if invoice.company_id and invoice.account_id and\
                     invoice.company_id != invoice.account_id.company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
-                                'Account must be the same.'))
+                                        'Account must be the same.'))
         return True
 
     @api.multi
@@ -64,7 +64,7 @@ class AccountInvoice(models.Model):
             if invoice.company_id and invoice.journal_id and\
                     invoice.company_id != invoice.journal_id.company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
-                                'Journal must be the same.'))
+                                        'Journal must be the same.'))
         return True
 
 
