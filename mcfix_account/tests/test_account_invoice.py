@@ -103,7 +103,8 @@ class TestAccountInvoiceMC(AccountTestUsers):
         with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'payment_term_id': self.payment_term_2.id})
-        self.cash_journal.company_id = self.company_2.id
+        with self.assertRaises(ValidationError):
+            self.cash_journal.company_id = self.company_2.id
         with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'journal_id': self.cash_journal.id})

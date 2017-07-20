@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, api
+from odoo import api, models, _
+from odoo.exceptions import ValidationError
 
 
 class AccountJournal(models.Model):
@@ -18,3 +19,25 @@ class AccountJournal(models.Model):
             name = "%s [%s]" % (journal_name[1], journal.company_id.name)
             res += [(journal.id, name)]
         return res
+
+    @api.multi
+    @api.constrains('default_debit_account_id', 'company_id')
+    def _check_company_debit_account(self):
+        for journal in self:
+            if journal.company_id and journal.default_debit_account_id and\
+                    journal.company_id != journal.default_debit_account_id.\
+                    company_id:
+                raise ValidationError(_('The Company in the Journal and in '
+                                        'Debit Account must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('default_credit_account_id', 'company_id')
+    def _check_company_credit_account(self):
+        for journal in self:
+            if journal.company_id and journal.default_credit_account_id and\
+                    journal.company_id != journal.default_credit_account_id.\
+                    company_id:
+                raise ValidationError(_('The Company in the Journal and in '
+                                        'Credit Account must be the same.'))
+        return True
