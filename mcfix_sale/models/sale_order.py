@@ -42,6 +42,8 @@ class SaleOrder(models.Model):
 
         if self.team_id and self.team_id.company_id != self.company_id:
             self.team_id = False
+        if self.user_id and self.user_id.company_id != self.company_id:
+            self.user_id = False
         self.fiscal_position_id = self.env['account.fiscal.position'].\
             get_fiscal_position(self.partner_id.id,
                                 self.partner_shipping_id.id)
