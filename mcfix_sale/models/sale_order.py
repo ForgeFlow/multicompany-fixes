@@ -109,6 +109,17 @@ class SaleOrder(models.Model):
                                         'must match with that of the '
                                         'quote/sales order'))
 
+    @api.multi
+    @api.constrains('partner_id', 'company_id')
+    def _check_partner_company(self):
+        for rec in self:
+            if (rec.partner_id and rec.partner_id.company_id and
+                    rec.partner_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the Partner '
+                                        'must match with that of the '
+                                        'quotation/sales order'))
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

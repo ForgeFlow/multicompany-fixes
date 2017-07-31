@@ -67,11 +67,12 @@ class TestSaleOrderMC(TestSale):
 
     def _create_partner(self, company):
         "Create a Partner"
-        self.partner1 = self.env['res.partner'].create({
+        partner = self.env['res.partner'].create({
             'name': 'Test partner',
             'company_id': company.id,
             'customer': True,
         })
+        return partner
 
     def _create_crm_team(self, uid, company):
         """Create a crm team."""
@@ -110,7 +111,7 @@ class TestSaleOrderMC(TestSale):
 
     def _create_sale_order(self, company, team):
         sale = self.env['sale.order'].create({
-            'partner_id': self.partner1.id,
+            'partner_id': self.partner_1.id,
             'company_id': company.id,
             'team_id': team.id,
 #            'user_id': user.id,
@@ -134,7 +135,7 @@ class TestSaleOrderMC(TestSale):
         # on company dependent fields
         with self.assertRaises(ValidationError):
             self.sale_order_1.\
-                write({'partner_id': self.self.partner_2.id})
+                write({'partner_id': self.partner_2.id})
 #        with self.assertRaises(ValidationError):
 #            self.sale_order_1.\
 #                write({'payment_term_id': self.payment_term_2.id})
