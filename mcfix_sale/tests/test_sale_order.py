@@ -3,6 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo.addons.sale.tests.test_sale_common import TestSale
+from odoo.exceptions import ValidationError
 
 
 class TestSaleOrderMC(TestSale):
@@ -10,7 +11,6 @@ class TestSaleOrderMC(TestSale):
     def setUp(self):
         super(TestSaleOrderMC, self).setUp()
         self.res_users_model = self.env['res.users']
-
         # Company
         self.company = self.env.ref('base.main_company')
 
@@ -19,11 +19,6 @@ class TestSaleOrderMC(TestSale):
             'name': 'Company 2',
         })
 
-        self.partner1 = self.env['res.partner'].create({
-            'name': 'Test partner',
-            'company_id': False,
-            'customer': True,
-        })
         # Multi-company access rights
         group_user = self.env.ref('sales_team.group_sale_salesman')
         group_mc = self.env.ref('base.group_multi_company')
@@ -46,7 +41,10 @@ class TestSaleOrderMC(TestSale):
             'company_ids': [(4, self.company_2.id)],
         })
 
-        # Create crm teams for both companies
+        # Create records for both companies
+        self.partner_1 = self._create_partner(self.company)
+        self.partner_2 = self._create_partner(self.company_2)
+
         self.crm_team_model = self.env['crm.team']
         self.team_1 = self._create_crm_team(self.user.id, self.company)
         self.team_2 = self._create_crm_team(self.user_2.id, self.company_2)
@@ -67,12 +65,19 @@ class TestSaleOrderMC(TestSale):
         self.sale_order_2 = self._create_sale_order(self.company_2,
                                                     self.team_2)
 
+    def _create_partner(self, company):
+        "Create a Partner"
+        self.partner1 = self.env['res.partner'].create({
+            'name': 'Test partner',
+            'company_id': company.id,
+            'customer': True,
+        })
+
     def _create_crm_team(self, uid, company):
         """Create a crm team."""
-        crm = self.crm_team_model.create({'name': 'CRM team',
-                                          'company_id': company.id,
-                                         'mail_create_nosubscribe': True})
-        return crm
+        crm_team = self.crm_team_model.create({'name': 'CRM team',
+                                          'company_id': company.id})
+        return crm_team
 
     def _create_pricelist(self, company):
         pricelist = self.env['product.pricelist'].create({
@@ -108,6 +113,7 @@ class TestSaleOrderMC(TestSale):
             'partner_id': self.partner1.id,
             'company_id': company.id,
             'team_id': team.id,
+#            'user_id': user.id,
         })
         return sale
 
@@ -122,3 +128,19 @@ class TestSaleOrderMC(TestSale):
                          "A user in company %s shouldn't be able "
                          "to see %s sales orders" % (self.user.company_id.name,
                                                      self.company_2.name))
+
+    def test_sale_order_company_consistency(self):
+        # Assertion on the constraints to ensure the consistency
+        # on company dependent fields
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.\
+                write({'partner_id': self.self.partner_2.id})
+#        with self.assertRaises(ValidationError):
+#            self.sale_order_1.\
+#                write({'payment_term_id': self.payment_term_2.id})
+#        with self.assertRaises(ValidationError):
+#            self.cash_journal.\
+#                write({'company_id': self.company_2.id})
+#        with self.assertRaises(ValidationError):
+#            self.account_invoice.\
+#                write({'journal_id': self.cash_journal.id})
