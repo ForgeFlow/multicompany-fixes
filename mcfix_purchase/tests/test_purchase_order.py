@@ -23,8 +23,19 @@ class TestPurchaseOrderMC(TestPurchaseOrder):
         })
 
         # Products
-        self.product1 = self.env.ref('product.product_product_7')
-        self.product2 = self.env.ref('product.product_product_6')
+        self.uom_unit = self.env.ref('product.product_uom_unit')
+
+        self.product_model = self.env['product.product']
+        self.product1 = self.product_model.create(
+            {'name': 'Product A',
+             'uom_id': self.uom_unit.id,
+             'lst_price': 1000,
+             'uom_po_id': self.uom_unit.id})
+        self.product2 = self.product_model.create(
+            {'name': 'Product B',
+             'uom_id': self.uom_unit.id,
+             'lst_price': 3000,
+             'uom_po_id': self.uom_unit.id})
         self.product2.write({'company_id': self.company_2.id})
 
         # Account
