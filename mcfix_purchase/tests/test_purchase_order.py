@@ -66,7 +66,8 @@ class TestPurchaseOrderMC(TestPurchaseOrder):
                                                self.partner_1)
 
         self.purchase1.button_confirm()
-        self._create_invoice(self.purchase1, self.partner_1, self.cash_account_id)
+        self._create_invoice(self.purchase1, self.partner_1,
+                             self.cash_account_id)
 
     def _create_purchase(self, company, product, tax, partner):
         """ Create a purchase order.
