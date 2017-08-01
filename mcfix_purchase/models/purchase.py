@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, api
+from odoo import api, models, _
+from odoo.exceptions import ValidationError
 
 
 class PurchaseOrder(models.Model):
@@ -60,9 +61,9 @@ class PurchaseOrder(models.Model):
                     rec.fiscal_position_id.company_id and
                     rec.fiscal_position_id.company_id != rec.company_id):
                 raise ValidationError(_('Configuration error\n'
-                                        'The Company of the fiscal position '
+                                        'The Company of the Fiscal position '
                                         'must match with that of the '
-                                        'quote/sales order'))
+                                        'RFQ/Purchase order'))
 
 
 class PurchaseOrderLine(models.Model):
@@ -88,23 +89,23 @@ class PurchaseOrderLine(models.Model):
         return result
 
     @api.multi
-    @api.constrains('tax_id', 'company_id')
+    @api.constrains('taxes_id', 'company_id')
     def _check_tax_company(self):
         for rec in self.sudo():
-            if (rec.tax_id.company_id and rec.tax_id.company_id !=
-                    rec.company_id):
+            if (rec.taxes_id and rec.taxes_id.company_id and
+                    rec.taxes_id.company_id != rec.company_id):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the tax %s '
                                         'must match with that of the '
-                                        'quote/sales order') % rec.tax_id.name)
+                                        'RFQ/Purchase order') % rec.taxes_id.name)
 
     @api.multi
     @api.constrains('product_id', 'company_id')
     def _check_product_company(self):
         for rec in self.sudo():
-            if (rec.product_id.company_id and
+            if (rec.product_id and rec.product_id.company_id and
                     rec.product_id.company_id != rec.company_id):
                 raise ValidationError(_('Configuration error\n'
-                                        'The Company of the product '
+                                        'The Company of the product %s'
                                         'must match with that of the '
-                                        'order line %s') % rec.name)
+                                        'RFQ/Purchase order') % rec.product_id.name)
