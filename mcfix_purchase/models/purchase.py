@@ -107,7 +107,7 @@ class PurchaseOrderLine(models.Model):
             if (rec.product_id and rec.product_id.company_id and
                     rec.product_id.company_id != rec.company_id):
                 raise ValidationError(_('Configuration error\n'
-                                        'The Company of the product %s'
+                                        'The Company of the product %s '
                                         'must match with that of the '
                                         'RFQ/Purchase order') %
                                       rec.product_id.name)
