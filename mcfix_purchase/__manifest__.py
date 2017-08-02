@@ -12,7 +12,8 @@
     'website': 'http://www.creublanca.es',
     'depends': ['purchase', 'mcfix_account'],
     'data': [
-        'views/product.xml'
+        'views/product.xml',
+        'views/purchase_order_view.xml'
     ],
     'installable': True,
     'application': False,
