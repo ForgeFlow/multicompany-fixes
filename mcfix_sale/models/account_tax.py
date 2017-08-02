@@ -16,7 +16,7 @@ class AccountTax(models.Model):
             if rec.company_id:
                 orders_lines = self.env['sale.order.line'].search(
                     [('tax_id', 'in', [rec.id]),
-                    ('company_id', '!=', rec.company_id.id)], limit=1)
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
 
                 if orders_lines:
                     raise ValidationError(_('Sales order lines already exist '
