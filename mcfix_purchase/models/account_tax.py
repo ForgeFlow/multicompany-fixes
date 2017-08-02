@@ -15,7 +15,8 @@ class AccountTax(models.Model):
         for rec in self:
             if rec.company_id:
                 orders_lines = self.env['purchase.order.line'].search(
-                    [('taxes_id', 'in', [rec.id])], limit=1)
+                    [('taxes_id', 'in', [rec.id]),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
 
                 if orders_lines:
                     raise ValidationError(_('Purchase order lines already '
