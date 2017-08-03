@@ -18,6 +18,6 @@ class AccountInvoiceLine(models.Model):
                     [('invoice_lines', 'in', [rec.id]),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if order_lines:
-                    raise ValidationError(_('Purchase order lines already exist '
-                                            'referencing this invoice line '
-                                            'in other companies.'))
+                    raise ValidationError(_('Purchase order lines already '
+                                            'exist referencing this invoice '
+                                            'line in other companies.'))
