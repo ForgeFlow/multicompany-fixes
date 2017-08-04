@@ -33,18 +33,18 @@ class SaleOrder(models.Model):
     def onchange_team_id_change_warehouse(self):
         super(SaleOrder, self).onchange_team_id()
         if self.team_id and self.team_id.company_id:
-            warehouses = self.env['stock.warehouse'].search(
+            warehouse = self.env['stock.warehouse'].search(
                 [('company_id', '=', self.team_id.company_id.id)], limit=1)
-            if warehouses:
-                self.warehouse_id = warehouses[0]
+            if warehouse:
+                self.warehouse_id = warehouse
 
     @api.onchange('company_id')
     def onchange_company_id(self):
         res = super(SaleOrder, self).onchange_company_id()
-        warehouses = self.env['stock.warehouse'].search(
+        warehouse = self.env['stock.warehouse'].search(
             [('company_id', '=', self.company_id.id)], limit=1)
-        if warehouses:
-            self.warehouse_id = warehouses[0]
+        if warehouse:
+            self.warehouse_id = warehouse
         return res
 
     @api.onchange('warehouse_id')
@@ -60,15 +60,5 @@ class SaleOrder(models.Model):
                     rec.warehouse_id.company_id != rec.company_id):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the warehouse '
-                                        'must match with that of the '
-                                        'quote/sales order'))
-
-    @api.constrains('partner_id', 'company_id')
-    def _check_partner_company(self):
-        for rec in self.sudo():
-            if (rec.partner_id.company_id and
-                    rec.partner_id.company_id != rec.company_id):
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the partner '
                                         'must match with that of the '
                                         'quote/sales order'))
