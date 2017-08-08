@@ -107,6 +107,51 @@ class SaleOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the sales team '
                                         'must match with that of the '
+                                        'Quotation/Sales order'))
+
+    @api.multi
+    @api.constrains('partner_id', 'company_id')
+    def _check_partner_company(self):
+        for rec in self:
+            if (rec.partner_id and rec.partner_id.company_id and
+                    rec.partner_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the Partner '
+                                        'must match with that of the '
+                                        'Quotation/Sales order'))
+
+    @api.multi
+    @api.constrains('payment_term_id', 'company_id')
+    def _check_payment_term_company(self):
+        for rec in self:
+            if (rec.payment_term_id and rec.payment_term_id.company_id and
+                    rec.payment_term_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the Payment Term '
+                                        'must match with that of the '
+                                        'Quotation/Sales order'))
+
+    @api.multi
+    @api.constrains('user_id', 'company_id')
+    def _check_sales_user_company(self):
+        for rec in self:
+            if (rec.user_id and rec.user_id.company_id and
+                    rec.user_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the salesperson '
+                                        'must match with that of the '
+                                        'Quotation/Sales order'))
+
+    @api.multi
+    @api.constrains('fiscal_position_id', 'company_id')
+    def _check_fiscal_position_company(self):
+        for rec in self:
+            if (rec.fiscal_position_id and
+                    rec.fiscal_position_id.company_id and
+                    rec.fiscal_position_id.company_id != rec.company_id):
+                raise ValidationError(_('Configuration error\n'
+                                        'The Company of the fiscal position '
+                                        'must match with that of the '
                                         'quote/sales order'))
 
 
