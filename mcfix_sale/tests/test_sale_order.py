@@ -3,6 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo.addons.sale.tests.test_sale_common import TestSale
+from odoo.exceptions import ValidationError
 
 
 class TestSaleOrderMC(TestSale):
@@ -10,7 +11,6 @@ class TestSaleOrderMC(TestSale):
     def setUp(self):
         super(TestSaleOrderMC, self).setUp()
         self.res_users_model = self.env['res.users']
-
         # Company
         self.company = self.env.ref('base.main_company')
 
@@ -19,11 +19,11 @@ class TestSaleOrderMC(TestSale):
             'name': 'Company 2',
         })
 
-        self.partner1 = self.env['res.partner'].create({
-            'name': 'Test partner',
-            'company_id': False,
-            'customer': True,
-        })
+        # Products
+        self.product1 = self.env.ref('product.product_product_7')
+        self.product2 = self.env.ref('product.product_product_8')
+        self.product2.write({'company_id': self.company_2.id})
+
         # Multi-company access rights
         group_user = self.env.ref('sales_team.group_sale_salesman')
         group_mc = self.env.ref('base.group_multi_company')
@@ -45,8 +45,21 @@ class TestSaleOrderMC(TestSale):
         self.user_2.write({
             'company_ids': [(4, self.company_2.id)],
         })
+        self.user_3 = self.env['res.users'].create({
+            'name': 'Daisy User',
+            'login': 'user_3',
+            'email': 'sample@example.com',
+            'signature': '--\nSample',
+            'notify_email': 'always',
+            'company_id': self.company_2.id,
+            'company_ids': [(4, self.company_2.id)],
+            'groups_id': [(6, 0, [group_user.id, group_mc.id])],
+        })
 
-        # Create crm teams for both companies
+        # Create records for both companies
+        self.partner_1 = self._create_partner(self.company)
+        self.partner_2 = self._create_partner(self.company_2)
+
         self.crm_team_model = self.env['crm.team']
         self.team_1 = self._create_crm_team(self.user.id, self.company)
         self.team_2 = self._create_crm_team(self.user_2.id, self.company_2)
@@ -63,16 +76,34 @@ class TestSaleOrderMC(TestSale):
         self.payment_terms_1 = self._create_payment_terms(self.company)
         self.payment_terms_2 = self._create_payment_terms(self.company_2)
 
-        self.sale_order_1 = self._create_sale_order(self.company, self.team_1)
+        self.sale_order_1 = self._create_sale_order(self.company,
+                                                    self.product1,
+                                                    self.tax_1,
+                                                    self.partner_1,
+                                                    self.team_1,
+                                                    self.user_2)
         self.sale_order_2 = self._create_sale_order(self.company_2,
-                                                    self.team_2)
+                                                    self.product2,
+                                                    self.tax_2,
+                                                    self.partner_2,
+                                                    self.team_2,
+                                                    self.user_3)
+
+    def _create_partner(self, company):
+        "Create a Partner"
+        partner = self.env['res.partner'].create({
+            'name': 'Test partner',
+            'company_id': company.id,
+            'customer': True,
+        })
+        return partner
 
     def _create_crm_team(self, uid, company):
         """Create a crm team."""
-        crm = self.crm_team_model.create({'name': 'CRM team',
-                                          'company_id': company.id,
-                                         'mail_create_nosubscribe': True})
-        return crm
+        crm_team = self.crm_team_model.with_context(
+            mail_create_nosubscribe=True).create({'name': 'CRM team',
+                                                  'company_id': company.id})
+        return crm_team
 
     def _create_pricelist(self, company):
         pricelist = self.env['product.pricelist'].create({
@@ -103,11 +134,15 @@ class TestSaleOrderMC(TestSale):
         })
         return terms
 
-    def _create_sale_order(self, company, team):
+    def _create_sale_order(self, company, product, tax, partner, team, user):
         sale = self.env['sale.order'].create({
-            'partner_id': self.partner1.id,
+            'partner_id': partner.id,
             'company_id': company.id,
             'team_id': team.id,
+            'user_id': user.id,
+            'order_line': [(0, 0, {'product_id': product.id,
+                                   'tax_id': [(6, 0, [tax.id])],
+                                   'name': 'Sale Order Line'})]
         })
         return sale
 
@@ -122,3 +157,28 @@ class TestSaleOrderMC(TestSale):
                          "A user in company %s shouldn't be able "
                          "to see %s sales orders" % (self.user.company_id.name,
                                                      self.company_2.name))
+
+    def test_sale_order_company_consistency(self):
+        # Assertion on the constraints to ensure the consistency
+        # on company dependent fields
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.\
+                write({'partner_id': self.partner_2.id})
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.\
+                write({'payment_term_id': self.payment_terms_2.id})
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.\
+                write({'team_id': self.team_2.id})
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.\
+                write({'user_id': self.user_3.id})
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.\
+                write({'fiscal_position_id': self.fiscal_position_2.id})
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.order_line.\
+                write({'tax_id': [(6, 0, [self.tax_2.id])]})
+        with self.assertRaises(ValidationError):
+            self.sale_order_1.order_line.\
+                write({'product_id': self.product2.id})

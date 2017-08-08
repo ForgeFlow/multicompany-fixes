@@ -11,15 +11,15 @@ class AccountTax(models.Model):
 
     @api.multi
     @api.constrains('company_id')
-    def _check_sales_order_company(self):
+    def _check_purchase_order_company(self):
         for rec in self:
             if rec.company_id:
-                orders_lines = self.env['sale.order.line'].search(
-                    [('tax_id', 'in', [rec.id]),
+                orders_lines = self.env['purchase.order.line'].search(
+                    [('taxes_id', 'in', [rec.id]),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
 
                 if orders_lines:
-                    raise ValidationError(_('Sales order lines already exist '
-                                            'referencing this tax in '
+                    raise ValidationError(_('Purchase order lines already '
+                                            'exist referencing this tax in '
                                             'other company : %s.') %
                                           orders_lines.company_id.name)
