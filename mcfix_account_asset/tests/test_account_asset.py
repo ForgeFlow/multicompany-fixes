@@ -19,7 +19,7 @@ class TestAccountAssetMC(TransactionCase):
 
         self.company_2 = self.env['res.company'].\
             create({'name': 'Company 2',
-                    'parent_id' : self.company.id})
+                    'parent_id': self.company.id})
 
         self.cash_journal = self._create_journal(self.company)
 
@@ -29,16 +29,19 @@ class TestAccountAssetMC(TransactionCase):
 
         self.journal_id = self.env['account.journal'].\
             search([('type', '=', 'general'),
-                    ('id', '!=', self.company.currency_exchange_journal_id.id)],
+                    ('id', '!=',
+                     self.company.currency_exchange_journal_id.id)],
                    limit=1)
         self.xfa_account_id = self.env['account.account'].\
-            search([('user_type_id', '=', self.env.ref('account.data_account_type_fixed_assets').id)],
+            search([('user_type_id', '=', self.env.
+                     ref('account.data_account_type_fixed_assets').id)],
                     limit=1)
         if not self.xfa_account_id:
             self.xfa_account_id = self.env['account.account'].\
-                search([('user_type_id', '=', self.env.ref('account.data_account_type_current_assets').id)],
+                search([('user_type_id', '=', self.env.
+                         ref('account.data_account_type_current_assets').id)],
                        limit=1)
-       # Create expense account
+        # Create expense account
         user_type = self.env.ref('account.data_account_type_expenses')
         self.expense_account_id = self.account_model.create({
             'name': 'Expense - Test',
