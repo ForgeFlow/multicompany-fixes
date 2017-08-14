@@ -86,6 +86,12 @@ class PurchaseOrderLine(models.Model):
 
         return result
 
+    def _suggest_quantity(self):
+        current_quantity = self.product_qty
+        super(PurchaseOrderLine, self)._suggest_quantity()
+        if current_quantity > self.product_qty:
+            self.product_qty = current_quantity
+
     @api.multi
     @api.constrains('taxes_id', 'company_id')
     def _check_tax_company(self):
