@@ -11,10 +11,9 @@ class AccountAssetCategory(models.Model):
     def onchange_company_id(self):
         res = {}
         for asset in self:
-            journal = self.env['account.journal'].search(
-                    [('company_id', '=', asset.company_id.id),
-                     ('type', '=', asset.journal_id.type)
-                     ], limit=1)
+            journal = self.env['account.journal'].\
+                search([('company_id', '=', asset.company_id.id),
+                        ('type', '=', asset.journal_id.type)], limit=1)
             asset.journal_id = journal
             if asset.journal_id and\
                     asset.journal_id.company_id != asset.company_id:
