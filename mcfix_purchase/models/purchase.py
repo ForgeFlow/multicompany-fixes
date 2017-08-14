@@ -10,8 +10,9 @@ class PurchaseOrder(models.Model):
     def onchange_partner_id(self):
         res = super(PurchaseOrder, self).onchange_partner_id()
         if self.partner_id:
-            if self.partner_id.company_id != self.company_id:
-                self.partner_id = False
+            if self.partner_id.company_id:
+                if self.partner_id.company_id != self.company_id:
+                    self.partner_id = False
             self.payment_term_id = self.partner_id.\
                 with_context(force_company=self.company_id.id).\
                 property_supplier_payment_term_id.id
