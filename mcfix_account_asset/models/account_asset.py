@@ -2,6 +2,7 @@
 from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
+
 class AccountAssetCategory(models.Model):
     _inherit = 'account.asset.category'
 
@@ -15,15 +16,20 @@ class AccountAssetCategory(models.Model):
                      ('type', '=', asset.journal_id.type)
                      ], limit=1)
             asset.journal_id = journal
-            if asset.journal_id and asset.journal_id.company_id != asset.company_id:
+            if asset.journal_id and\
+                    asset.journal_id.company_id != asset.company_id:
                 asset.journal_id = False
-            if asset.account_analytic_id and asset.account_analytic_id.company_id != asset.company_id:
+            if asset.account_analytic_id and\
+                    asset.account_analytic_id.company_id != asset.company_id:
                 asset.account_analytic_id = False
-            if asset.account_asset_id and asset.account_asset_id.company_id != asset.company_id:
+            if asset.account_asset_id and\
+                    asset.account_asset_id.company_id != asset.company_id:
                 asset.account_asset_id = False
-            if asset.account_depreciation_id and asset.account_depreciation_id.company_id != asset.company_id:
+            if asset.account_depreciation_id and\
+                    asset.account_depreciation_id.company_id != asset.company_id:
                 asset.account_depreciation_id = False
-            if asset.account_depreciation_expense_id and asset.account_depreciation_expense_id.company_id != asset.company_id:
+            if asset.account_depreciation_expense_id and\
+                    asset.account_depreciation_expense_id.company_id != asset.company_id:
                 asset.account_depreciation_expense_id = False
         return res
 
@@ -54,7 +60,8 @@ class AccountAssetCategory(models.Model):
     def _check_company_depreciation_account(self):
         for asset in self:
             if asset.company_id and asset.account_depreciation_id and\
-                    asset.company_id != asset.account_depreciation_id.company_id:
+                    asset.company_id != asset.account_depreciation_id.\
+                        company_id:
                 raise ValidationError(_('The Company in the Asset category '
                                         'and in Depreciation Account must '
                                         'be the same.'))
@@ -65,7 +72,8 @@ class AccountAssetCategory(models.Model):
     def _check_company_depreciation_expense_account(self):
         for asset in self:
             if asset.company_id and asset.account_depreciation_expense_id and\
-                    asset.company_id != asset.account_depreciation_expense_id.company_id:
+                    asset.company_id != asset.account_depreciation_expense_id.\
+                        company_id:
                 raise ValidationError(_('The Company in the Asset category '
                                         'and in Depreciation Expense Account '
                                         'must be the same.'))
@@ -80,6 +88,7 @@ class AccountAssetCategory(models.Model):
                 raise ValidationError(_('The Company in the Asset category '
                                         'and in Journal must be the same.'))
         return True
+
 
 class AccountAssetAsset(models.Model):
     _inherit = 'account.asset.asset'
