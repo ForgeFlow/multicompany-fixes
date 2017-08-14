@@ -20,18 +20,18 @@ class TestAccountAssetMC(TransactionCase):
         self.company_2 = self.env['res.company'].\
             create({'name': 'Company 2'})
 
-        accounts = self._create_account(self.company)
-        accounts_2 = self._create_account(self.company_2)
+        self.accounts = self._create_account(self.company)
+        self.accounts_2 = self._create_account(self.company_2)
 
-        journal = self._create_journal(self.company)
-        journal_2 = self._create_journal(self.company_2)
+        self.journal = self._create_journal(self.company)
+        self.journal_2 = self._create_journal(self.company_2)
 
         self.assets = self._create_asset('Hardware', 3, 12000.0, 2000.0,
-                                         'Laptops', self.company, journal,
-                                         accounts)
+                                         'Laptops', self.company, self.journal,
+                                         self.accounts)
         self.assets_2 = self._create_asset('Furniture', 1, 50000.0, 5000.0,
                                            'Chairs', self.company_2,
-                                           journal_2, accounts_2)
+                                           self.journal_2, self.accounts_2)
 
     def _create_account(self, company):
 
@@ -56,7 +56,7 @@ class TestAccountAssetMC(TransactionCase):
 
     def _create_journal(self, company):
 
-        # Create a journal for cash account
+        # Create a Misc journal
         journal = self.journal_model.create({
             'name': 'Misc Journal 1 - Test',
             'code': 'test_misc_1',
@@ -67,7 +67,6 @@ class TestAccountAssetMC(TransactionCase):
 
     def _create_asset(self, categ_name, method_number, value, salvage_value,
                       asset_name, company, journal, accounts):
-
         xfa_account_id, expense_account_id = [account for account in accounts]
         asset_category = self.env['account.asset.category'].create({
             'journal_id': journal.id,
@@ -94,7 +93,20 @@ class TestAccountAssetMC(TransactionCase):
     def test_account_asset_company_consistency(self):
         # Assertion on the constraints to ensure the consistency
         # for company dependent fields
+        xfa_account_id, expense_account_id = [account for account in
+                                              self.accounts_2]
         asset_categ, asset_asset = [asset for asset in self.assets]
-        asset_categ_2, asset_2 = [asset for asset in self.assets_2]
+        asset_categ_2, asset_asset_2 = [asset for asset in self.assets_2]
         with self.assertRaises(ValidationError):
             asset_asset.write({'category_id': asset_categ_2.id})
+        with self.assertRaises(ValidationError):
+            asset_asset_2.write({'category_id': asset_categ.id})
+        with self.assertRaises(ValidationError):
+            asset_categ.write({'account_asset_id': xfa_account_id.id})
+        with self.assertRaises(ValidationError):
+            asset_categ.write({'account_depreciation_id': xfa_account_id.id})
+        with self.assertRaises(ValidationError):
+            asset_categ.write({'journal_id': self.journal_2.id})
+        with self.assertRaises(ValidationError):
+            asset_categ.write({'account_depreciation_expense_id':
+                               expense_account_id.id})
