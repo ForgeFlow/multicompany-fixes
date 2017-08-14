@@ -70,31 +70,31 @@ class TestAccountAssetMC(TransactionCase):
 
         xfa_account_id, expense_account_id = [account for account in accounts]
         asset_category = self.env['account.asset.category'].create({
-                'journal_id': journal.id,
-                'name': categ_name,
-                'method_number': method_number,
-                'company_id': company.id,
-                'account_asset_id': xfa_account_id.id,
-                'account_depreciation_id': xfa_account_id.id,
-                'account_depreciation_expense_id': expense_account_id.id,
+            'journal_id': journal.id,
+            'name': categ_name,
+            'method_number': method_number,
+            'company_id': company.id,
+            'account_asset_id': xfa_account_id.id,
+            'account_depreciation_id': xfa_account_id.id,
+            'account_depreciation_expense_id': expense_account_id.id,
             })
 
         asset_asset = self.env['account.asset.asset'].create({
-                'salvage_value': salvage_value,
-                'state': 'open',
-                'method_period': 12,
-                'method_number': 5,
-                'name': asset_name,
-                'value': value,
-                'company_id': company.id,
-                'category_id': asset_category.id,
+            'salvage_value': salvage_value,
+            'state': 'open',
+            'method_period': 12,
+            'method_number': 5,
+            'name': asset_name,
+            'value': value,
+            'company_id': company.id,
+            'category_id': asset_category.id,
             })
         return asset_category, asset_asset
 
     def test_account_asset_company_consistency(self):
         # Assertion on the constraints to ensure the consistency
         # for company dependent fields
-        asset_categ, asset = [asset for asset in self.assets]
+        asset_categ, asset_asset = [asset for asset in self.assets]
         asset_categ_2, asset_2 = [asset for asset in self.assets_2]
-#        with self.assertRaises(ValidationError):
-        asset.write({'category_id': asset_categ_2.id})
+        with self.assertRaises(ValidationError):
+            asset_asset.write({'category_id': asset_categ_2.id})

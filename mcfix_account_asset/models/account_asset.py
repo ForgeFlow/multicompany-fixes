@@ -26,10 +26,12 @@ class AccountAssetCategory(models.Model):
                     asset.account_asset_id.company_id != asset.company_id:
                 asset.account_asset_id = False
             if asset.account_depreciation_id and\
-                    asset.account_depreciation_id.company_id != asset.company_id:
+                    asset.account_depreciation_id.company_id != asset.\
+                    company_id:
                 asset.account_depreciation_id = False
             if asset.account_depreciation_expense_id and\
-                    asset.account_depreciation_expense_id.company_id != asset.company_id:
+                    asset.account_depreciation_expense_id.company_id != asset.\
+                    company_id:
                 asset.account_depreciation_expense_id = False
         return res
 
@@ -61,7 +63,7 @@ class AccountAssetCategory(models.Model):
         for asset in self:
             if asset.company_id and asset.account_depreciation_id and\
                     asset.company_id != asset.account_depreciation_id.\
-                        company_id:
+                    company_id:
                 raise ValidationError(_('The Company in the Asset category '
                                         'and in Depreciation Account must '
                                         'be the same.'))
@@ -73,7 +75,7 @@ class AccountAssetCategory(models.Model):
         for asset in self:
             if asset.company_id and asset.account_depreciation_expense_id and\
                     asset.company_id != asset.account_depreciation_expense_id.\
-                        company_id:
+                    company_id:
                 raise ValidationError(_('The Company in the Asset category '
                                         'and in Depreciation Expense Account '
                                         'must be the same.'))
