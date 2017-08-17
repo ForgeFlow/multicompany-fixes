@@ -19,6 +19,9 @@
             <field name="company_id" position="attributes">
                 <attribute name="attrs">{'readonly':[('state','!=','draft')]}</attribute>
             </field>
+             <field name="creating_user_id" position="attributes">
+                <attribute name="domain">[('company_id','=',company_id)]</attribute>
+            </field>
             <xpath expr="//field[@name='crossovered_budget_line']/form/group/group/field[@name='general_budget_id']"
                    position="attributes">
                 <attribute name="domain">[('company_id','=',parent.company_id)]</attribute>
