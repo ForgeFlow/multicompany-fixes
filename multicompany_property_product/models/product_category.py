@@ -57,3 +57,15 @@ class ProductCategoryProperty(models.TransientModel):
     @api.model
     def set_properties(self, object, properties=False):
         return
+
+    @api.multi
+    def write(self, vals):
+        prop_obj = self.env['ir.property'].with_context(
+            force_company=self.company_id.id)
+        fields = self.get_property_fields_list()
+        for field in fields:
+            if field in vals:
+                for rec in self:
+                    self.set_property(rec.partner_id, field,
+                                      vals[field], prop_obj)
+        return super(ProductCategoryProperty, self).write(vals)

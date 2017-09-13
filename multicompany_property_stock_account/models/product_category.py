@@ -97,6 +97,17 @@ class ProductCategoryProperty(models.TransientModel):
         self.property_stock_valuation_account_id = self.get_property_value(
             'property_stock_valuation_account_id', object, properties)
 
+    @api.multi
+    def get_property_fields_list(self):
+        res = super(ProductCategoryProperty, self).get_property_fields_list()
+        res.append('property_valuation')
+        res.append('property_cost_method')
+        res.append('property_stock_journal')
+        res.append('property_stock_account_input_categ_id')
+        res.append('property_stock_account_output_categ_id')
+        res.append('property_stock_valuation_account_id')
+        return res
+
     @api.model
     def set_properties(self, object, properties=False):
         super(ProductCategoryProperty, self).set_properties(object, properties)

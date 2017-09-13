@@ -35,6 +35,13 @@ class ResPartnerProperty(models.TransientModel):
         self.property_stock_supplier = self.get_property_value(
             'property_stock_supplier', object, properties)
 
+    @api.multi
+    def get_property_fields_list(self):
+        res = super(ResPartnerProperty, self).get_property_fields_list()
+        res.append('property_stock_customer')
+        res.append('property_stock_supplier')
+        return res
+
     @api.model
     def set_properties(self, object, properties=False):
         super(ResPartnerProperty, self).set_properties(object, properties)

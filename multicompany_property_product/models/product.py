@@ -112,6 +112,8 @@ class MulticompanyPropertyProduct(models.TransientModel):
 
     @api.multi
     def write(self, vals):
+        ''' Standard price do not follow the usual workflow
+        as it has special considerations '''
         prop_obj = self.env['ir.property'].with_context(
             force_company=self.company_id.id)
         if 'standard_price' in vals:
@@ -128,5 +130,11 @@ class MulticompanyPropertyProduct(models.TransientModel):
                     self.set_property(obj, 'standard_price',
                                       vals['standard_price'], prop_obj)
                     obj._set_standard_price(vals.get('standard_price', 0.0))
-
+        fields = self.get_property_fields_list()
+        for field in fields:
+            if field in vals:
+                for rec in self:
+                    obj = rec.product_id or rec.product_template_id
+                    self.set_property(obj, field,
+                                      vals[field], prop_obj)
         return super(MulticompanyPropertyProduct, self).write(vals)
