@@ -30,6 +30,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="attributes">
                 <attribute name="domain">['|', ('company_id', '=', company_id),('company_id', '=', False)]</attribute>
+                <attribute name="context">{'default_company_id': company_id}</attribute>
             </field>
             <field name="team_id" position="attributes">
                 <attribute name="domain">['|', ('company_id', '=', company_id),('company_id', '=', False)]</attribute>
@@ -43,6 +44,18 @@
             <field name="payment_term_id" position="attributes">
                 <attribute name="domain">[('company_id', '=', company_id)]</attribute>
             </field>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="after">
+                <field name="company_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='product_id']" position="attributes">
+                <attribute name="domain">[('company_id', '=', company_id)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="after">
+                <field name="company_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="attributes">
+                <attribute name="domain">[('company_id', '=', company_id)]</attribute>
+            </xpath>
         </field>
     </record>
 
