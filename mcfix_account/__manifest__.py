@@ -22,7 +22,8 @@
         'views/res_partner_view.xml',
         'views/product_category_view.xml',
         'wizard/wizard_tax_adjustments_views.xml',
-        'views/account_payment_term_view.xml'
+        'views/account_payment_term_view.xml',
+        'views/account_journal_dashboard_view.xml',
     ],
     'installable': True,
     'application': False,

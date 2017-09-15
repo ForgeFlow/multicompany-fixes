@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError, UserError
 
 
 class AccountJournal(models.Model):
@@ -41,3 +41,28 @@ class AccountJournal(models.Model):
                 raise ValidationError(_('The Company in the Journal and in '
                                         'Credit Account must be the same.'))
         return True
+
+    @api.multi
+    @api.depends('company_id')
+    def _belong_to_company_or_child(self):
+        for journal in self:
+            journal.belong_to_company_or_child = len(self.search(
+                [('company_id', 'child_of', self.env.user.company_id.id)])) > 0
+
+    @api.multi
+    def _search_user_company_and_child_journals(self, operator, value):
+        companies = self.env.user.company_id + \
+                    self.env.user.company_id.child_ids
+        if operator == '=':
+            recs = self.search([('company_id', 'in', companies.ids)])
+        elif operator == '!=':
+            recs = self.search([('company_id', 'not in', companies.ids)])
+        else:
+            raise UserError(_("Invalid search operator."))
+
+        return [('id', 'in', [x.id for x in recs])]
+
+    belong_to_company_or_child = fields.Boolean(
+        'Belong to the user\'s current child company',
+        compute="_belong_to_company_or_child",
+        search="_search_user_company_and_child_journals")
