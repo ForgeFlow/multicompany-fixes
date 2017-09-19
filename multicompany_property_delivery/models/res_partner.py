@@ -24,6 +24,12 @@ class ResPartnerProperty(models.TransientModel):
         self.property_delivery_carrier_id = self.get_property_value(
             'property_delivery_carrier_id', object, properties)
 
+    @api.multi
+    def get_property_fields_list(self):
+        res = super(ResPartnerProperty, self).get_property_fields_list()
+        res.append('property_delivery_carrier_id')
+        return res
+
     @api.model
     def set_properties(self, object, properties=False):
         super(ResPartnerProperty, self).set_properties(object, properties)

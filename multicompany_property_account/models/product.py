@@ -42,6 +42,13 @@ class ProductProperty(models.TransientModel):
             self.get_property_value('property_account_expense_id', object,
                                     properties)
 
+    @api.multi
+    def get_property_fields_list(self):
+        res = super(ProductProperty, self).get_property_fields_list()
+        res.append('property_account_income_id')
+        res.append('property_account_expense_id')
+        return res
+
     @api.model
     def set_properties(self, object, properties=False):
         super(ProductProperty, self).set_properties(object, properties)

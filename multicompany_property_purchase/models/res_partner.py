@@ -26,6 +26,12 @@ class ResPartnerProperties(models.TransientModel):
             self.get_property_value('property_purchase_currency_id',
                                     object, properties)
 
+    @api.multi
+    def get_property_fields_list(self):
+        res = super(ResPartnerProperties, self).get_property_fields_list()
+        res.append('property_purchase_currency_id')
+        return res
+
     @api.model
     def set_properties(self, object, properties=False):
         super(ResPartnerProperties, self).set_properties()

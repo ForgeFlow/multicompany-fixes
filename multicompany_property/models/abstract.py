@@ -47,3 +47,7 @@ class MulticomanyPropertyAbstract(models.AbstractModel):
             else:
                 return value
         return False
+
+    @api.multi
+    def get_property_fields_list(self):
+        return []

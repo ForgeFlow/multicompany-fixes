@@ -28,6 +28,12 @@ class ProductCategoryProperty(models.TransientModel):
                 'property_account_creditor_price_difference_categ',
                 object, properties)
 
+    @api.multi
+    def get_property_fields_list(self):
+        res = super(ProductCategoryProperty, self).get_property_fields_list()
+        res.append('property_account_creditor_price_difference_categ')
+        return res
+
     @api.model
     def set_properties(self, object, properties=False):
         super(ProductCategoryProperty, self).set_properties(object, properties)
