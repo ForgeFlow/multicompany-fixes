@@ -76,18 +76,20 @@ class TestSaleOrderMC(TestSale):
         self.payment_terms_1 = self._create_payment_terms(self.company)
         self.payment_terms_2 = self._create_payment_terms(self.company_2)
 
-        self.sale_order_1 = self._create_sale_order(self.company,
-                                                    self.product1,
-                                                    self.tax_1,
-                                                    self.partner_1,
-                                                    self.team_1,
-                                                    self.user_2)
-        self.sale_order_2 = self._create_sale_order(self.company_2,
-                                                    self.product2,
-                                                    self.tax_2,
-                                                    self.partner_2,
-                                                    self.team_2,
-                                                    self.user_3)
+        self.sale_order_1 = self._create_sale_order(
+            self.company,
+            self.product1,
+            self.tax_1,
+            self.partner_1,
+            self.team_1,
+            self.user_2)
+        self.sale_order_2 = self._create_sale_order(
+            self.company_2,
+            self.product2,
+            self.tax_2,
+            self.partner_2,
+            self.team_2,
+            self.user_3)
 
     def _create_partner(self, company):
         "Create a Partner"

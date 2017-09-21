@@ -10,12 +10,14 @@ class TestSaleStockOrderMC(TestSaleOrderMC):
 
     def setUp(self):
         super(TestSaleStockOrderMC, self).setUp()
-        self.sale_order_3 = self._create_sale_order(self.company_2,
-                                                    self.product2,
-                                                    self.tax_2,
-                                                    self.partner_2,
-                                                    self.team_2,
-                                                    self.user_3)
+        self.sale_order_3 = self._create_sale_order(
+            self.company_2,
+            self.product2,
+            self.tax_2,
+            self.partner_2,
+            self.team_2,
+            self.user_3
+        )
 
     def test_sale_stock_company_consistency(self):
         # Assertion on the constraints to ensure the consistency

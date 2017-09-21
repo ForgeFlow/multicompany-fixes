@@ -14,10 +14,10 @@ class CrmTeam(models.Model):
     def _check_sales_order_company(self):
         for rec in self:
             if rec.company_id:
-                orders = self.env['sale.order'].search(
+                order_id = self.env['sale.order'].search(
                     [('team_id', '=', rec.id), ('company_id', '!=',
                                                 rec.company_id.id)], limit=1)
-                if orders:
-                    raise ValidationError(_('Sales orders already exist '
+                if order_id:
+                    raise ValidationError(_('Sales Orders already exist '
                                             'referencing this team in other '
                                             'companies.'))

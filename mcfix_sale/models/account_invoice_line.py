@@ -14,10 +14,10 @@ class AccountInvoiceLine(models.Model):
     def _check_sales_order_company(self):
         for rec in self:
             if rec.company_id:
-                order_lines = self.env['sale.order.line'].search(
+                order_line_id = self.env['sale.order.line'].search(
                     [('invoice_lines', 'in', [rec.id]),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
-                if order_lines:
-                    raise ValidationError(_('Sales order lines already exist '
-                                            'referencing this invoice line '
+                if order_line_id:
+                    raise ValidationError(_('Sales Order lines already exist '
+                                            'referencing this Invoice line '
                                             'in other companies.'))

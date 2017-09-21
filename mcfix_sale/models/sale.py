@@ -8,8 +8,8 @@ class SaleOrder(models.Model):
 
     @api.model
     def create(self, vals):
-        ''' Influence the default values in related comodels, if we reach to
-        this point an no value has yet been provided '''
+        """ Influence the default values in related comodels, if we reach to
+        this point and no value has yet been provided """
         if 'company_id' in vals:
             updated_self = self.with_context(force_company=vals['company_id'])
         else:
@@ -18,7 +18,7 @@ class SaleOrder(models.Model):
 
     @api.onchange('team_id')
     def onchange_team_id(self):
-        if self.team_id.company_id:
+        if self.team_id and self.team_id.company_id:
             self.company_id = self.team_id.company_id
 
     @api.multi
@@ -44,9 +44,10 @@ class SaleOrder(models.Model):
             self.team_id = False
         if self.user_id and self.user_id.company_id != self.company_id:
             self.user_id = False
-        self.fiscal_position_id = self.env['account.fiscal.position'].\
-            get_fiscal_position(self.partner_id.id,
-                                self.partner_shipping_id.id)
+        if self.partner_id:
+            self.fiscal_position_id = self.env['account.fiscal.position'].\
+                get_fiscal_position(self.partner_id.id,
+                                    self.partner_shipping_id.id)
         return res
 
     @api.model
@@ -61,7 +62,7 @@ class SaleOrder(models.Model):
     @api.multi
     def _prepare_invoice(self):
         """
-        Prepare the dict of values to create the new invoice for a sales order.
+        Prepare the dict of values to create the new invoice for a Sales Order.
         This method may be overridden to implement custom invoice generation
         (making sure to call super() to establish a clean extension chain).
         """
@@ -107,7 +108,7 @@ class SaleOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the sales team '
                                         'must match with that of the '
-                                        'Quotation/Sales order'))
+                                        'Quotation/Sales Order.'))
 
     @api.multi
     @api.constrains('partner_id', 'company_id')
@@ -118,7 +119,7 @@ class SaleOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the Partner '
                                         'must match with that of the '
-                                        'Quotation/Sales order'))
+                                        'Quotation/Sales Order.'))
 
     @api.multi
     @api.constrains('payment_term_id', 'company_id')
@@ -129,7 +130,7 @@ class SaleOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the Payment Term '
                                         'must match with that of the '
-                                        'Quotation/Sales order'))
+                                        'Quotation/Sales Order.'))
 
     @api.multi
     @api.constrains('user_id', 'company_id')
@@ -140,7 +141,7 @@ class SaleOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the salesperson '
                                         'must match with that of the '
-                                        'Quotation/Sales order'))
+                                        'Quotation/Sales Order.'))
 
     @api.multi
     @api.constrains('fiscal_position_id', 'company_id')
@@ -152,7 +153,7 @@ class SaleOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the fiscal position '
                                         'must match with that of the '
-                                        'quote/sales order'))
+                                        'Quotation/Sales Order.'))
 
 
 class SaleOrderLine(models.Model):
@@ -166,7 +167,7 @@ class SaleOrderLine(models.Model):
     def _prepare_invoice_line(self, qty):
         """
         Prepare the dict of values to create the new invoice line
-        for a sales order line.
+        for a Sales Order Line.
         :param qty: float quantity to invoice
         """
         res = super(SaleOrderLine, self)._prepare_invoice_line(qty)
@@ -198,7 +199,8 @@ class SaleOrderLine(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the tax %s '
                                         'must match with that of the '
-                                        'quote/sales order') % rec.tax_id.name)
+                                        'Quotation/Sales Order.') %
+                                      rec.tax_id.name)
 
     @api.multi
     @api.constrains('product_id', 'company_id')
@@ -209,4 +211,4 @@ class SaleOrderLine(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the product '
                                         'must match with that of the '
-                                        'order line %s') % rec.name)
+                                        'Sales Order line %s.') % rec.name)

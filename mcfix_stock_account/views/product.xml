@@ -9,18 +9,18 @@
             <field name="arch" type="xml">
                 <field name="property_stock_account_input_categ_id"
                        position="attributes">
-                    <attribute name="domain">[('deprecated', '=', False), ('company_id','=',current_company_id)]</attribute>
+                    <attribute name="domain">[('deprecated', '=', False), ('company_id', '=', current_company_id)]</attribute>
                 </field>
                 <field name="property_stock_account_output_categ_id"
                        position="attributes">
-                    <attribute name="domain">[('deprecated', '=', False), ('company_id','=',current_company_id)]</attribute>
+                    <attribute name="domain">[('deprecated', '=', False), ('company_id', '=', current_company_id)]</attribute>
                 </field>
                 <field name="property_stock_valuation_account_id"
                        position="attributes">
-                    <attribute name="domain">[('deprecated', '=', False), ('company_id','=',current_company_id)]</attribute>
+                    <attribute name="domain">[('deprecated', '=', False), ('company_id', '=', current_company_id)]</attribute>
                 </field>
                 <field name="property_stock_journal" position="attributes">
-                    <attribute name="domain">[('company_id','=',current_company_id)]</attribute>
+                    <attribute name="domain">[('company_id', '=', current_company_id)]</attribute>
                 </field>
             </field>
         </record>
