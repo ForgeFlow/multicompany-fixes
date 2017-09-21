@@ -14,9 +14,9 @@ class TestPurchaseOrderMC(TestPurchaseOrder):
         super(TestPurchaseOrderMC, self).setUp()
         self.res_users_model = self.env['res.users']
         self.account_model = self.env['account.account']
+
         # Company
         self.company = self.env.ref('base.main_company')
-
         # Company 2
         self.company_2 = self.env['res.company'].create({
             'name': 'Company 2',
@@ -60,10 +60,12 @@ class TestPurchaseOrderMC(TestPurchaseOrder):
         self.payment_terms_1 = self._create_payment_terms(self.company)
         self.payment_terms_2 = self._create_payment_terms(self.company_2)
 
-        self.purchase1 = self._create_purchase(self.company,
-                                               self.product1,
-                                               self.tax_1,
-                                               self.partner_1)
+        self.purchase1 = self._create_purchase(
+            self.company,
+            self.product1,
+            self.tax_1,
+            self.partner_1
+        )
 
         self.purchase1.button_confirm()
         self._create_invoice(self.purchase1, self.partner_1,
@@ -108,7 +110,7 @@ class TestPurchaseOrderMC(TestPurchaseOrder):
         return True
 
     def _create_partner(self, company):
-        "Create a Partner"
+        """ Create a Partner """
         partner = self.env['res.partner'].create({
             'name': 'Test partner',
             'company_id': company.id,

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models
+from odoo import api, models, _
+from odoo.exceptions import ValidationError
 
 
 class AccountInvoice(models.Model):
@@ -45,3 +46,20 @@ class AccountInvoice(models.Model):
         nself = self.with_context(force_company=self.company_id.id)
         return super(AccountInvoice, nself)._anglo_saxon_purchase_move_lines(
             i_line, res)
+
+
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    @api.multi
+    @api.constrains('company_id')
+    def _check_purchase_order_company(self):
+        for rec in self:
+            if rec.company_id:
+                order_line_id = self.env['purchase.order.line'].search(
+                    [('invoice_lines', 'in', [rec.id]),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if order_line_id:
+                    raise ValidationError(_('Purchase Order lines already '
+                                            'exist referencing this invoice '
+                                            'line in other companies.'))

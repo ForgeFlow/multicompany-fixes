@@ -14,12 +14,12 @@ class AccountTax(models.Model):
     def _check_purchase_order_company(self):
         for rec in self:
             if rec.company_id:
-                orders_lines = self.env['purchase.order.line'].search(
+                order_line_id = self.env['purchase.order.line'].search(
                     [('taxes_id', 'in', [rec.id]),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
 
-                if orders_lines:
-                    raise ValidationError(_('Purchase order lines already '
+                if order_line_id:
+                    raise ValidationError(_('Purchase Order lines already '
                                             'exist referencing this tax in '
                                             'other company : %s.') %
-                                          orders_lines.company_id.name)
+                                          order_line_id.company_id.name)

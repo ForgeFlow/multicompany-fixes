@@ -18,7 +18,7 @@ class AccountFiscalPosition(models.Model):
                     [('fiscal_position_id', '=', rec.id),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if orders:
-                    raise ValidationError(_('Purchase orders already exist '
+                    raise ValidationError(_('Purchase Orders already exist '
                                             'referencing this fiscal position '
                                             'in other company : %s.') %
                                           orders.company_id.name)

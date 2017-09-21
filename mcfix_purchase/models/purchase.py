@@ -39,7 +39,7 @@ class PurchaseOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the Partner '
                                         'must match with that of the '
-                                        'RFQ/Purchase order'))
+                                        'RFQ/Purchase Order.'))
 
     @api.multi
     @api.constrains('payment_term_id', 'company_id')
@@ -50,7 +50,7 @@ class PurchaseOrder(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the Payment Term '
                                         'must match with that of the '
-                                        'RFQ/Purchase order'))
+                                        'RFQ/Purchase Order.'))
 
     @api.multi
     @api.constrains('fiscal_position_id', 'company_id')
@@ -60,9 +60,9 @@ class PurchaseOrder(models.Model):
                     rec.fiscal_position_id.company_id and
                     rec.fiscal_position_id.company_id != rec.company_id):
                 raise ValidationError(_('Configuration error\n'
-                                        'The Company of the Fiscal position '
+                                        'The Company of the fiscal position '
                                         'must match with that of the '
-                                        'RFQ/Purchase order'))
+                                        'RFQ/Purchase Order.'))
 
 
 class PurchaseOrderLine(models.Model):
@@ -102,7 +102,7 @@ class PurchaseOrderLine(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the tax %s '
                                         'must match with that of the '
-                                        'RFQ/Purchase order') %
+                                        'RFQ/Purchase Order.') %
                                       rec.taxes_id.name)
 
     @api.multi
@@ -114,5 +114,5 @@ class PurchaseOrderLine(models.Model):
                 raise ValidationError(_('Configuration error\n'
                                         'The Company of the product %s '
                                         'must match with that of the '
-                                        'RFQ/Purchase order') %
+                                        'RFQ/Purchase Order.') %
                                       rec.product_id.name)

@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="purchase.view_product_account_purchase_ok_form"/>
         <field name="arch" type="xml">
             <field name="property_account_expense_id" position="attributes">
-                <attribute name="domain">[('internal_type','=','other'),('deprecated','=',False),('company_id', '=', current_company_id)]</attribute>
+                <attribute name="domain">[('internal_type', '=', 'other'), ('deprecated', '=', False), ('company_id', '=', current_company_id)]</attribute>
             </field>
         </field>
     </record>
@@ -18,7 +18,7 @@
         <field name="arch" type="xml">
             <field name="property_account_creditor_price_difference"
                    position="attributes">
-                <attribute name="domain">[('deprecated','=',False),('company_id','=',current_company_id)]</attribute>
+                <attribute name="domain">[('deprecated', '=', False), ('company_id', '=', current_company_id)]</attribute>
             </field>
         </field>
     </record>
@@ -30,7 +30,7 @@
         <field name="arch" type="xml">
             <field name="property_account_creditor_price_difference_categ"
                    position="attributes">
-                <attribute name="domain">[('deprecated','=',False),('company_id','=',current_company_id)]</attribute>
+                <attribute name="domain">[('deprecated', '=', False), ('company_id', '=', current_company_id)]</attribute>
             </field>
         </field>
     </record>
