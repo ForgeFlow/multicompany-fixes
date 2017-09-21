@@ -3,7 +3,6 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo.addons.account.tests.account_test_users import AccountTestUsers
-from odoo.exceptions import ValidationError
 
 
 class TestAccountInvoiceMC(AccountTestUsers):

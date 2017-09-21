@@ -96,7 +96,7 @@ class AccountTax(models.Model):
                             _('You cannot change the company, as this '
                               'tax is assigned as Tax on Product in Fiscal '
                               'Position Tax %s of Fiscal Position %s' % (
-                                fp_tax.name, fp_tax.position_id.name)))
+                            fp_tax.name, fp_tax.position_id.name)))
 
                     fp_tax = self.env['account.fiscal.position.tax'].search(
                         [('tax_dest_id', '=', [rec.id]),
@@ -106,7 +106,7 @@ class AccountTax(models.Model):
                             _('You cannot change the company, as this '
                               'tax is assigned as Tax to Apply in Fiscal '
                               'Position Tax %s of Fiscal Position %s' % (
-                                fp_tax.name, fp_tax.position_id.name)))
+                            fp_tax.name, fp_tax.position_id.name)))
 
                     # Product Template
                     pt = self.env['product.template'].search(
