@@ -7,7 +7,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     @api.onchange('company_id')
-    def onchange_company_id(self):
+    def _onchange_company_id(self):
         for invoice in self:
             invoice.journal_id = self.env['account.journal'].search(
                 [('company_id', '=', invoice.company_id.id),
@@ -41,10 +41,10 @@ class AccountInvoice(models.Model):
     def _check_company_fiscal_position(self):
         for invoice in self:
             if (
-                invoice.company_id
-                and invoice.fiscal_position_id.company_id
-                and invoice.company_id !=
-                    invoice.fiscal_position_id.company_id):
+                invoice.company_id and
+                invoice.fiscal_position_id.company_id and
+                invoice.company_id != invoice.fiscal_position_id.company_id
+            ):
                 raise ValidationError(_('The Company in the Invoice and in '
                                         'Fiscal Position must be the same.'))
         return True
@@ -54,9 +54,8 @@ class AccountInvoice(models.Model):
     def _check_company_account(self):
         for invoice in self:
             if (
-                invoice.company_id
-                and invoice.account_id
-                and invoice.company_id != invoice.account_id.company_id
+                invoice.company_id and invoice.account_id and
+                invoice.company_id != invoice.account_id.company_id
             ):
                 raise ValidationError(_('The Company in the Invoice and in '
                                         'Account must be the same.'))
@@ -78,9 +77,8 @@ class AccountInvoice(models.Model):
         for invoice in self:
             for tax_line in invoice.tax_line_ids:
                 if (
-                    invoice.company_id
-                    and tax_line.company_id
-                    and invoice.company_id != tax_line.company_id
+                    invoice.company_id and tax_line.company_id and
+                    invoice.company_id != tax_line.company_id
                 ):
                     raise ValidationError(
                         _('The Company in the Invoice and in '

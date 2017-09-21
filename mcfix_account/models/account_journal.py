@@ -19,7 +19,7 @@ class AccountJournal(models.Model):
     @api.multi
     def _search_user_company_and_child_journals(self, operator, value):
         companies = self.env.user.company_id + \
-                    self.env.user.company_id.child_ids
+            self.env.user.company_id.child_ids
         if operator == '=':
             recs = self.search([('company_id', 'in', companies.ids)])
         elif operator == '!=':
@@ -54,7 +54,7 @@ class AccountJournal(models.Model):
         for journal in self.sudo():
             for account in journal.account_control_ids:
                 if journal.company_id and \
-                                journal.company_id != account.company_id:
+                        journal.company_id != account.company_id:
                     raise ValidationError(
                         _('The Company in the Journal and in Accounts Allowed '
                           'must be the same.'))
@@ -123,7 +123,8 @@ class AccountJournal(models.Model):
 
                 if journal.bank_account_id.company_id.id != vals[
                         'company_id']:
-                    company = self.env['res.company'].browse(vals['company_id'])
+                    company = self.env['res.company'].browse(
+                        vals['company_id'])
                     journal.bank_account_id.with_context(
                         bypass_company_validation=True).write(
                         {'company_id': company.id,

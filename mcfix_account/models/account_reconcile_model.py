@@ -23,9 +23,8 @@ class AccountReconcileModel(models.Model):
     def _check_company_account_id(self):
         for reconcile in self:
             if (
-                reconcile.company_id
-                and reconcile.account_id.company_id
-                and reconcile.company_id != reconcile.account_id.company_id
+                reconcile.company_id and reconcile.account_id.company_id and
+                reconcile.company_id != reconcile.account_id.company_id
             ):
                 raise ValidationError(
                     _('The Company in the Reconciliation model and in the '
@@ -37,9 +36,8 @@ class AccountReconcileModel(models.Model):
     def _check_company_journal_id(self):
         for reconcile in self:
             if (
-                reconcile.company_id
-                and reconcile.journal_id.company_id
-                and reconcile.company_id != reconcile.journal_id.company_id
+                reconcile.company_id and reconcile.journal_id.company_id and
+                reconcile.company_id != reconcile.journal_id.company_id
             ):
                 raise ValidationError(
                     _('The Company in the Reconciliation model and in the '
@@ -51,13 +49,10 @@ class AccountReconcileModel(models.Model):
     def _check_company_tax_id(self):
         for reconcile in self:
             if (
-                reconcile.company_id
-                and reconcile.tax_id.company_id
-                and reconcile.company_id != reconcile.tax_id.company_id
+                reconcile.company_id and reconcile.tax_id.company_id and
+                reconcile.company_id != reconcile.tax_id.company_id
             ):
                 raise ValidationError(
                     _('The Company in the Reconciliation model and in the '
                       'Tax must be the same.'))
         return True
-
-

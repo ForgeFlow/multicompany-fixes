@@ -15,10 +15,10 @@ class AccountBankStatement(models.Model):
         child_companies = self.env.user.company_id.child_ids
         child_company_ids = child_companies and tuple(child_companies.ids)
 
-        sql_query = """SELECT stl.id 
-                        FROM account_bank_statement_line stl  
-                        WHERE account_id IS NULL AND not exists 
-                        (select 1 from account_move m where 
+        sql_query = """SELECT stl.id
+                        FROM account_bank_statement_line stl
+                        WHERE account_id IS NULL AND not exists
+                        (select 1 from account_move m where
                         m.statement_line_id = stl.id)
                             AND company_id in %s
                 """
@@ -42,26 +42,26 @@ class AccountBankStatement(models.Model):
 
             sql_query = """SELECT aml.partner_id, aml.ref, stl.id
                             FROM account_move_line aml
-                                JOIN account_account acc 
+                                JOIN account_account acc
                                 ON acc.id = aml.account_id
-                                JOIN account_bank_statement_line stl 
+                                JOIN account_bank_statement_line stl
                                 ON aml.ref = stl.name
-                            WHERE (aml.company_id in %s 
-                                AND aml.partner_id IS NOT NULL) 
+                            WHERE (aml.company_id in %s
+                                AND aml.partner_id IS NOT NULL)
                                 AND (
-                                    (aml.statement_id IS NULL 
-                                    AND aml.account_id IN %s) 
-                                    OR 
-                                    (acc.internal_type IN 
-                                    ('payable', 'receivable') 
+                                    (aml.statement_id IS NULL
+                                    AND aml.account_id IN %s)
+                                    OR
+                                    (acc.internal_type IN
+                                    ('payable', 'receivable')
                                     AND aml.reconciled = false)
                                     )
                                 AND aml.ref IN %s
                                 """
             params = (child_company_ids, (
-            st_lines_left[0].journal_id.default_credit_account_id.id,
-            st_lines_left[0].journal_id.default_debit_account_id.id),
-                      tuple(refs))
+                st_lines_left[0].journal_id.default_credit_account_id.id,
+                st_lines_left[0].journal_id.default_debit_account_id.id),
+                tuple(refs))
             if statements:
                 sql_query += 'AND stl.id IN %s'
                 params += (tuple(stl_to_assign_partner),)

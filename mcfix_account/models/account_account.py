@@ -40,13 +40,13 @@ class AccountAccount(models.Model):
             if not self.env.context.get('bypass_company_validation', False):
                 for rec in self:
                     journal = self.env['account.journal'].search(
-                            [('default_debit_account_id', '=', rec.id),
-                             ('company_id', '!=', vals['company_id'])], limit=1)
+                        [('default_debit_account_id', '=', rec.id),
+                         ('company_id', '!=', vals['company_id'])], limit=1)
                     if journal:
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'account is assigned as Debit Account in '
-                              'Account Journal %s' %journal.name))
+                              'Account Journal %s' % journal.name))
 
                     journal = self.env['account.journal'].search(
                         [('default_credit_account_id', '=', rec.id),

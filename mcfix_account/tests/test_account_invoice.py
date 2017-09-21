@@ -33,6 +33,12 @@ class TestAccountInvoiceMC(AccountTestUsers):
 
         self.fiscal_position_1 = self._create_fiscal_position(self.company)
         self.fiscal_position_2 = self._create_fiscal_position(self.company_2)
+        self.main_partner.with_context(
+            force_company=self.company.id).property_account_position_id = \
+            self.fiscal_position_1
+        self.main_partner.with_context(
+            force_company=self.company_2.id).property_account_position_id = \
+            self.fiscal_position_2
 
         self.payment_term_1 = self._create_payment_terms(self.company)
         self.payment_term_2 = self._create_payment_terms(self.company_2)
@@ -101,3 +107,10 @@ class TestAccountInvoiceMC(AccountTestUsers):
         with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'journal_id': self.journal_c2.id})
+
+    def test_onchange_company(self):
+        self.account_invoice.company_id = self.company_2
+        self.account_invoice._onchange_company()
+        self.account_invoice._onchange_partner_id()
+        self.assertEquals(
+            self.account_invoice.fiscal_position_id, self.fiscal_position_2)
