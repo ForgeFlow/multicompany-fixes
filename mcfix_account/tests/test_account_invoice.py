@@ -22,7 +22,8 @@ class TestAccountInvoiceMC(AccountTestUsers):
             'name': 'Company 2',
         })
 
-        self.cash_journal = self._create_journal(self.company)
+        self.journal_c1 = self._create_journal('J1', self.company)
+        self.journal_c2 = self._create_journal('J2', self.company_2)
 
         self.pricelist_1 = self._create_pricelist(self.company)
         self.pricelist_2 = self._create_pricelist(self.company_2)
@@ -38,24 +39,14 @@ class TestAccountInvoiceMC(AccountTestUsers):
 
         self.account_invoice = self._create_account_invoice(self.company)
 
-    def _create_journal(self, company):
+    def _create_journal(self, name, company):
         # Create a cash account
-        user_type = self.env.ref('account.data_account_type_liquidity')
-        self.cash_account_id = self.account_model.create({
-            'name': 'Cash 1 - Test',
-            'code': 'test_cash_1',
-            'user_type_id': user_type.id,
-            'company_id': company.id,
-        })
-
         # Create a journal for cash account
         cash_journal = self.journal_model.create({
-            'name': 'Cash Journal 1 - Test',
-            'code': 'test_cash_1',
-            'type': 'cash',
+            'name': name,
+            'code': name,
+            'type': 'sale',
             'company_id': company.id,
-            'default_debit_account_id': self.cash_account_id.id,
-            'default_credit_account_id': self.cash_account_id.id,
         })
         return cash_journal
 
@@ -94,7 +85,7 @@ class TestAccountInvoiceMC(AccountTestUsers):
             'company_id': company.id,
             'fiscal_position_id': self.fiscal_position_1.id,
             'payment_term_id': self.payment_term_1.id,
-            'journal_id': self.cash_journal.id
+            'journal_id': self.journal_c1.id
         })
         return invoice
 
@@ -108,8 +99,5 @@ class TestAccountInvoiceMC(AccountTestUsers):
             self.account_invoice.\
                 write({'payment_term_id': self.payment_term_2.id})
         with self.assertRaises(ValidationError):
-            self.cash_journal.\
-                write({'company_id': self.company_2.id})
-        with self.assertRaises(ValidationError):
             self.account_invoice.\
-                write({'journal_id': self.cash_journal.id})
+                write({'journal_id': self.journal_c2.id})

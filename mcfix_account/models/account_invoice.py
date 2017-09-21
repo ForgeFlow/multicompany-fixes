@@ -40,9 +40,11 @@ class AccountInvoice(models.Model):
     @api.constrains('fiscal_position_id', 'company_id')
     def _check_company_fiscal_position(self):
         for invoice in self:
-            if invoice.company_id and invoice.fiscal_position_id and\
-                    invoice.company_id != invoice.fiscal_position_id.\
-                    company_id:
+            if (
+                invoice.company_id
+                and invoice.fiscal_position_id.company_id
+                and invoice.company_id !=
+                    invoice.fiscal_position_id.company_id):
                 raise ValidationError(_('The Company in the Invoice and in '
                                         'Fiscal Position must be the same.'))
         return True
@@ -67,6 +69,21 @@ class AccountInvoice(models.Model):
                                         'Journal must be the same.'))
         return True
 
+    @api.multi
+    @api.constrains('tax_line_ids', 'company_id')
+    def _check_company_tax_line_ids(self):
+        for invoice in self:
+            for tax_line in invoice.tax_line_ids:
+                if (
+                    invoice.company_id
+                    and tax_line.company_id
+                    and invoice.company_id != tax_line.company_id
+                ):
+                    raise ValidationError(
+                        _('The Company in the Invoice and in '
+                          'Tax Line %s must be the same.') % tax_line.name)
+        return True
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -81,14 +98,14 @@ class AccountInvoiceLine(models.Model):
     def change_company_id(self):
         part = self.invoice_id.partner_id
         invoice_type = self.invoice_id.type
-        company = self.invoice_id.company_id.id
+        company_id = self.invoice_id.company_id.id
         if part.lang:
             product = self.product_id.with_context(lang=part.lang)
         else:
             product = self.product_id
         account = self.get_invoice_line_account(
             invoice_type,
-            product.with_context(force_company=company),
+            product.with_context(force_company=company_id),
             self.invoice_id.fiscal_position_id,
             self.invoice_id.company_id)
         if account:

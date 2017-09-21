@@ -21,7 +21,8 @@ class AccountMove(models.Model):
             for line in move.line_ids:
                 if line.account_id.company_id.id != move.company_id.id:
                     raise UserError(
-                        _('Company must be the same for all lines.'))
+                        _('Company must be the same for all account move '
+                          'lines.'))
 
 
 class AccountMoveLine(models.Model):
