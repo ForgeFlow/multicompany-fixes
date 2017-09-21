@@ -53,8 +53,11 @@ class AccountInvoice(models.Model):
     @api.constrains('account_id', 'company_id')
     def _check_company_account(self):
         for invoice in self:
-            if invoice.company_id and invoice.account_id and\
-                    invoice.company_id != invoice.account_id.company_id:
+            if (
+                invoice.company_id
+                and invoice.account_id
+                and invoice.company_id != invoice.account_id.company_id
+            ):
                 raise ValidationError(_('The Company in the Invoice and in '
                                         'Account must be the same.'))
         return True

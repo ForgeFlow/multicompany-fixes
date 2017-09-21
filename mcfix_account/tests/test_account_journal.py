@@ -64,28 +64,12 @@ class TestAccountJournalMC(AccountTestUsers):
         # for company dependent fields
 
         with self.assertRaises(ValidationError):
-            self.cash_journal.write(
-                {'default_debit_account_id': self.account_2.id})
-
-        with self.assertRaises(ValidationError):
-            self.cash_journal.\
-                write({'default_credit_account_id': self.account_2.id})
-
-        with self.assertRaises(ValidationError):
             self.cash_journal.\
                 write({'profit_account_id': self.account_2.id})
 
         with self.assertRaises(ValidationError):
             self.cash_journal.\
                 write({'loss_account_id': self.account_2.id})
-
-        with self.assertRaises(ValidationError):
-            self.cash_journal.\
-                write({'sequence_id': self.sequence_c2.id})
-
-        with self.assertRaises(ValidationError):
-            self.cash_journal.\
-                write({'refund_sequence_id': self.sequence_c2.id})
 
         with self.assertRaises(ValidationError):
             self.cash_journal.account_control_ids += self.account_2
@@ -97,24 +81,6 @@ class TestAccountJournalMC(AccountTestUsers):
             self.cash_journal.write(
                 {'company_id': self.company_2.id})
 
-        # Assign a bank account on another company should raise an error
-        bank_account = self.env['res.partner.bank'].create({
-            'acc_number': '0001',
-            'bank_id': self.bank.id,
-            'company_id': self.company_1.id,
-            'currency_id': self.currency_euro.id,
-            'partner_id': self.company_1.partner_id.id,
-        })
-
-        with self.assertRaises(ValidationError):
-            self.journal_model.create({
-                'name': 'Cash Journal 2 - Test',
-                'code': 'test_cash_2',
-                'type': 'cash',
-                'company_id': self.company_2.id,
-                'bank_account_id': bank_account.id,
-            })
-
         # Changing the company on a journal should change that of the
         # associated sequence and accounts
         journal = self.journal_model.create({
@@ -122,12 +88,10 @@ class TestAccountJournalMC(AccountTestUsers):
             'code': 'test_bank_1',
             'type': 'bank',
             'company_id': self.company_1.id,
-            'bank_acc_number': '0002',
+            'bank_acc_number': '0001',
             'bank_id': self.bank.id,
         })
-
         journal.company_id = self.company_2
-
         self.assertEquals(journal.sequence_id.company_id, self.company_2)
         self.assertEquals(journal.default_debit_account_id.company_id,
                           self.company_2)
@@ -140,6 +104,31 @@ class TestAccountJournalMC(AccountTestUsers):
         #  sequence that is already assigned to a journal that belongs to
         # another company
         with self.assertRaises(ValidationError):
-            self.cash_journal.sequence_id.company_id = self.company_2
+            self.cash_journal.sequence_id.company_id = self.company_1
+
+        bank_account = self.env['res.partner.bank'].create({
+            'acc_number': '0002',
+            'bank_id': self.bank.id,
+            'company_id': self.company_1.id,
+            'currency_id': self.currency_euro.id,
+            'partner_id': self.company_1.partner_id.id,
+        })
         with self.assertRaises(ValidationError):
-            self.cash_journal.refund_sequence_id.company_id = self.company_2
+            self.journal_model.create({
+                'name': 'Bank Journal 2 - Test',
+                'code': 'test_bank_2',
+                'type': 'bank',
+                'company_id': self.company_2.id,
+                'bank_account_id': bank_account.id,
+            })
+
+        # Test validation on refund sequence
+        journal = self.journal_model.create({
+            'name': 'Sale Journal 1 - Test',
+            'code': 'test_sale_1',
+            'type': 'sale',
+            'company_id': self.company_1.id,
+            'refund_sequence': True
+        })
+        with self.assertRaises(ValidationError):
+            journal.refund_sequence_id.company_id = self.company_2

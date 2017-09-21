@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError, UserError
+from odoo import api, models, _
+from odoo.exceptions import ValidationError
 
 
 class AccountAccount(models.Model):
@@ -34,3 +34,49 @@ class AccountAccount(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.tax_ids = False
+
+    def write(self, vals):
+        if 'company_id' in vals:
+            if not self.env.context.get('bypass_company_validation', False):
+                for rec in self:
+                    journal = self.env['account.journal'].search(
+                            [('default_debit_account_id', '=', rec.id),
+                             ('company_id', '!=', vals['company_id'])], limit=1)
+                    if journal:
+                        raise ValidationError(
+                            _('You cannot change the company, as this '
+                              'account is assigned as Debit Account in '
+                              'Account Journal %s' %journal.name))
+
+                    journal = self.env['account.journal'].search(
+                        [('default_credit_account_id', '=', rec.id),
+                         ('company_id', '!=', vals['company_id'])], limit=1)
+                    if journal:
+                        raise ValidationError(
+                            _('You cannot change the company, as this '
+                              'account is assigned as Credit Account '
+                              'in Account Journal %s' %
+                              journal.name))
+
+                    journal = self.env['account.journal'].search(
+                        [('profit_account_id', '=', rec.id),
+                         ('company_id', '!=', vals['company_id'])], limit=1)
+
+                    if journal:
+                        raise ValidationError(
+                            _('You cannot change the company, as this '
+                              'account is assigned as Profit Account in '
+                              'Account Journal %s' % journal.name))
+
+                    journal = self.env['account.journal'].search(
+                        [('loss_account_id', '=', rec.id),
+                         ('company_id', '!=', vals['company_id'])], limit=1)
+
+                    if journal:
+                        raise ValidationError(
+                            _('You cannot change the company, as this '
+                              'account is assigned as Loss Account in '
+                              'Account Journal %s' %
+                              journal.name))
+
+        return super(AccountAccount, self).write(vals)

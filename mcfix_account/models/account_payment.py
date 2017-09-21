@@ -18,12 +18,12 @@ class AccountPayment(models.Model):
                 if self.partner_type == 'customer':
                     self.destination_account_id = \
                         self.partner_id.with_context(
-                            force_company=
-                            rec.company_id.id).property_account_receivable_id.id
+                            force_company=rec.company_id.id).\
+                        property_account_receivable_id.id
                 else:
                     self.destination_account_id = self.partner_id.with_context(
-                            force_company=
-                            rec.company_id.id).property_account_payable_id.id
+                        force_company=rec.company_id.id).\
+                        property_account_payable_id.id
 
     @api.onchange('payment_type', 'company_id')
     def _onchange_payment_type(self):

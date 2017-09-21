@@ -45,6 +45,8 @@ class AccountMoveLine(models.Model):
     @api.model
     def get_data_for_manual_reconciliation(self, res_type, res_ids=None,
                                            account_type=None):
+        # Code is the same as original method, but we use it to compute for
+        # the child_companies
         prev_rows = super(
             AccountMoveLine, self).get_data_for_manual_reconciliation(
             res_type, res_ids, account_type)
@@ -65,18 +67,22 @@ class AccountMoveLine(models.Model):
 
         query = ("""
             SELECT {0} account_id, account_name, account_code, max_date,
-                   to_char(last_time_entries_checked, 'YYYY-MM-DD') AS last_time_entries_checked
+                   to_char(last_time_entries_checked, 'YYYY-MM-DD') 
+                   AS last_time_entries_checked
             FROM (
                     SELECT {1}
-                        {res_alias}.last_time_entries_checked AS last_time_entries_checked,
+                        {res_alias}.last_time_entries_checked 
+                        AS last_time_entries_checked,
                         a.id AS account_id,
                         a.name AS account_name,
                         a.code AS account_code,
                         MAX(l.write_date) AS max_date
                     FROM
                         account_move_line l
-                        RIGHT JOIN account_account a ON (a.id = l.account_id)
-                        RIGHT JOIN account_account_type at ON (at.id = a.user_type_id)
+                        RIGHT JOIN account_account a 
+                        ON (a.id = l.account_id)
+                        RIGHT JOIN account_account_type at 
+                        ON (at.id = a.user_type_id)
                         {2}
                     WHERE
                         a.reconcile IS TRUE
@@ -99,15 +105,20 @@ class AccountMoveLine(models.Model):
                             {7}
                             AND l.amount_residual < 0
                         )
-                    GROUP BY {8} a.id, a.name, a.code, {res_alias}.last_time_entries_checked
+                    GROUP BY {8} a.id, a.name, a.code, 
+                    {res_alias}.last_time_entries_checked
                     ORDER BY {res_alias}.last_time_entries_checked
                 ) as s
-            WHERE (last_time_entries_checked IS NULL OR max_date > last_time_entries_checked)
+            WHERE (last_time_entries_checked IS NULL 
+            OR max_date > last_time_entries_checked)
         """.format(
                 is_partner and 'partner_id, partner_name,' or ' ',
-                is_partner and 'p.id AS partner_id, p.name AS partner_name,' or ' ',
-                is_partner and 'RIGHT JOIN res_partner p ON (l.partner_id = p.id)' or ' ',
-                is_partner and ' ' or "AND at.type <> 'payable' AND at.type <> 'receivable'",
+                is_partner and 'p.id AS partner_id, p.name '
+                               'AS partner_name,' or ' ',
+                is_partner and 'RIGHT JOIN res_partner p '
+                               'ON (l.partner_id = p.id)' or ' ',
+                is_partner and ' ' or "AND at.type <> 'payable' "
+                                      "AND at.type <> 'receivable'",
                 account_type and "AND at.type = %(account_type)s" or '',
                 res_ids and 'AND ' + res_alias + '.id in %(res_ids)s' or '',
                 child_company_ids and '%(child_company_ids)s' or '',
@@ -130,9 +141,11 @@ class AccountMoveLine(models.Model):
         # Fetch other data
         for row in rows:
             account = self.env['account.account'].browse(row['account_id'])
-            row['currency_id'] = account.currency_id.id or account.company_id.currency_id.id
+            row['currency_id'] = account.currency_id.id or \
+                account.company_id.currency_id.id
             partner_id = is_partner and row['partner_id'] or None
-            row['reconciliation_proposition'] = self.get_reconciliation_proposition(account.id, partner_id)
+            row['reconciliation_proposition'] = \
+                self.get_reconciliation_proposition(account.id, partner_id)
         self._add_company_name_to_rows(rows)
         total_rows = rows + prev_rows
         return total_rows
