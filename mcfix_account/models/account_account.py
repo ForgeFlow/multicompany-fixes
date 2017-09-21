@@ -36,7 +36,7 @@ class AccountAccount(models.Model):
         self.tax_ids = False
 
     def write(self, vals):
-        if 'company_id' in vals:
+        if vals.get('company_id', False):
             if not self.env.context.get('bypass_company_validation', False):
                 for rec in self:
                     journal = self.env['account.journal'].search(
