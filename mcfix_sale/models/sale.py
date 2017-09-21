@@ -62,7 +62,7 @@ class SaleOrder(models.Model):
     @api.multi
     def _prepare_invoice(self):
         """
-        Prepare the dict of values to create the new invoice for a Sales Order.
+        Prepare the dict of values to create the new invoice for a sale order.
         This method may be overridden to implement custom invoice generation
         (making sure to call super() to establish a clean extension chain).
         """
