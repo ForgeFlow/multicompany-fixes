@@ -40,7 +40,7 @@ class AccountTax(models.Model):
                     if invoice:
                         raise ValidationError(
                             _('You cannot change the company, as this '
-                              'tax is assigned to invoice %s' %
+                              'tax is assigned to invoice %s.' %
                               invoice.name))
                     invoice_tax = self.env['account.invoice.tax'].search(
                         [('tax_id', '=', rec.id),
@@ -49,7 +49,7 @@ class AccountTax(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'tax is assigned to invoice tax %s in invoice '
-                              '%s' % (invoice_tax.name,
+                              '%s.' % (invoice_tax.name,
                                       invoice_tax.invoice_id.name)))
 
                     # Account Tax
@@ -59,7 +59,7 @@ class AccountTax(models.Model):
                     if parent_tax:
                         raise ValidationError(
                             _('You cannot change the company, as this '
-                              'tax is child tax of Tax %s' %
+                              'tax is child tax of Tax %s.' %
                               parent_tax.name))
                     second_tax = self.search(
                         [('second_tax_id', '=', [rec.id]),
@@ -67,7 +67,7 @@ class AccountTax(models.Model):
                     if second_tax:
                         raise ValidationError(
                             _('You cannot change the company, as this '
-                              'tax is Second Tax of Tax %s' %
+                              'tax is Second Tax of Tax %s.' %
                               parent_tax.name))
 
                     # Account Move Line
@@ -78,7 +78,7 @@ class AccountTax(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'tax is assigned to account move line %s of '
-                              'move %s' % (aml.name, aml.move_id.name)))
+                              'move %s.' % (aml.name, aml.move_id.name)))
                     aml = self.env['account.move.line'].search(
                         [('tax_line_id', '=', [rec.id]),
                          ('company_id', '!=', vals['company_id'])], limit=1)
@@ -86,7 +86,7 @@ class AccountTax(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'tax is assigned to account move line %s of '
-                              'move %s' % (aml.name, aml.move_id.name)))
+                              'move %s.' % (aml.name, aml.move_id.name)))
 
                     # Account Fiscal Position Tax
                     fp_tax = self.env['account.fiscal.position.tax'].search(
@@ -96,7 +96,7 @@ class AccountTax(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'tax is assigned as Tax on Product in Fiscal '
-                              'Position Tax %s of Fiscal Position %s' %
+                              'Position Tax %s of Fiscal Position %s.' %
                               (fp_tax.name, fp_tax.position_id.name)))
 
                     fp_tax = self.env['account.fiscal.position.tax'].search(
@@ -106,7 +106,7 @@ class AccountTax(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'tax is assigned as Tax to Apply in Fiscal '
-                              'Position Tax %s of Fiscal Position %s' %
+                              'Position Tax %s of Fiscal Position %s.' %
                               (fp_tax.name, fp_tax.position_id.name)))
 
                     # Product Template
@@ -117,7 +117,7 @@ class AccountTax(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'tax is assigned as Customer Taxes of Product '
-                              'Template %s' % pt.name))
+                              'Template %s.' % pt.name))
                     pt = self.env['product.template'].search(
                         [('supplier_taxes_id', 'in', [rec.id]),
                          ('company_id', '!=', vals['company_id'])], limit=1)
@@ -125,6 +125,6 @@ class AccountTax(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'tax is assigned as Supplier Taxes of Product '
-                              'Template %s' % pt.name))
+                              'Template %s.' % pt.name))
 
         return super(AccountTax, self).write(vals)

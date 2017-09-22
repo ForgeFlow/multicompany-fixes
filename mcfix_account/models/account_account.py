@@ -47,7 +47,7 @@ class AccountAccount(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'account is assigned as Debit Account in '
-                              'Account Journal %s' % journal.name))
+                              'Account Journal %s.' % journal.name))
 
                     journal = self.env['account.journal'].search(
                         [('default_credit_account_id', '=', rec.id),
@@ -56,8 +56,7 @@ class AccountAccount(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'account is assigned as Credit Account '
-                              'in Account Journal %s' %
-                              journal.name))
+                              'in Account Journal %s.' % journal.name))
 
                     journal = self.env['account.journal'].search(
                         [('profit_account_id', '=', rec.id),
@@ -67,7 +66,7 @@ class AccountAccount(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'account is assigned as Profit Account in '
-                              'Account Journal %s' % journal.name))
+                              'Account Journal %s.' % journal.name))
 
                     journal = self.env['account.journal'].search(
                         [('loss_account_id', '=', rec.id),
@@ -77,7 +76,6 @@ class AccountAccount(models.Model):
                         raise ValidationError(
                             _('You cannot change the company, as this '
                               'account is assigned as Loss Account in '
-                              'Account Journal %s' %
-                              journal.name))
+                              'Account Journal %s.' % journal.name))
 
         return super(AccountAccount, self).write(vals)
