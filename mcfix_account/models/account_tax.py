@@ -50,7 +50,7 @@ class AccountTax(models.Model):
                             _('You cannot change the company, as this '
                               'tax is assigned to invoice tax %s in invoice '
                               '%s.' % (invoice_tax.name,
-                                      invoice_tax.invoice_id.name)))
+                                       invoice_tax.invoice_id.name)))
 
                     # Account Tax
                     parent_tax = self.search(
