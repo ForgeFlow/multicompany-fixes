@@ -101,7 +101,7 @@ class TestAccountJournalMC(AccountTestUsers):
                           self.company_2)
 
         # Test that a user cannot change the company of the ir.sequence for a
-        #  sequence that is already assigned to a journal that belongs to
+        # sequence that is already assigned to a journal that belongs to
         # another company
         with self.assertRaises(ValidationError):
             self.cash_journal.sequence_id.company_id = self.company_1

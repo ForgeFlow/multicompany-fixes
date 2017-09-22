@@ -7,7 +7,7 @@
             <field name="name">Account Payment Term</field>
             <field name="model_id" ref="account.model_account_payment_term"/>
             <field name="global" eval="True"/>
-            <field name="domain_force">[('company_id','child_of',[user.company_id.id])]</field>
+            <field name="domain_force">[('company_id', 'child_of', [user.company_id.id])]</field>
         </record>
 
     </data>
