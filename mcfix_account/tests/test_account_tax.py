@@ -5,10 +5,10 @@
 from odoo.addons.account.tests.account_test_users import AccountTestUsers
 
 
-class TestAccountInvoiceMC(AccountTestUsers):
+class TestAccountTaxMC(AccountTestUsers):
 
     def setUp(self):
-        super(TestAccountInvoiceMC, self).setUp()
+        super(TestAccountTaxMC, self).setUp()
 
     def test_name_get(self):
         """ Test that in multi-company the taxes get the correct name """

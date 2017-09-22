@@ -10,14 +10,15 @@ class AccountTax(models.Model):
     @api.depends('company_id')
     def name_get(self):
         res = []
-        tax_names = super(AccountTax, self).name_get()
+        names = super(AccountTax, self).name_get()
         multicompany_group = self.env.ref('base.group_multi_company')
         if multicompany_group not in self.env.user.groups_id:
-            return tax_names
-        for tax_name in tax_names:
-            tax = self.browse(tax_name[0])
-            name = "%s [%s]" % (tax_names[1], tax_names.company_id.name)
-            res += [(tax.id, name)]
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = "%s [%s]" % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
         return res
 
     @api.onchange('company_id')
