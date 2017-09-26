@@ -20,17 +20,14 @@ class AccountInvoice(models.Model):
             res += [(rec.id, name)]
         return res
 
-    # @api.onchange('company_id')
-    # def onchange_company_id(self):
-    #     self.refund_invoice_id = False
-    #     self.payment_term_id = False
-    #     self.account_id = False
-    #     self.invoice_line_ids = False
-    #     self.tax_line_ids = False
-    #     self.move_id = False
-    #     self.journal_id = False
-    #     self.payment_move_line_ids = False
-    #     self.fiscal_position_id = False
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.refund_invoice_id = False
+        self.invoice_line_ids = False
+        self.tax_line_ids = False
+        self.move_id = False
+        self.journal_id = False
+        self.payment_move_line_ids = False
 
     @api.multi
     @api.onchange('company_id')

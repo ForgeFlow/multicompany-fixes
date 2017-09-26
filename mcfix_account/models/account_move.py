@@ -109,7 +109,7 @@ class AccountMoveLine(models.Model):
 
     def auto_reconcile_lines(self):
         return super(AccountMoveLine, self.with_context(
-                         check_move_validity=False)).auto_reconcile_lines()
+            check_move_validity=False)).auto_reconcile_lines()
 
     @api.model
     def _add_company_name_to_rows(self, rows):
