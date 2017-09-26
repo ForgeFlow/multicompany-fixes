@@ -68,11 +68,67 @@ class AccountTaxTemplate(models.Model):
 #     _inherit = 'account.fiscal.position.account.template'
 #
 #
-# class WizardMultiChartsAccounts(models.TransientModel):
-#     _name = 'wizard.multi.charts.accounts'
-#     _inherit = 'res.config'
-#
-#
+class WizardMultiChartsAccounts(models.Model):
+    _inherit = 'wizard.multi.charts.accounts'
+
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(WizardMultiChartsAccounts, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.chart_template_id = False
+        self.sale_tax_id = False
+        self.purchase_tax_id = False
+
+    @api.multi
+    @api.constrains('chart_template_id', 'company_id')
+    def _check_company_chart_template_id(self):
+        for multi_charts_accounts in self.sudo():
+            if multi_charts_accounts.company_id and multi_charts_accounts.\
+                    chart_template_id and multi_charts_accounts.company_id !=\
+                    multi_charts_accounts.chart_template_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Multi Charts Accounts and in '
+                      'Chart Template must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('sale_tax_id', 'company_id')
+    def _check_company_sale_tax_id(self):
+        for multi_charts_accounts in self.sudo():
+            if multi_charts_accounts.company_id and multi_charts_accounts.\
+                    sale_tax_id and multi_charts_accounts.company_id != \
+                    multi_charts_accounts.sale_tax_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Multi Charts Accounts and in '
+                      'Default Sales Tax must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('purchase_tax_id', 'company_id')
+    def _check_company_purchase_tax_id(self):
+        for multi_charts_accounts in self.sudo():
+            if multi_charts_accounts.company_id and multi_charts_accounts.\
+                    purchase_tax_id and multi_charts_accounts.company_id != \
+                    multi_charts_accounts.purchase_tax_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Multi Charts Accounts and in '
+                      'Default Purchase Tax must be the same.'))
+        return True
+
+
 # class AccountBankAccountsWizard(models.TransientModel):
 #     _inherit = 'account.bank.accounts.wizard'
 #
