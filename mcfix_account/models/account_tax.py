@@ -33,7 +33,7 @@ class AccountTax(models.Model):
         for tax in self.sudo():
             for children_tax in tax.children_tax_ids:
                 if tax.company_id and \
-                                tax.company_id != children_tax.company_id:
+                        tax.company_id != children_tax.company_id:
                     raise ValidationError(
                         _('The Company in the Tax and in Children Tax %s '
                           'must be the same.') % children_tax.name)
@@ -44,7 +44,7 @@ class AccountTax(models.Model):
     def _check_company_account_id(self):
         for tax in self.sudo():
             if tax.company_id and tax.account_id and \
-                            tax.company_id != tax.account_id.company_id:
+                    tax.company_id != tax.account_id.company_id:
                 raise ValidationError(_('The Company in the Tax and in '
                                         ' must be the same.'))
         return True
@@ -54,7 +54,7 @@ class AccountTax(models.Model):
     def _check_company_refund_account_id(self):
         for tax in self.sudo():
             if tax.company_id and tax.refund_account_id and \
-                            tax.company_id != tax.refund_account_id.company_id:
+                    tax.company_id != tax.refund_account_id.company_id:
                 raise ValidationError(_('The Company in the Tax and in '
                                         'Tax Account on Refunds must be the'
                                         ' same.'))

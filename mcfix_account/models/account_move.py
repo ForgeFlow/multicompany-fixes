@@ -50,7 +50,7 @@ class AccountMove(models.Model):
     def _check_company_journal_id(self):
         for move in self.sudo():
             if move.company_id and move.journal_id and \
-                            move.company_id != move.journal_id.company_id:
+                    move.company_id != move.journal_id.company_id:
                 raise ValidationError(_('The Company in the Move and in '
                                         'Journal must be the same.'))
         return True
@@ -61,7 +61,7 @@ class AccountMove(models.Model):
         for move in self.sudo():
             for line in move.line_ids:
                 if move.company_id and \
-                                move.company_id != line.company_id:
+                        move.company_id != line.company_id:
                     raise ValidationError(
                         _('The Company in the Move and in Journal Item %s '
                           'must be the same.') % line.name)
@@ -72,8 +72,7 @@ class AccountMove(models.Model):
     def _check_company_dummy_account_id(self):
         for move in self.sudo():
             if move.company_id and move.dummy_account_id and \
-                            move.company_id != move.dummy_account_id.\
-                            company_id:
+                    move.company_id != move.dummy_account_id.company_id:
                 raise ValidationError(_('The Company in the Move and in '
                                         'Account must be the same.'))
         return True
@@ -109,8 +108,7 @@ class AccountMoveLine(models.Model):
         self.invoice_id = False
 
     def auto_reconcile_lines(self):
-        return super(AccountMoveLine,
-                     self.with_context(
+        return super(AccountMoveLine, self.with_context(
                          check_move_validity=False)).auto_reconcile_lines()
 
     @api.model
@@ -235,8 +233,7 @@ class AccountMoveLine(models.Model):
     def _check_company_account_id(self):
         for move_line in self.sudo():
             if move_line.company_id and move_line.account_id and \
-                            move_line.company_id != move_line.account_id.\
-                            company_id:
+                    move_line.company_id != move_line.account_id.company_id:
                 raise ValidationError(_('The Company in the Move Line and in '
                                         'Account must be the same.'))
         return True
@@ -246,8 +243,7 @@ class AccountMoveLine(models.Model):
     def _check_company_move_id(self):
         for move_line in self.sudo():
             if move_line.company_id and move_line.move_id and \
-                            move_line.company_id != move_line.move_id.\
-                            company_id:
+                    move_line.company_id != move_line.move_id.company_id:
                 raise ValidationError(_('The Company in the Move Line and in '
                                         'Journal Entry must be the same.'))
         return True
@@ -257,8 +253,7 @@ class AccountMoveLine(models.Model):
     def _check_company_statement_id(self):
         for move_line in self.sudo():
             if move_line.company_id and move_line.statement_id and \
-                            move_line.company_id != move_line.statement_id.\
-                            company_id:
+                    move_line.company_id != move_line.statement_id.company_id:
                 raise ValidationError(_('The Company in the Move Line and in '
                                         'Statement must be the same.'))
         return True
@@ -269,7 +264,7 @@ class AccountMoveLine(models.Model):
         for move_line in self.sudo():
             for account in move_line.matched_debit_ids:
                 if move_line.company_id and \
-                                move_line.company_id != account.company_id:
+                        move_line.company_id != account.company_id:
                     raise ValidationError(
                         _('The Company in the Move Line and in  '
                           'must be the same.'))
@@ -292,8 +287,7 @@ class AccountMoveLine(models.Model):
     def _check_company_journal_id(self):
         for move_line in self.sudo():
             if move_line.company_id and move_line.journal_id and \
-                            move_line.company_id != move_line.journal_id.\
-                            company_id:
+                    move_line.company_id != move_line.journal_id.company_id:
                 raise ValidationError(_('The Company in the Move Line and in '
                                         'Journal must be the same.'))
         return True
@@ -304,7 +298,7 @@ class AccountMoveLine(models.Model):
         for move_line in self.sudo():
             for tax in move_line.tax_ids:
                 if move_line.company_id and \
-                                move_line.company_id != tax.company_id:
+                        move_line.company_id != tax.company_id:
                     raise ValidationError(
                         _('The Company in the Move Line and in Tax %s'
                           'must be the same.') % tax.name)
@@ -315,8 +309,7 @@ class AccountMoveLine(models.Model):
     def _check_company_tax_line_id(self):
         for move_line in self.sudo():
             if move_line.company_id and move_line.tax_line_id and \
-                            move_line.company_id != move_line.tax_line_id.\
-                            company_id:
+                    move_line.company_id != move_line.tax_line_id.company_id:
                 raise ValidationError(_('The Company in the Move Line and in '
                                         'Originator tax must be the same.'))
         return True
@@ -326,8 +319,7 @@ class AccountMoveLine(models.Model):
     def _check_company_invoice_id(self):
         for move_line in self.sudo():
             if move_line.company_id and move_line.invoice_id and \
-                            move_line.company_id != move_line.invoice_id.\
-                            company_id:
+                    move_line.company_id != move_line.invoice_id.company_id:
                 raise ValidationError(_('The Company in the Move Line and in '
                                         'Partner must be the same.'))
         return True

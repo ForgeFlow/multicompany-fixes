@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models, _
-# from odoo.exceptions import ValidationError
+from odoo import api, models
 
 
 class AccountFiscalPosition(models.Model):
@@ -20,15 +19,3 @@ class AccountFiscalPosition(models.Model):
                 name.company_id else name[1]
             res += [(rec.id, name)]
         return res
-
-
-# class AccountFiscalPositionTax(models.Model):
-#     _inherit = 'account.fiscal.position.tax'
-#
-#
-# class AccountFiscalPositionAccount(models.Model):
-#     _inherit = 'account.fiscal.position.account'
-#
-#
-# class ResPartner(models.Model):
-#     _inherit = 'res.partner'

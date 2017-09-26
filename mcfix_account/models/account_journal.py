@@ -69,7 +69,7 @@ class AccountJournal(models.Model):
         for journal in self.sudo():
             for invoice in journal.invoice_ids:
                 if journal.company_id and \
-                                journal.company_id != invoice.company_id:
+                        journal.company_id != invoice.company_id:
                     raise ValidationError(
                         _('The Company in the Journal and in Invoice %s '
                           'must be the same.') % invoice.name)

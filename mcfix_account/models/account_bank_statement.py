@@ -100,8 +100,8 @@ class AccountBankStatement(models.Model):
     def _check_company_journal_id(self):
         for bank_statement in self.sudo():
             if bank_statement.company_id and bank_statement.journal_id and \
-                            bank_statement.company_id != bank_statement.\
-                            journal_id.company_id:
+                    bank_statement.company_id != bank_statement.\
+                    journal_id.company_id:
                 raise ValidationError(
                     _('The Company in the Bank Statement and in '
                       'Journal must be the same.'))
@@ -113,8 +113,8 @@ class AccountBankStatement(models.Model):
         for bank_statement in self.sudo():
             for move_line in bank_statement.move_line_ids:
                 if bank_statement.company_id and \
-                                bank_statement.company_id != move_line.\
-                                company_id:
+                        bank_statement.company_id != move_line.\
+                        company_id:
                     raise ValidationError(
                         _('The Company in the Bank Statement and in '
                           'Entry line %s must be the same.') % move_line.name)

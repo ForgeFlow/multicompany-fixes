@@ -27,7 +27,7 @@ class AccountAccount(models.Model):
         for account in self.sudo():
             for tax in account.tax_ids:
                 if account.company_id and \
-                                account.company_id != tax.company_id:
+                        account.company_id != tax.company_id:
                     raise ValidationError(_('The Company in the Account and '
                                             'in Default Taxes %s must be the '
                                             'same.' % tax.name))

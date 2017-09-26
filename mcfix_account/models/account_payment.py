@@ -49,8 +49,8 @@ class AccountAbstractPayment(models.Model):
     def _check_company_journal_id(self):
         for abstract_payment in self.sudo():
             if abstract_payment.company_id and abstract_payment.journal_id and\
-                            abstract_payment.company_id != abstract_payment.\
-                            journal_id.company_id:
+                    abstract_payment.company_id != abstract_payment.\
+                    journal_id.company_id:
                 raise ValidationError(
                     _('The Company in the Abstract Payment and in '
                       'Payment Journal must be the same.'))

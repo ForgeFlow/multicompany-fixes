@@ -35,8 +35,8 @@ class AccountChartTemplate(models.Model):
     def _check_company_parent_id(self):
         for chart_template in self.sudo():
             if chart_template.company_id and chart_template.parent_id and \
-                            chart_template.company_id != chart_template.\
-                            parent_id.company_id:
+                    chart_template.company_id != chart_template.\
+                    parent_id.company_id:
                 raise ValidationError(
                     _('The Company in the Chart Template and in '
                       'Parent Chart Template must be the same.'))
@@ -48,8 +48,8 @@ class AccountChartTemplate(models.Model):
         for chart_template in self.sudo():
             for tax_template in chart_template.tax_template_ids:
                 if chart_template.company_id and \
-                                chart_template.company_id != tax_template.\
-                                company_id:
+                        chart_template.company_id != tax_template.\
+                        company_id:
                     raise ValidationError(
                         _('The Company in the Chart Template and in '
                           'Tax Template List %s must be the same.'
@@ -85,8 +85,8 @@ class AccountTaxTemplate(models.Model):
     def _check_company_chart_template_id(self):
         for tax_template in self.sudo():
             if tax_template.company_id and tax_template.chart_template_id and \
-                            tax_template.company_id != tax_template.\
-                            chart_template_id.company_id:
+                    tax_template.company_id != tax_template.\
+                    chart_template_id.company_id:
                 raise ValidationError(
                     _('The Company in the Tax Template and in '
                       'Chart Template must be the same.'))
@@ -98,7 +98,7 @@ class AccountTaxTemplate(models.Model):
         for tax_template in self.sudo():
             for account in tax_template.children_tax_ids:
                 if tax_template.company_id and \
-                                tax_template.company_id != account.company_id:
+                        tax_template.company_id != account.company_id:
                     raise ValidationError(
                         _(
                             'The Company in the Tax Template and in '
@@ -106,14 +106,6 @@ class AccountTaxTemplate(models.Model):
         return True
 
 
-# class AccountFiscalPositionTaxTemplate(models.Model):
-#     _inherit = 'account.fiscal.position.tax.template'
-#
-#
-# class AccountFiscalPositionAccountTemplate(models.Model):
-#     _inherit = 'account.fiscal.position.account.template'
-#
-#
 class WizardMultiChartsAccounts(models.Model):
     _inherit = 'wizard.multi.charts.accounts'
 
@@ -173,11 +165,3 @@ class WizardMultiChartsAccounts(models.Model):
                     _('The Company in the Multi Charts Accounts and in '
                       'Default Purchase Tax must be the same.'))
         return True
-
-
-# class AccountBankAccountsWizard(models.TransientModel):
-#     _inherit = 'account.bank.accounts.wizard'
-#
-#
-# class AccountReconcileModelTemplate(models.Model):
-#     _inherit = "account.reconcile.model.template"

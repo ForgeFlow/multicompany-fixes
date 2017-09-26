@@ -58,8 +58,8 @@ class AccountInvoice(models.Model):
     def _check_company_refund_invoice_id(self):
         for invoice in self.sudo():
             if invoice.company_id and invoice.refund_invoice_id and \
-                            invoice.company_id != invoice.refund_invoice_id.\
-                            company_id:
+                    invoice.company_id != invoice.refund_invoice_id.\
+                    company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
                                         'the Refund must be the same.'))
         return True
@@ -129,7 +129,7 @@ class AccountInvoice(models.Model):
         for invoice in self.sudo():
             for invoice_line in invoice.invoice_line_ids:
                 if invoice.company_id and \
-                                invoice.company_id != invoice_line.company_id:
+                        invoice.company_id != invoice_line.company_id:
                     raise ValidationError(
                         _('The Company in the Invoice and in Invoice Line %s '
                           'must be the same.') % invoice_line.name)
@@ -140,7 +140,7 @@ class AccountInvoice(models.Model):
     def _check_company_move_id(self):
         for invoice in self.sudo():
             if invoice.company_id and invoice.move_id and \
-                            invoice.company_id != invoice.move_id.company_id:
+                    invoice.company_id != invoice.move_id.company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
                                         'Journal Entry must be the same.'))
         return True
@@ -151,7 +151,7 @@ class AccountInvoice(models.Model):
         for invoice in self.sudo():
             for move_line in invoice.payment_move_line_ids:
                 if invoice.company_id and \
-                                invoice.company_id != move_line.company_id:
+                        invoice.company_id != move_line.company_id:
                     raise ValidationError(
                         _('The Company in the Invoice and in '
                           'Payment Move Line % must be the same.'
@@ -212,8 +212,8 @@ class AccountInvoiceLine(models.Model):
     def _check_company_invoice_id(self):
         for invoice_line in self.sudo():
             if invoice_line.company_id and invoice_line.invoice_id and \
-                            invoice_line.company_id != invoice_line.\
-                            invoice_id.company_id:
+                    invoice_line.company_id != invoice_line.\
+                    invoice_id.company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Line and in '
                       'Invoice Reference must be the same.'))
@@ -224,8 +224,8 @@ class AccountInvoiceLine(models.Model):
     def _check_company_account_id(self):
         for invoice_line in self.sudo():
             if invoice_line.company_id and invoice_line.account_id and \
-                            invoice_line.company_id != invoice_line.\
-                            account_id.company_id:
+                    invoice_line.company_id != invoice_line.\
+                    account_id.company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Line and in '
                       'Account must be the same.'))
@@ -237,8 +237,8 @@ class AccountInvoiceLine(models.Model):
         for invoice_line in self.sudo():
             for invoice_line_tax in invoice_line.invoice_line_tax_ids:
                 if invoice_line.company_id and \
-                                invoice_line.company_id != invoice_line_tax.\
-                                company_id:
+                        invoice_line.company_id != invoice_line_tax.\
+                        company_id:
                     raise ValidationError(
                         _('The Company in the Invoice Line and in Tax %s '
                           'must be the same.') % invoice_line_tax.name)
@@ -274,8 +274,8 @@ class AccountInvoiceTax(models.Model):
     def _check_company_invoice_id(self):
         for invoice_tax in self.sudo():
             if invoice_tax.company_id and invoice_tax.invoice_id and \
-                            invoice_tax.company_id != invoice_tax.invoice_id.\
-                            company_id:
+                    invoice_tax.company_id != invoice_tax.invoice_id.\
+                    company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Tax and in '
                       'Invoice must be the same.'))
@@ -286,8 +286,7 @@ class AccountInvoiceTax(models.Model):
     def _check_company_tax_id(self):
         for invoice_tax in self.sudo():
             if invoice_tax.company_id and invoice_tax.tax_id and \
-                            invoice_tax.company_id != invoice_tax.tax_id.\
-                            company_id:
+                    invoice_tax.company_id != invoice_tax.tax_id.company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Tax and in '
                       'Tax must be the same.'))
@@ -298,8 +297,8 @@ class AccountInvoiceTax(models.Model):
     def _check_company_account_id(self):
         for invoice_tax in self.sudo():
             if invoice_tax.company_id and invoice_tax.account_id and \
-                            invoice_tax.company_id != invoice_tax.account_id.\
-                            company_id:
+                    invoice_tax.company_id != invoice_tax.account_id.\
+                    company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Tax and in '
                       'Tax Account must be the same.'))
