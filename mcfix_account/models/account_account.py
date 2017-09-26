@@ -26,10 +26,11 @@ class AccountAccount(models.Model):
     def _check_company_tax_ids(self):
         for account in self.sudo():
             for tax in account.tax_ids:
-                if account.company_id != tax.company_id:
+                if account.company_id and \
+                                account.company_id != tax.company_id:
                     raise ValidationError(_('The Company in the Account and '
-                                            'in tax %s must be the same.' %
-                                            tax.name))
+                                            'in Default Taxes %s must be the '
+                                            'same.' % tax.name))
         return True
 
     @api.onchange('company_id')
