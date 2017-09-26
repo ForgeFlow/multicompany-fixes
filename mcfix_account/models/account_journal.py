@@ -67,12 +67,12 @@ class AccountJournal(models.Model):
     @api.constrains('invoice_ids', 'company_id')
     def _check_company_invoice_ids(self):
         for journal in self.sudo():
-            for account in journal.invoice_ids:
+            for invoice in journal.invoice_ids:
                 if journal.company_id and \
-                                journal.company_id != account.company_id:
+                                journal.company_id != invoice.company_id:
                     raise ValidationError(
-                        _('The Company in the Journal and in Invoices '
-                          'must be the same.'))
+                        _('The Company in the Journal and in Invoice %s '
+                          'must be the same.') % invoice.name)
         return True
 
     @api.multi
