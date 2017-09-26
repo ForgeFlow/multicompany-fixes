@@ -21,6 +21,12 @@ class AccountMove(models.Model):
             res += [(rec.id, name)]
         return res
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.journal_id = False
+        self.line_ids = False
+        self.dummy_account_id = False
+
     @api.multi
     def _get_default_journal(self):
         if self.env.context.get('default_journal_type'):
@@ -38,6 +44,39 @@ class AccountMove(models.Model):
                     raise UserError(
                         _('Company must be the same for all account move '
                           'lines.'))
+
+    @api.multi
+    @api.constrains('journal_id', 'company_id')
+    def _check_company_journal_id(self):
+        for move in self.sudo():
+            if move.company_id and move.journal_id and \
+                            move.company_id != move.journal_id.company_id:
+                raise ValidationError(_('The Company in the Move and in '
+                                        'Journal must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('line_ids', 'company_id')
+    def _check_company_line_ids(self):
+        for move in self.sudo():
+            for account in move.line_ids:
+                if move.company_id and \
+                                move.company_id != account.company_id:
+                    raise ValidationError(
+                        _('The Company in the Move and in Journal Items '
+                          'must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('dummy_account_id', 'company_id')
+    def _check_company_dummy_account_id(self):
+        for move in self.sudo():
+            if move.company_id and move.dummy_account_id and \
+                            move.company_id != move.dummy_account_id.\
+                            company_id:
+                raise ValidationError(_('The Company in the Move and in '
+                                        'Account must be the same.'))
+        return True
 
 
 class AccountMoveLine(models.Model):
