@@ -235,12 +235,13 @@ class AccountInvoiceLine(models.Model):
     @api.constrains('invoice_line_tax_ids', 'company_id')
     def _check_company_invoice_line_tax_ids(self):
         for invoice_line in self.sudo():
-            for account in invoice_line.invoice_line_tax_ids:
+            for invoice_line_tax in invoice_line.invoice_line_tax_ids:
                 if invoice_line.company_id and \
-                                invoice_line.company_id != account.company_id:
+                                invoice_line.company_id != invoice_line_tax.\
+                                company_id:
                     raise ValidationError(
-                        _('The Company in the Invoice Line and in Taxes '
-                          'must be the same.'))
+                        _('The Company in the Invoice Line and in Tax %s '
+                          'must be the same.') % invoice_line_tax.name)
         return True
 
 
