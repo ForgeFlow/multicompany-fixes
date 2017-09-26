@@ -59,12 +59,12 @@ class AccountMove(models.Model):
     @api.constrains('line_ids', 'company_id')
     def _check_company_line_ids(self):
         for move in self.sudo():
-            for account in move.line_ids:
+            for line in move.line_ids:
                 if move.company_id and \
-                                move.company_id != account.company_id:
+                                move.company_id != line.company_id:
                     raise ValidationError(
-                        _('The Company in the Move and in Journal Items '
-                          'must be the same.'))
+                        _('The Company in the Move and in Journal Item %s '
+                          'must be the same.') % line.name)
         return True
 
     @api.multi
@@ -279,12 +279,12 @@ class AccountMoveLine(models.Model):
     @api.constrains('matched_credit_ids', 'company_id')
     def _check_company_matched_credit_ids(self):
         for move_line in self.sudo():
-            for account in move_line.matched_credit_ids:
-                if move_line.company_id and \
-                                move_line.company_id != account.company_id:
+            for matched_credit in move_line.matched_credit_ids:
+                if move_line.company_id and move_line.company_id != \
+                        matched_credit.company_id:
                     raise ValidationError(
-                        _('The Company in the Move Line and in Journal '
-                          'must be the same.'))
+                        _('The Company in the Move Line and in Journal %s'
+                          'must be the same.') % matched_credit.name)
         return True
 
     @api.multi
@@ -302,12 +302,12 @@ class AccountMoveLine(models.Model):
     @api.constrains('tax_ids', 'company_id')
     def _check_company_tax_ids(self):
         for move_line in self.sudo():
-            for account in move_line.tax_ids:
+            for tax in move_line.tax_ids:
                 if move_line.company_id and \
-                                move_line.company_id != account.company_id:
+                                move_line.company_id != tax.company_id:
                     raise ValidationError(
-                        _('The Company in the Move Line and in Taxes '
-                          'must be the same.'))
+                        _('The Company in the Move Line and in Tax %s'
+                          'must be the same.') % tax.name)
         return True
 
     @api.multi
