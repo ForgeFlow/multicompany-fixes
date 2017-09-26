@@ -64,6 +64,18 @@ class AccountJournal(models.Model):
         return res
 
     @api.multi
+    @api.constrains('invoice_ids', 'company_id')
+    def _check_company_invoice_ids(self):
+        for journal in self.sudo():
+            for account in journal.invoice_ids:
+                if journal.company_id and \
+                                journal.company_id != account.company_id:
+                    raise ValidationError(
+                        _('The Company in the Journal and in Invoices '
+                          'must be the same.'))
+        return True
+
+    @api.multi
     @api.constrains('account_control_ids', 'company_id')
     def _check_company_account_control_ids(self):
         for journal in self.sudo():
@@ -97,6 +109,7 @@ class AccountJournal(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
+        self.invoice_ids = False
         self.account_control_ids = False
         self.profit_account_id = False
         self.loss_account_id = False
