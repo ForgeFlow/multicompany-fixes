@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 
 class AccountPaymentTerm(models.Model):
@@ -19,6 +20,41 @@ class AccountPaymentTerm(models.Model):
                 name.company_id else name[1]
             res += [(rec.id, name)]
         return res
+
+
+class AccountAbstractPayment(models.Model):
+    _inherit = 'account.abstract.payment'
+
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(AccountAbstractPayment, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.journal_id = False
+
+    @api.multi
+    @api.constrains('journal_id', 'company_id')
+    def _check_company_journal_id(self):
+        for abstract_payment in self.sudo():
+            if abstract_payment.company_id and abstract_payment.journal_id and\
+                            abstract_payment.company_id != abstract_payment.\
+                            journal_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Abstract Payment and in '
+                      'Payment Journal must be the same.'))
+        return True
 
 
 class AccountPayment(models.Model):
