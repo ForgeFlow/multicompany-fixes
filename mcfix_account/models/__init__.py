@@ -7,3 +7,4 @@ from . import account_bank_statement
 from . import account_account
 from . import ir_sequence
 from . import account_tax
+from . import chart_template
