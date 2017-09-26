@@ -1,9 +1,9 @@
-
-from odoo import api, models
+# -*- coding: utf-8 -*-
+from odoo import api, models, _
+from odoo.exceptions import ValidationError
 
 
 class AccountBankStatement(models.Model):
-
     _inherit = "account.bank.statement"
 
     @api.multi
@@ -20,6 +20,11 @@ class AccountBankStatement(models.Model):
                 name.company_id else name[1]
             res += [(rec.id, name)]
         return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.journal_id = False
+        self.move_line_ids = False
 
     def reconciliation_widget_preprocess(self):
         # This is the same code as the original method except for the fact
@@ -89,3 +94,28 @@ class AccountBankStatement(models.Model):
 
         res['st_lines_ids'] += st_lines_left.ids
         return res
+
+    @api.multi
+    @api.constrains('journal_id', 'company_id')
+    def _check_company_journal_id(self):
+        for bank_statement in self.sudo():
+            if bank_statement.company_id and bank_statement.journal_id and \
+                            bank_statement.company_id != bank_statement.\
+                            journal_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Bank Statement and in '
+                      'Journal must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('move_line_ids', 'company_id')
+    def _check_company_move_line_ids(self):
+        for bank_statement in self.sudo():
+            for move_line in bank_statement.move_line_ids:
+                if bank_statement.company_id and \
+                                bank_statement.company_id != move_line.\
+                                company_id:
+                    raise ValidationError(
+                        _('The Company in the Bank Statement and in '
+                          'Entry line %s must be the same.') % move_line.name)
+        return True
