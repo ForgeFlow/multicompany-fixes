@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
@@ -70,4 +71,52 @@ class AccountReconcileModel(models.Model):
                 raise ValidationError(
                     _('The Company in the Reconciliation model and in the '
                       'Tax must be the same.'))
+        return True
+
+
+class AccountPartialReconcile(models.Model):
+    _inherit = 'account.partial.reconcile'
+
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(AccountPartialReconcile, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.debit_move_id = False
+        self.credit_move_id = False
+
+    @api.multi
+    @api.constrains('debit_move_id', 'company_id')
+    def _check_company_debit_move_id(self):
+        for partial_reconcile in self.sudo():
+            if partial_reconcile.company_id and partial_reconcile.\
+                    debit_move_id and partial_reconcile.company_id != \
+                    partial_reconcile.debit_move_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Partial Reconcile and in '
+                      ' must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('credit_move_id', 'company_id')
+    def _check_company_credit_move_id(self):
+        for partial_reconcile in self.sudo():
+            if partial_reconcile.company_id and partial_reconcile.\
+                    credit_move_id and partial_reconcile.company_id != \
+                    partial_reconcile.credit_move_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Partial Reconcile and in '
+                      ' must be the same.'))
         return True
