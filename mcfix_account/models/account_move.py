@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class AccountMove(models.Model):
@@ -56,6 +56,18 @@ class AccountMoveLine(models.Model):
             name = "%s [%s]" % (name[1], name.company_id.name)
             res += [(rec.id, name)]
         return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.account_id = False
+        self.move_id = False
+        self.statement_id = False
+        self.matched_debit_ids = False
+        self.matched_credit_ids = False
+        self.journal_id = False
+        self.tax_ids = False
+        self.tax_line_id = False
+        self.invoice_id = False
 
     def auto_reconcile_lines(self):
         return super(AccountMoveLine,
@@ -178,3 +190,105 @@ class AccountMoveLine(models.Model):
         self._add_company_name_to_rows(rows)
         total_rows = rows + prev_rows
         return total_rows
+
+    @api.multi
+    @api.constrains('account_id', 'company_id')
+    def _check_company_account_id(self):
+        for move_line in self.sudo():
+            if move_line.company_id and move_line.account_id and \
+                            move_line.company_id != move_line.account_id.\
+                            company_id:
+                raise ValidationError(_('The Company in the Move Line and in '
+                                        'Account must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('move_id', 'company_id')
+    def _check_company_move_id(self):
+        for move_line in self.sudo():
+            if move_line.company_id and move_line.move_id and \
+                            move_line.company_id != move_line.move_id.\
+                            company_id:
+                raise ValidationError(_('The Company in the Move Line and in '
+                                        'Journal Entry must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('statement_id', 'company_id')
+    def _check_company_statement_id(self):
+        for move_line in self.sudo():
+            if move_line.company_id and move_line.statement_id and \
+                            move_line.company_id != move_line.statement_id.\
+                            company_id:
+                raise ValidationError(_('The Company in the Move Line and in '
+                                        'Statement must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('matched_debit_ids', 'company_id')
+    def _check_company_matched_debit_ids(self):
+        for move_line in self.sudo():
+            for account in move_line.matched_debit_ids:
+                if move_line.company_id and \
+                                move_line.company_id != account.company_id:
+                    raise ValidationError(
+                        _('The Company in the Move Line and in  '
+                          'must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('matched_credit_ids', 'company_id')
+    def _check_company_matched_credit_ids(self):
+        for move_line in self.sudo():
+            for account in move_line.matched_credit_ids:
+                if move_line.company_id and \
+                                move_line.company_id != account.company_id:
+                    raise ValidationError(
+                        _('The Company in the Move Line and in Journal '
+                          'must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('journal_id', 'company_id')
+    def _check_company_journal_id(self):
+        for move_line in self.sudo():
+            if move_line.company_id and move_line.journal_id and \
+                            move_line.company_id != move_line.journal_id.\
+                            company_id:
+                raise ValidationError(_('The Company in the Move Line and in '
+                                        'Journal must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('tax_ids', 'company_id')
+    def _check_company_tax_ids(self):
+        for move_line in self.sudo():
+            for account in move_line.tax_ids:
+                if move_line.company_id and \
+                                move_line.company_id != account.company_id:
+                    raise ValidationError(
+                        _('The Company in the Move Line and in Taxes '
+                          'must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('tax_line_id', 'company_id')
+    def _check_company_tax_line_id(self):
+        for move_line in self.sudo():
+            if move_line.company_id and move_line.tax_line_id and \
+                            move_line.company_id != move_line.tax_line_id.\
+                            company_id:
+                raise ValidationError(_('The Company in the Move Line and in '
+                                        'Originator tax must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('invoice_id', 'company_id')
+    def _check_company_invoice_id(self):
+        for move_line in self.sudo():
+            if move_line.company_id and move_line.invoice_id and \
+                            move_line.company_id != move_line.invoice_id.\
+                            company_id:
+                raise ValidationError(_('The Company in the Move Line and in '
+                                        'Partner must be the same.'))
+        return True
