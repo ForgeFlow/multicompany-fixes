@@ -25,7 +25,6 @@ class AccountTax(models.Model):
     def onchange_company_id(self):
         self.account_id = False
         self.refund_account_id = False
-        self.refund_account_id = False
         self.children_tax_ids = False
 
     def write(self, vals):
