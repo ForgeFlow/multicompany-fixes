@@ -7,8 +7,54 @@ from odoo.exceptions import ValidationError
 #     _inherit = "account.account.template"
 #
 #
-# class AccountChartTemplate(models.Model):
-#     _inherit = "account.chart.template"
+class AccountChartTemplate(models.Model):
+    _inherit = "account.chart.template"
+
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(AccountChartTemplate, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.parent_id = False
+        self.tax_template_ids = False
+
+    @api.multi
+    @api.constrains('parent_id', 'company_id')
+    def _check_company_parent_id(self):
+        for chart_template in self.sudo():
+            if chart_template.company_id and chart_template.parent_id and \
+                            chart_template.company_id != chart_template.\
+                            parent_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Chart Template and in '
+                      'Parent Chart Template must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('tax_template_ids', 'company_id')
+    def _check_company_tax_template_ids(self):
+        for chart_template in self.sudo():
+            for tax_template in chart_template.tax_template_ids:
+                if chart_template.company_id and \
+                                chart_template.company_id != tax_template.\
+                                company_id:
+                    raise ValidationError(
+                        _('The Company in the Chart Template and in '
+                          'Tax Template List %s must be the same.'
+                          ) % tax_template.name)
+        return True
 
 
 class AccountTaxTemplate(models.Model):
