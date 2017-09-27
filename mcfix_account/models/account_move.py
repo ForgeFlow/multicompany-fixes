@@ -35,15 +35,30 @@ class AccountMove(models.Model):
                  ('company_id', '=', self.env.user.company_id)],
                 limit=1).id
 
-    @api.multi
     @api.constrains('company_id')
-    def constrain_company(self):
-        for move in self:
-            for line in move.line_ids:
-                if line.account_id.company_id.id != move.company_id.id:
+    def _check_company_id(self):
+        for rec in self:
+            for line in rec.line_ids:
+                if line.account_id.company_id.id != rec.company_id.id:
                     raise UserError(
                         _('Company must be the same for all account move '
                           'lines.'))
+            move_line = self.env['account.move.line'].search(
+                [('move_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal Entry is assigned to Move Line '
+                      '%s.' % move_line.name))
+            invoice = self.env['account.invoice'].search(
+                [('move_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal Entry is assigned to Invoice '
+                      '%s.' % invoice.name))
 
     @api.multi
     @api.constrains('journal_id', 'company_id')
