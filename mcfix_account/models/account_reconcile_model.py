@@ -120,3 +120,25 @@ class AccountPartialReconcile(models.Model):
                     _('The Company in the Partial Reconcile and in '
                       ' must be the same.'))
         return True
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            move_line = self.env['account.move.line'].search(
+                [('matched_debit_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      ' is assigned to Move Line '
+                      '%s in Move %s.' % (move_line.name,
+                                          move_line.move_id.name)))
+            move_line = self.env['account.move.line'].search(
+                [('matched_credit_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal is assigned to Move Line '
+                      '%s in Move %s.' % (move_line.name,
+                                          move_line.move_id.name)))
