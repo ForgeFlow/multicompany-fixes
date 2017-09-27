@@ -10,18 +10,19 @@ class AccountJournal(models.Model):
                                   inverse_name='journal_id', string='Invoices')
 
     @api.multi
-    @api.depends('company_id')
+    @api.depends('name', 'currency_id', 'company_id', 'company_id.currency_id')
     def name_get(self):
         res = []
-        names = super(AccountJournal, self).name_get()
+        journal_names = super(AccountJournal, self).name_get()
         multicompany_group = self.env.ref('base.group_multi_company')
         if multicompany_group not in self.env.user.groups_id:
-            return names
-        for name in names:
-            rec = self.browse(name[0])
-            name = "%s [%s]" % (name[1], name.company_id.name) if \
-                name.company_id else name[1]
-            res += [(rec.id, name)]
+            return journal_names
+        for journal_name in journal_names:
+            journal = self.browse(journal_name[0])
+            name = "%s [%s]" % (
+                journal_name[1], journal_name.company_id.name) if \
+                journal_name.company_id else journal_name[1]
+            res += [(journal.id, name)]
         return res
 
     @api.multi
@@ -48,20 +49,6 @@ class AccountJournal(models.Model):
         'Belong to the user\'s current child company',
         compute="_belong_to_company_or_child",
         search="_search_user_company_and_child_journals")
-
-    @api.multi
-    @api.depends('name', 'currency_id', 'company_id', 'company_id.currency_id')
-    def name_get(self):
-        res = []
-        journal_names = super(AccountJournal, self).name_get()
-        multicompany_group = self.env.ref('base.group_multi_company')
-        if multicompany_group not in self.env.user.groups_id:
-            return journal_names
-        for journal_name in journal_names:
-            journal = self.browse(journal_name[0])
-            name = "%s [%s]" % (journal_name[1], journal.company_id.name)
-            res += [(journal.id, name)]
-        return res
 
     @api.multi
     @api.constrains('invoice_ids', 'company_id')
@@ -114,18 +101,52 @@ class AccountJournal(models.Model):
         self.profit_account_id = False
         self.loss_account_id = False
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            move = self.env['account.move'].search(
+                [('journal_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal is assigned to Move '
+                      '%s.' % move.name))
+            move_line = self.env['account.move.line'].search(
+                [('journal_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal is assigned to Move Line '
+                      '%s in Move %s.' % (move_line.name,
+                                          move_line.move_id.name)))
+            invoice = self.env['account.invoice'].search(
+                [('journal_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal is assigned to Invoice '
+                      '%s.' % invoice.name))
+            abstract_payment = self.env['account.abstract.payment'].search(
+                [('journal_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if abstract_payment:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Payment Journal is assigned to Payment '
+                      '%s.' % abstract_payment.name))
+            bank_statement = self.env['account.bank.statement'].search(
+                [('journal_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if bank_statement:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal is assigned to Bank Statement '
+                      '%s.' % bank_statement.name))
+
     def write(self, vals):
-        if 'company_id' in vals:
-            if self.env['account.move'].search(
-                    [('journal_id', 'in', self.ids)], limit=1):
-                raise ValidationError(_(
-                    'This journal already contains items, therefore '
-                    'you cannot modify its company.'))
-            if self.env['account.invoice'].search(
-                    [('journal_id', 'in', self.ids)], limit=1):
-                raise ValidationError(_(
-                    'This journal already contains invoices, therefore '
-                    'you cannot modify its company.'))
         for journal in self:
             if 'company_id' in vals:
                 if journal.sequence_id.company_id.id != vals['company_id']:
