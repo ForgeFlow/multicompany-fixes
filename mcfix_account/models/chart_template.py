@@ -105,6 +105,43 @@ class AccountTaxTemplate(models.Model):
                             'Children Taxes must be the same.'))
         return True
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            tax_template = self.search(
+                [('children_tax_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if tax_template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is child tax of Tax %s.' % tax_template.name))
+            multi_charts_accounts = self.env[
+                'wizard.multi.charts.accounts'].search(
+                [('sale_tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if multi_charts_accounts:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Sales Tax is assigned to Multi Charts Account '
+                      '%s.' % multi_charts_accounts.name))
+            multi_charts_accounts = self.env[
+                'wizard.multi.charts.accounts'].search(
+                [('purchase_tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if multi_charts_accounts:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase Tax is assigned to Multi Charts Account '
+                      '%s.' % multi_charts_accounts.name))
+            chart_template = self.env['account.chart.template'].search(
+                [('tax_template_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if chart_template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Tax Template is assigned to Chart Template '
+                      '%s.' % chart_template.name))
+
 
 class WizardMultiChartsAccounts(models.TransientModel):
     _inherit = 'wizard.multi.charts.accounts'
