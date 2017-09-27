@@ -119,3 +119,16 @@ class AccountBankStatement(models.Model):
                         _('The Company in the Bank Statement and in '
                           'Entry line %s must be the same.') % move_line.name)
         return True
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            move_line = self.env['account.move.line'].search(
+                [('statement_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Statement is assigned to Move Line '
+                      '%s of Move %s.' % (move_line.name,
+                                          move_line.move_id.name)))

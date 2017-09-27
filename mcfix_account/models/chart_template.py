@@ -3,10 +3,6 @@ from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
 
-# class AccountAccountTemplate(models.Model):
-#     _inherit = "account.account.template"
-#
-#
 class AccountChartTemplate(models.Model):
     _inherit = "account.chart.template"
 
