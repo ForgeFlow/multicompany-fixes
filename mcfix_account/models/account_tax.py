@@ -70,17 +70,20 @@ class AccountTax(models.Model):
             if invoice_tax:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'tax is assigned to invoice tax %s in invoice '
+                      'tax is assigned to Invoice Tax %s in invoice '
                       '%s.' % (invoice_tax.name,
                                invoice_tax.invoice_id.name)))
-            invoice = self.env['account.invoice'].search(
+
+            invoice_line = self.env['account.invoice.line'].search(
                 [('invoice_line_tax_ids', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
-            if invoice:
+            if invoice_line:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'tax is assigned to invoice %s.' %
-                      invoice.name))
+                      'tax is assigned to invoice line %s in invoice '
+                      '%s.' % (invoice_line.name,
+                               invoice_line.invoice_id.name)))
+
             # Account Tax
             parent_tax = self.search(
                 [('children_tax_ids', 'in', [rec.id]),
@@ -89,14 +92,6 @@ class AccountTax(models.Model):
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'tax is child tax of Tax %s.' %
-                      parent_tax.name))
-            second_tax = self.search(
-                [('second_tax_id', '=', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if second_tax:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'tax is Second Tax of Tax %s.' %
                       parent_tax.name))
 
             # Account Move Line
@@ -108,14 +103,15 @@ class AccountTax(models.Model):
                     _('You cannot change the company, as this '
                       'tax is assigned to account move line %s of '
                       'move %s.' % (aml.name, aml.move_id.name)))
+
             aml = self.env['account.move.line'].search(
-                [('tax_line_id', '=', [rec.id]),
+                [('tax_line_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if aml:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'tax is assigned to account move line %s of '
-                      'move %s.' % (aml.name, aml.move_id.name)))
+                      'tax is assigned to Move Line %s of '
+                      'Move %s.' % (aml.name, aml.move_id.name)))
 
             # Account Fiscal Position Tax
             fp_tax = self.env['account.fiscal.position.tax'].search(
@@ -137,7 +133,15 @@ class AccountTax(models.Model):
                       'tax is assigned as Tax to Apply in Fiscal '
                       'Position Tax %s of Fiscal Position %s.' %
                       (fp_tax.name, fp_tax.position_id.name)))
-
+            # Account Account
+            account = self.env['account.account'].search(
+                [('tax_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if account:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is assigned to Account '
+                      '%s.' % account.name))
             # Product Template
             pt = self.env['product.template'].search(
                 [('taxes_id', 'in', [rec.id]),
@@ -147,6 +151,7 @@ class AccountTax(models.Model):
                     _('You cannot change the company, as this '
                       'tax is assigned as Customer Taxes of Product '
                       'Template %s.' % pt.name))
+
             pt = self.env['product.template'].search(
                 [('supplier_taxes_id', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
