@@ -155,6 +155,51 @@ class AccountInvoice(models.Model):
                           ) % move_line.name)
         return True
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            move_line = self.env['account.move.line'].search(
+                [('invoice_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Partner is assigned to Move Line '
+                      '%s.' % move_line.name))
+            invoice_line = self.env['account.invoice.line'].search(
+                [('invoice_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Invoice Reference is assigned to Invoice Line '
+                      '%s in Invoice %s.' % (invoice_line.name,
+                                             invoice_line.invoice_id.name)))
+            journal = self.env['account.journal'].search(
+                [('invoice_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if journal:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Invoice is assigned to Journal '
+                      '%s.' % journal.name))
+            invoice = self.search(
+                [('refund_invoice_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Invoice for refund is assigned to Invoice '
+                      '%s.' % invoice.name))
+            invoice_tax = self.env['account.invoice.tax'].search(
+                [('invoice_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice_tax:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Invoice is assigned to Invoice Tax '
+                      '%s.' % invoice_tax.name))
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
