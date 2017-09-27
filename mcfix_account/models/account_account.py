@@ -39,117 +39,118 @@ class AccountAccount(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id(self):
-        for rec in self:
-            # Account Invoice
-            invoice = self.env['account.invoice'].search(
-                [('account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if invoice:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Account is assigned to Invoice '
-                      '%s.' % invoice.name))
+        if not self.env.context.get('bypass_company_validation', False):
+            for rec in self:
+                # Account Invoice
+                invoice = self.env['account.invoice'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if invoice:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Account is assigned to Invoice '
+                          '%s.' % invoice.name))
 
-            invoice_line = self.env['account.invoice.line'].search(
-                [('account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if invoice_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Account is assigned to Invoice Line '
-                      '%s in Invoice %s.' % (invoice_line.name,
-                                             invoice_line.invoice_id.name)))
+                invoice_line = self.env['account.invoice.line'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if invoice_line:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Account is assigned to Invoice Line %s in '
+                          'Invoice %s.' % (invoice_line.name,
+                                           invoice_line.invoice_id.name)))
 
-            invoice_tax = self.env['account.invoice.tax'].search(
-                [('account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if invoice_tax:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Tax Account is assigned to Invoice Tax '
-                      '%s.' % invoice_tax.name))
+                invoice_tax = self.env['account.invoice.tax'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if invoice_tax:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Tax Account is assigned to Invoice Tax '
+                          '%s.' % invoice_tax.name))
 
-            # Account Journal
-            journal = self.env['account.journal'].search(
-                [('account_control_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if journal:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'account is assigned to Journal '
-                      '%s.' % journal.name))
+                # Account Journal
+                journal = self.env['account.journal'].search(
+                    [('account_control_ids', 'in', [rec.id]),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if journal:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Journal '
+                          '%s.' % journal.name))
 
-            journal = self.env['account.journal'].search(
-                [('default_debit_account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if journal:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'account is assigned as Debit Account in '
-                      'Account Journal %s.' % journal.name))
+                journal = self.env['account.journal'].search(
+                    [('default_debit_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if journal:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned as Debit Account in '
+                          'Account Journal %s.' % journal.name))
 
-            journal = self.env['account.journal'].search(
-                [('default_credit_account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if journal:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'account is assigned as Credit Account '
-                      'in Account Journal %s.' % journal.name))
+                journal = self.env['account.journal'].search(
+                    [('default_credit_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if journal:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned as Credit Account '
+                          'in Account Journal %s.' % journal.name))
 
-            journal = self.env['account.journal'].search(
-                [('profit_account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if journal:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'account is assigned as Profit Account in '
-                      'Account Journal %s.' % journal.name))
+                journal = self.env['account.journal'].search(
+                    [('profit_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if journal:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned as Profit Account in '
+                          'Account Journal %s.' % journal.name))
 
-            journal = self.env['account.journal'].search(
-                [('loss_account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if journal:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'account is assigned as Loss Account in '
-                      'Account Journal %s.' % journal.name))
+                journal = self.env['account.journal'].search(
+                    [('loss_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if journal:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned as Loss Account in '
+                          'Account Journal %s.' % journal.name))
 
-            # Account Move
-            move = self.env['account.move'].search(
-                [('dummy_account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if move:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Account is assigned to Move '
-                      '%s.' % move.name))
+                # Account Move
+                move = self.env['account.move'].search(
+                    [('dummy_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if move:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Account is assigned to Move '
+                          '%s.' % move.name))
 
-            move_line = self.env['account.move.line'].search(
-                [('account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if move_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Account is assigned to Move Line '
-                      '%s in Move %s.' % (move_line.name,
-                                          move_line.move_id.name)))
+                move_line = self.env['account.move.line'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if move_line:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Account is assigned to Move Line '
+                          '%s in Move %s.' % (move_line.name,
+                                              move_line.move_id.name)))
 
-            # Account Tax
-            tax = self.env['account.tax'].search(
-                [('account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if tax:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'account is assigned to Tax '
-                      '%s.' % tax.name))
+                # Account Tax
+                tax = self.env['account.tax'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if tax:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Tax '
+                          '%s.' % tax.name))
 
-            tax = self.env['account.tax'].search(
-                [('refund_account_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if tax:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'account is assigned as Tax Account on Refunds to Tax '
-                      '%s.' % tax.name))
+                tax = self.env['account.tax'].search(
+                    [('refund_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if tax:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned as Tax Account on Refunds '
+                          'to Tax %s.' % tax.name))
