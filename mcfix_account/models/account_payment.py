@@ -21,6 +21,18 @@ class AccountPaymentTerm(models.Model):
             res += [(rec.id, name)]
         return res
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            invoice = self.env['account.invoice'].search(
+                [('payment_term_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Payment Term is assigned to Invoice '
+                      '%s.' % invoice.name))
+
 
 class AccountAbstractPayment(models.AbstractModel):
     _inherit = 'account.abstract.payment'
