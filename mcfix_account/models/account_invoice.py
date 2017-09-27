@@ -241,6 +241,18 @@ class AccountInvoiceLine(models.Model):
                           'must be the same.') % invoice_line_tax.name)
         return True
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            invoice = self.env['account.invoice'].search(
+                [('invoice_line_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Invoice Line is assigned to Invoice '
+                      '%s.' % invoice.name))
+
 
 class AccountInvoiceTax(models.Model):
     _inherit = 'account.invoice.tax'
