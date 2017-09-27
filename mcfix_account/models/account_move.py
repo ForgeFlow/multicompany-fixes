@@ -324,6 +324,50 @@ class AccountMoveLine(models.Model):
                                         'Partner must be the same.'))
         return True
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            move = self.env['account.move'].search(
+                [('line_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Journal Item is assigned to Move '
+                      '%s.' % move.name))
+            invoice = self.env['account.invoice'].search(
+                [('payment_move_line_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Payment Move Line is assigned to Invoice '
+                      '%s.' % invoice.name))
+            partial_reconcile = self.env['account.partial.reconcile'].search(
+                [('debit_move_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partial_reconcile:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'line is assigned to Partial Reconcile '
+                      '%s.' % partial_reconcile.name))
+            partial_reconcile = self.env['account.partial.reconcile'].search(
+                [('credit_move_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partial_reconcile:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'line is assigned to Partial Reconcile '
+                      '%s.' % partial_reconcile.name))
+            bank_statement = self.env['account.bank.statement'].search(
+                [('move_line_ids', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if bank_statement:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'line is assigned to Bank Statement '
+                      '%s.' % bank_statement.name))
+
 
 class AccountMoveLineReconcile(models.TransientModel):
     _inherit = 'account.move.line.reconcile'
