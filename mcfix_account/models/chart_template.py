@@ -56,6 +56,35 @@ class AccountChartTemplate(models.Model):
                           ) % tax_template.name)
         return True
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            tax_template = self.env['account.tax.template'].search(
+                [('chart_template_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if tax_template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Chart Template is assigned to Tax Template '
+                      '%s.' % tax_template.name))
+            multi_charts_accounts = self.env[
+                'wizard.multi.charts.accounts'].search(
+                [('chart_template_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if multi_charts_accounts:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Chart Template is assigned to Multi Charts Account '
+                      '%s.' % multi_charts_accounts.name))
+            chart_template = self.search(
+                [('parent_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if chart_template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'chart template is parent of Chart Template '
+                      '%s.' % chart_template.name))
+
 
 class AccountTaxTemplate(models.Model):
     _inherit = 'account.tax.template'
