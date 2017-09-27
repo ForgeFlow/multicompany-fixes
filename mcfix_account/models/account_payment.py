@@ -22,7 +22,7 @@ class AccountPaymentTerm(models.Model):
         return res
 
 
-class AccountAbstractPayment(models.Model):
+class AccountAbstractPayment(models.AbstractModel):
     _inherit = 'account.abstract.payment'
 
     @api.multi

@@ -106,7 +106,7 @@ class AccountTaxTemplate(models.Model):
         return True
 
 
-class WizardMultiChartsAccounts(models.Model):
+class WizardMultiChartsAccounts(models.TransientModel):
     _inherit = 'wizard.multi.charts.accounts'
 
     @api.multi

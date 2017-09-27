@@ -325,7 +325,7 @@ class AccountMoveLine(models.Model):
         return True
 
 
-class AccountMoveLineReconcile(models.Model):
+class AccountMoveLineReconcile(models.TransientModel):
     _inherit = 'account.move.line.reconcile'
 
     @api.multi
