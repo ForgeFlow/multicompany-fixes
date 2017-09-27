@@ -129,14 +129,6 @@ class AccountJournal(models.Model):
                     _('You cannot change the company, as this '
                       'Journal is assigned to Invoice '
                       '%s.' % invoice.name))
-            abstract_payment = self.env['account.abstract.payment'].search(
-                [('journal_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if abstract_payment:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Payment Journal is assigned to Payment '
-                      '%s.' % abstract_payment.name))
             bank_statement = self.env['account.bank.statement'].search(
                 [('journal_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
