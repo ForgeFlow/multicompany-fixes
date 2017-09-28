@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+        <record model="ir.ui.view" id="view_voucher_line_form">
+            <field name="name">account.voucher.line.form</field>
+            <field name="model">account.voucher.line</field>
+            <field name="inherit_id" ref="account_voucher.view_account_voucher_category_form"/>
+            <field name="arch" type="xml">
+                <field name="account_id" position="attributes">
+                    <attribute name="domain">[('company_id', '=', company_id)]</attribute>
+                </field>
+            </field>
+        </record>
+</odoo>

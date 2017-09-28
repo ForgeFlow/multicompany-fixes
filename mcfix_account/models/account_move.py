@@ -50,7 +50,8 @@ class AccountMove(models.Model):
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'Journal Entry is assigned to Move Line '
-                      '%s.' % move_line.name))
+                      '%s of Move %s.' % (move_line.name,
+                                          move_line.move_id.name)))
             invoice = self.env['account.invoice'].search(
                 [('move_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
