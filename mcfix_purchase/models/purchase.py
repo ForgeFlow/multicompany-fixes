@@ -92,7 +92,7 @@ class PurchaseOrder(models.Model):
     def _check_company_payment_term_id(self):
         for order in self.sudo():
             if order.company_id and order.payment_term_id and \
-                            order.company_id != order.payment_term_id.company_id:
+                    order.company_id != order.payment_term_id.company_id:
                 raise ValidationError(
                     _('Configuration error\n'
                       'The Company of the Payment Term must match with that '
@@ -104,7 +104,7 @@ class PurchaseOrder(models.Model):
     def _check_company_fiscal_position_id(self):
         for order in self.sudo():
             if order.company_id and order.fiscal_position_id and \
-                            order.company_id != order.fiscal_position_id.company_id:
+                    order.company_id != order.fiscal_position_id.company_id:
                 raise ValidationError(
                     _('Configuration error\n'
                       'The Company of the fiscal position must match with that'
