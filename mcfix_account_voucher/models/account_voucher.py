@@ -32,8 +32,7 @@ class AccountVoucher(models.Model):
     def _check_company_journal_id(self):
         for voucher in self.sudo():
             if voucher.company_id and voucher.journal_id and \
-                            voucher.company_id != voucher.journal_id.\
-                            company_id:
+                    voucher.company_id != voucher.journal_id.company_id:
                 raise ValidationError(_('The Company in the Voucher and in '
                                         ' must be the same.'))
         return True
@@ -43,8 +42,7 @@ class AccountVoucher(models.Model):
     def _check_company_account_id(self):
         for voucher in self.sudo():
             if voucher.company_id and voucher.account_id and \
-                            voucher.company_id != voucher.account_id.\
-                            company_id:
+                    voucher.company_id != voucher.account_id.company_id:
                 raise ValidationError(_('The Company in the Voucher and in '
                                         ' must be the same.'))
         return True
@@ -54,7 +52,7 @@ class AccountVoucher(models.Model):
     def _check_company_move_id(self):
         for voucher in self.sudo():
             if voucher.company_id and voucher.move_id and \
-                            voucher.company_id != voucher.move_id.company_id:
+                    voucher.company_id != voucher.move_id.company_id:
                 raise ValidationError(_('The Company in the Voucher and in '
                                         ' must be the same.'))
         return True
