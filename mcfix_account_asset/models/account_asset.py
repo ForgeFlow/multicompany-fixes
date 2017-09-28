@@ -7,6 +7,21 @@ class AccountAssetCategory(models.Model):
     _inherit = 'account.asset.category'
 
     @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(AccountAssetCategory, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.multi
     @api.onchange('company_id')
     def onchange_company_id(self):
         res = {}
@@ -90,13 +105,44 @@ class AccountAssetCategory(models.Model):
                                         'and in Journal must be the same.'))
         return True
 
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            asset_asset = self.env['account.asset.asset'].search(
+                [('category_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if asset_asset:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Category is assigned to Asset Asset '
+                      '%s.' % asset_asset.name))
+
 
 class AccountAssetAsset(models.Model):
     _inherit = 'account.asset.asset'
 
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(AccountAssetAsset, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.category_id = False
+
     @api.constrains('category_id', 'company_id')
     def _check_company_asset_categ(self):
-        for asset in self:
+        for asset in self.sudo():
             if asset.company_id and asset.category_id and\
                     asset.company_id != asset.category_id.company_id:
                 raise ValidationError(_('The Company in the Asset and in '
