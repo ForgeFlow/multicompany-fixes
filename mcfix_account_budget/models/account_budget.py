@@ -3,6 +3,25 @@ from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
 
+class AccountBudgetPost(models.Model):
+    _inherit = 'account.budget.post'
+
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(AccountBudgetPost, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+
 class CrossoveredBudget(models.Model):
     _inherit = 'crossovered.budget'
 
@@ -64,22 +83,3 @@ class CrossoveredBudgetLines(models.Model):
                                         'and in Budgetary Position must '
                                         'be the same.'))
         return True
-
-
-class AccountBudgetPost(models.Model):
-    _inherit = 'crossovered.budget.post'
-
-    @api.multi
-    @api.depends('company_id')
-    def name_get(self):
-        res = []
-        names = super(AccountBudgetPost, self).name_get()
-        multicompany_group = self.env.ref('base.group_multi_company')
-        if multicompany_group not in self.env.user.groups_id:
-            return names
-        for name in names:
-            rec = self.browse(name[0])
-            name = '%s [%s]' % (name[1], name.company_id.name) if \
-                name.company_id else name[1]
-            res += [(rec.id, name)]
-        return res
