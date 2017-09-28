@@ -9,16 +9,15 @@ from odoo.exceptions import ValidationError
 class AccountFiscalPosition(models.Model):
     _inherit = 'account.fiscal.position'
 
-    @api.multi
     @api.constrains('company_id')
-    def _check_purchase_order_company(self):
+    def _check_company_id(self):
+        super(AccountFiscalPosition, self)._check_company_id()
         for rec in self:
-            if rec.company_id:
-                orders = self.env['purchase.order'].search(
-                    [('fiscal_position_id', '=', rec.id),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if orders:
-                    raise ValidationError(_('Purchase Orders already exist '
-                                            'referencing this fiscal position '
-                                            'in other company : %s.') %
-                                          orders.company_id.name)
+            order = self.env['purchase.order'].search(
+                [('fiscal_position_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if order:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Fiscal Position is assigned to Purchase Order '
+                      '%s.' % order.name))

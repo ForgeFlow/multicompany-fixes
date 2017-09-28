@@ -51,15 +51,16 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    @api.multi
     @api.constrains('company_id')
-    def _check_purchase_order_company(self):
+    def _check_company_id(self):
+        super(AccountInvoiceLine, self)._check_company_id()
         for rec in self:
-            if rec.company_id:
-                order_line_id = self.env['purchase.order.line'].search(
-                    [('invoice_lines', 'in', [rec.id]),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if order_line_id:
-                    raise ValidationError(_('Purchase Order lines already '
-                                            'exist referencing this invoice '
-                                            'line in other companies.'))
+            order_line = self.env['purchase.order.line'].search(
+                [('invoice_lines', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if order_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Bill Line is assigned to Purchase Order Line '
+                      '%s of Purchase Order %s.' % (order_line.name,
+                                                    order_line.order_id.name)))

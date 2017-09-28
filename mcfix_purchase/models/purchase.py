@@ -6,6 +6,28 @@ from odoo.exceptions import ValidationError
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(PurchaseOrder, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.order_line = False
+        self.invoice_ids = False
+        self.fiscal_position_id = False
+        self.payment_term_id = False
+
     @api.onchange('partner_id', 'company_id')
     def onchange_partner_id(self):
         res = super(PurchaseOrder, self).onchange_partner_id()
@@ -42,31 +64,108 @@ class PurchaseOrder(models.Model):
                                         'RFQ/Purchase Order.'))
 
     @api.multi
+    @api.constrains('order_line', 'company_id')
+    def _check_company_order_line(self):
+        for order in self.sudo():
+            for purchase_order_line in order.order_line:
+                if order.company_id and \
+                        order.company_id != purchase_order_line.company_id:
+                    raise ValidationError(
+                        _('The Company in the RFQ/Purchase Order and in '
+                          'Purchase Order Line must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('invoice_ids', 'company_id')
+    def _check_company_invoice_ids(self):
+        for order in self.sudo():
+            for account_invoice in order.invoice_ids:
+                if order.company_id and \
+                        order.company_id != account_invoice.company_id:
+                    raise ValidationError(
+                        _('The Company in the RFQ/Purchase Order and in '
+                          'Bill must be the same.'))
+        return True
+
+    @api.multi
     @api.constrains('payment_term_id', 'company_id')
-    def _check_payment_term_company(self):
-        for rec in self:
-            if (rec.payment_term_id and rec.payment_term_id.company_id and
-                    rec.payment_term_id.company_id != rec.company_id):
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the Payment Term '
-                                        'must match with that of the '
-                                        'RFQ/Purchase Order.'))
+    def _check_company_payment_term_id(self):
+        for order in self.sudo():
+            if order.company_id and order.payment_term_id and \
+                            order.company_id != order.payment_term_id.company_id:
+                raise ValidationError(
+                    _('Configuration error\n'
+                      'The Company of the Payment Term must match with that '
+                      'of the RFQ/Purchase Order.'))
+        return True
 
     @api.multi
     @api.constrains('fiscal_position_id', 'company_id')
-    def _check_fiscal_position_company(self):
+    def _check_company_fiscal_position_id(self):
+        for order in self.sudo():
+            if order.company_id and order.fiscal_position_id and \
+                            order.company_id != order.fiscal_position_id.company_id:
+                raise ValidationError(
+                    _('Configuration error\n'
+                      'The Company of the fiscal position must match with that'
+                      ' of the RFQ/Purchase Order.'))
+        return True
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
         for rec in self:
-            if (rec.fiscal_position_id and
-                    rec.fiscal_position_id.company_id and
-                    rec.fiscal_position_id.company_id != rec.company_id):
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the fiscal position '
-                                        'must match with that of the '
-                                        'RFQ/Purchase Order.'))
+            order_line = self.env['purchase.order.line'].search(
+                [('order_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if order_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'RFQ/Purchase Order is assigned to Purchase Order Line '
+                      '%s of Purchase Order %s.' % (order_line.name,
+                                                    order_line.order_id.name)))
+            invoice_line = self.env['account.invoice.line'].search(
+                [('purchase_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase Order is assigned to Invoice Line '
+                      '%s of Invoice %s.' % (invoice_line.name,
+                                             invoice_line.invoice_id.name)))
+            invoice = self.env['account.invoice'].search(
+                [('purchase_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase Order is assigned to Invoice '
+                      '%s.' % invoice.name))
 
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
+
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        res = []
+        names = super(PurchaseOrderLine, self).name_get()
+        multicompany_group = self.env.ref('base.group_multi_company')
+        if multicompany_group not in self.env.user.groups_id:
+            return names
+        for name in names:
+            rec = self.browse(name[0])
+            name = '%s [%s]' % (name[1], name.company_id.name) if \
+                name.company_id else name[1]
+            res += [(rec.id, name)]
+        return res
+
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.taxes_id = False
+        self.order_id = False
+        self.account_analytic_id = False
+        self.invoice_lines = False
 
     @api.onchange('product_id', 'company_id')
     def onchange_product_id(self):
@@ -94,16 +193,55 @@ class PurchaseOrderLine(models.Model):
             self.product_qty = current_quantity
 
     @api.multi
+    @api.constrains('order_id', 'company_id')
+    def _check_company_order_id(self):
+        for order_line in self.sudo():
+            if order_line.company_id and order_line.order_id and \
+                    order_line.company_id != order_line.order_id.company_id:
+                raise ValidationError(_('The Company in the Purchase Order '
+                                        'Line and in the RFQ/Purchase must be '
+                                        'the same.'))
+        return True
+
+    @api.multi
     @api.constrains('taxes_id', 'company_id')
-    def _check_tax_company(self):
-        for rec in self.sudo():
-            if (rec.taxes_id and rec.taxes_id.company_id and
-                    rec.taxes_id.company_id != rec.company_id):
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the tax %s '
-                                        'must match with that of the '
-                                        'RFQ/Purchase Order.') %
-                                      rec.taxes_id.name)
+    def _check_company_taxes_id(self):
+        for order_line in self.sudo():
+            for account_tax in order_line.taxes_id:
+                if order_line.company_id and \
+                        order_line.company_id != account_tax.company_id:
+                    raise ValidationError(
+                        _('Configuration error\n'
+                          'The Company of the tax %s must match with that of '
+                          'the RFQ/Purchase Order.'
+                          ) % order_line.taxes_id.name)
+            return True
+
+    @api.multi
+    @api.constrains('invoice_lines', 'company_id')
+    def _check_company_invoice_lines(self):
+        for order_line in self.sudo():
+            for account_invoice_line in order_line.invoice_lines:
+                if order_line.company_id and \
+                        order_line.company_id != account_invoice_line.\
+                        company_id:
+                    raise ValidationError(
+                        _('The Company of the bill line %s must match with '
+                          'that of the RFQ/Purchase Order.'
+                          ) % account_invoice_line.name)
+        return True
+
+    @api.multi
+    @api.constrains('account_analytic_id', 'company_id')
+    def _check_company_account_analytic_id(self):
+        for order_line in self.sudo():
+            if order_line.company_id and order_line.account_analytic_id and \
+                    order_line.company_id != order_line.account_analytic_id.\
+                    company_id:
+                raise ValidationError(_('The Company in the Purchase Order '
+                                        'Line and in Analytic Account must be '
+                                        'the same.'))
+        return True
 
     @api.multi
     @api.constrains('product_id', 'company_id')
@@ -116,3 +254,24 @@ class PurchaseOrderLine(models.Model):
                                         'must match with that of the '
                                         'RFQ/Purchase Order.') %
                                       rec.product_id.name)
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            invoice_line = self.env['account.invoice.line'].search(
+                [('purchase_line_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      ' is assigned to Invoice Line '
+                      '%s of Invoice %s.' % (invoice_line.name,
+                                             invoice_line.invoice_id.name)))
+            order = self.env['purchase.order'].search(
+                [('order_line', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if order:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase Order Line is assigned to RFQ/Purchase Order '
+                      '%s.' % order.name))

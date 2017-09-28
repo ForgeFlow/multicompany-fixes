@@ -9,17 +9,16 @@ from odoo.exceptions import ValidationError
 class AccountTax(models.Model):
     _inherit = 'account.tax'
 
-    @api.multi
     @api.constrains('company_id')
-    def _check_purchase_order_company(self):
+    def _check_company_id(self):
+        super(AccountTax, self)._check_company_id()
         for rec in self:
-            if rec.company_id:
-                order_line_id = self.env['purchase.order.line'].search(
-                    [('taxes_id', 'in', [rec.id]),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-
-                if order_line_id:
-                    raise ValidationError(_('Purchase Order lines already '
-                                            'exist referencing this tax in '
-                                            'other company : %s.') %
-                                          order_line_id.company_id.name)
+            order_line = self.env['purchase.order.line'].search(
+                [('taxes_id', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if order_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Tax is assigned to Purchase Order Line '
+                      '%s of Purchase %s.' % (order_line.name,
+                                              order_line.order_id.name)))
