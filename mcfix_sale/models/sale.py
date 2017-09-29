@@ -63,6 +63,7 @@ class SaleOrder(models.Model):
             self.fiscal_position_id = self.env['account.fiscal.position'].\
                 get_fiscal_position(self.partner_id.id,
                                     self.partner_shipping_id.id)
+        self.payment_acquirer_id = False
         self.pricelist_id = False
         self.project_id = False
         self.related_project_id = False
