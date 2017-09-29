@@ -6,4 +6,9 @@ from . import res_partner
 from . import account_fiscal_position
 from . import product_product
 from . import account_tax
-from . import account_invoice_line
+from . import account_invoice
+from . import account_payment
+from . import payment
+from . import analytic
+from . import crm_lead
+from . import sale_config_settings
