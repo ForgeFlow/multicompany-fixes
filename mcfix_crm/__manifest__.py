@@ -12,7 +12,6 @@
     'website': 'http://www.creublanca.es',
     'depends': ['crm', 'mcfix_base'],
     'data': [
-        'views/crm_lead_views.xml'
     ],
     'installable': True,
     'application': False,

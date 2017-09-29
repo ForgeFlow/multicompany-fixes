@@ -12,7 +12,6 @@
     'website': 'http://www.creublanca.es',
     'depends': ['analytic', 'mcfix_base'],
     'data': [
-        'views/analytic_account_views.xml'
     ],
     'installable': True,
     'application': False,
