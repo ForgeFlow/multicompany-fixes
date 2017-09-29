@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import _, api, models
+from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -17,7 +17,7 @@ class CrmLead(models.Model):
         for lead in self.sudo():
             for sale_order in lead.order_ids:
                 if lead.company_id and \
-                                lead.company_id != sale_order.company_id:
+                        lead.company_id != sale_order.company_id:
                     raise ValidationError(
                         _('The Company in the Lead and in '
                           'Orders must be the same.'))
