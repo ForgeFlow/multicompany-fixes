@@ -2,14 +2,14 @@
 from odoo import api, models
 
 
-class SaleConfigSettings(models.TransientModel):
-    _inherit = 'sale.config.settings'
+class ProcurementRule(models.Model):
+    _inherit = "procurement.rule"
 
     @api.multi
     @api.depends('company_id')
     def name_get(self):
         res = []
-        names = super(SaleConfigSettings, self).name_get()
+        names = super(ProcurementRule, self).name_get()
         multicompany_group = self.env.ref('base.group_multi_company')
         if multicompany_group not in self.env.user.groups_id:
             return names

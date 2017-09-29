@@ -10,7 +10,7 @@
     'sequence': 30,
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['crm_sale'],
+    'depends': ['crm_sale', 'mcfix_crm', 'mcfix_sale'],
     'data': [
     ],
     'installable': True,

@@ -10,7 +10,7 @@
     'sequence': 30,
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['analytic'],
+    'depends': ['analytic', 'mcfix_base'],
     'data': [
         'views/analytic_account_views.xml'
     ],
