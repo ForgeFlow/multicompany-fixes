@@ -5,3 +5,4 @@ from . import account_tax
 from . import account_fiscal_position
 from . import res_config
 from . import account_payment
+from . import analytic_account

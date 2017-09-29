@@ -9,6 +9,6 @@ from . import account_tax
 from . import account_invoice
 from . import account_payment
 from . import payment
-from . import analytic
+from . import analytic_account
 from . import crm_lead
 from . import sale_config_settings
