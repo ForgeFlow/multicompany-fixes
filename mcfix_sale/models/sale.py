@@ -218,18 +218,6 @@ class SaleOrder(models.Model):
                                         'Quotation/Sales Order.'))
         return True
 
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        for rec in self:
-            lead = self.env['crm.lead'].search(
-                [('order_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if lead:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Sales Order is assigned to Lead '
-                      '%s.' % lead.name))
-
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
