@@ -16,8 +16,8 @@ class AccountReconcileModel(models.Model):
             return names
         for name in names:
             rec = self.browse(name[0])
-            name = "%s [%s]" % (name[1], name.company_id.name) if \
-                name.company_id else name[1]
+            name = "%s [%s]" % (name[1], rec.company_id.name) if \
+                rec.company_id else name[1]
             res += [(rec.id, name)]
         return res
 

@@ -20,8 +20,8 @@ class AccountJournal(models.Model):
         for journal_name in journal_names:
             journal = self.browse(journal_name[0])
             name = "%s [%s]" % (
-                journal_name[1], journal_name.company_id.name) if \
-                journal_name.company_id else journal_name[1]
+                journal_name[1], journal.company_id.name) if \
+                journal.company_id else journal_name[1]
             res += [(journal.id, name)]
         return res
 
