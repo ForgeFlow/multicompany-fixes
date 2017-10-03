@@ -10,7 +10,7 @@
     'sequence': 30,
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['sale_stock', 'mcfix_sale', 'mcfix_stock'],
+    'depends': ['sale_stock', 'mcfix_sale', 'mcfix_stock_account'],
     'data': [
         'views/sale_order_view.xml'
     ],
