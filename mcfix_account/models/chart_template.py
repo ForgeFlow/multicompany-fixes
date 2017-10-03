@@ -30,9 +30,9 @@ class AccountChartTemplate(models.Model):
     @api.constrains('parent_id', 'company_id')
     def _check_company_parent_id(self):
         for chart_template in self.sudo():
-            if chart_template.company_id and chart_template.parent_id and \
-                    chart_template.company_id != chart_template.\
-                    parent_id.company_id:
+            if chart_template.company_id and chart_template.parent_id.\
+                    company_id and chart_template.company_id != chart_template\
+                    .parent_id.company_id:
                 raise ValidationError(
                     _('The Company in the Chart Template and in '
                       'Parent Chart Template must be the same.'))
@@ -55,6 +55,8 @@ class AccountChartTemplate(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             tax_template = self.env['account.tax.template'].search(
                 [('chart_template_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -109,7 +111,8 @@ class AccountTaxTemplate(models.Model):
     @api.constrains('chart_template_id', 'company_id')
     def _check_company_chart_template_id(self):
         for tax_template in self.sudo():
-            if tax_template.company_id and tax_template.chart_template_id and \
+            if tax_template.company_id and \
+                    tax_template.chart_template_id.company_id and \
                     tax_template.company_id != tax_template.\
                     chart_template_id.company_id:
                 raise ValidationError(
@@ -197,8 +200,9 @@ class WizardMultiChartsAccounts(models.TransientModel):
     def _check_company_chart_template_id(self):
         for multi_charts_accounts in self.sudo():
             if multi_charts_accounts.company_id and multi_charts_accounts.\
-                    chart_template_id and multi_charts_accounts.company_id !=\
-                    multi_charts_accounts.chart_template_id.company_id:
+                    chart_template_id.company_id and multi_charts_accounts.\
+                    company_id != multi_charts_accounts.chart_template_id.\
+                    company_id:
                 raise ValidationError(
                     _('The Company in the Multi Charts Accounts and in '
                       'Chart Template must be the same.'))

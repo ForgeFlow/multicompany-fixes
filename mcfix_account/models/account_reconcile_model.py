@@ -124,6 +124,8 @@ class AccountPartialReconcile(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             move_line = self.env['account.move.line'].search(
                 [('matched_debit_ids', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
