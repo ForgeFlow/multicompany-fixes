@@ -196,8 +196,9 @@ class StockQuantPackage(models.Model):
     @api.constrains('parent_id', 'company_id')
     def _check_company_parent_id(self):
         for quant_package in self.sudo():
-            if quant_package.company_id and quant_package.parent_id.company_id and \
-                    quant_package.company_id != quant_package.parent_id.company_id:
+            if quant_package.company_id and quant_package.parent_id.company_id\
+                    and quant_package.company_id != quant_package.parent_id.\
+                    company_id:
                 raise ValidationError(
                     _('The Company in the Quant Package and in '
                       'Parent Package must be the same.'))
@@ -208,8 +209,9 @@ class StockQuantPackage(models.Model):
     def _check_company_ancestor_ids(self):
         for quant_package in self.sudo():
             for stock_quant_package in quant_package.ancestor_ids:
-                if quant_package.company_id and stock_quant_package.company_id and \
-                        quant_package.company_id != stock_quant_package.company_id:
+                if quant_package.company_id and stock_quant_package.company_id\
+                        and quant_package.company_id != stock_quant_package.\
+                        company_id:
                     raise ValidationError(
                         _('The Company in the Quant Package and in '
                           'Ancestor Package must be the same.'))
@@ -232,8 +234,9 @@ class StockQuantPackage(models.Model):
     def _check_company_children_ids(self):
         for quant_package in self.sudo():
             for stock_quant_package in quant_package.children_ids:
-                if quant_package.company_id and stock_quant_package.company_id and \
-                        quant_package.company_id != stock_quant_package.company_id:
+                if quant_package.company_id and stock_quant_package.company_id\
+                        and quant_package.company_id != stock_quant_package.\
+                        company_id:
                     raise ValidationError(
                         _('The Company in the Quant Package and in '
                           'Child Package must be the same.'))
@@ -243,8 +246,9 @@ class StockQuantPackage(models.Model):
     @api.constrains('location_id', 'company_id')
     def _check_company_location_id(self):
         for quant_package in self.sudo():
-            if quant_package.company_id and quant_package.location_id.company_id and \
-                    quant_package.company_id != quant_package.location_id.company_id:
+            if quant_package.company_id and quant_package.location_id.\
+                    company_id and quant_package.company_id != quant_package.\
+                    location_id.company_id:
                 raise ValidationError(
                     _('The Company in the Quant Package and in '
                       'Location must be the same.'))

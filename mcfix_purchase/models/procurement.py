@@ -53,4 +53,4 @@ class ProcurementOrder(models.Model):
                     _('You cannot change the company, as this '
                       'Procurement Order is assigned to Purchase Order Line '
                       '%s in Purchase Order %s.' % (
-                        order_line.name, order_line.order_id.name)))
+                       order_line.name, order_line.order_id.name)))

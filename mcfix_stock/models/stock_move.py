@@ -203,7 +203,7 @@ class StockMove(models.Model):
     @api.constrains('origin_returned_move_id', 'company_id')
     def _check_company_origin_returned_move_id(self):
         for move in self.sudo():
-            if move.company_id and move.origin_returned_move_id.company_id and \
+            if move.company_id and move.origin_returned_move_id.company_id and\
                     move.company_id != move.origin_returned_move_id.company_id:
                 raise ValidationError(
                     _('The Company in the Move and in '

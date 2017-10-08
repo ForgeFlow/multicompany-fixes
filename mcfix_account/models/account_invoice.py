@@ -114,7 +114,7 @@ class AccountInvoice(models.Model):
         for invoice in self.sudo():
             for tax_line in invoice.tax_line_ids:
                 if invoice.company_id and tax_line.company_id and\
-                            invoice.company_id != tax_line.company_id:
+                        invoice.company_id != tax_line.company_id:
                     raise ValidationError(
                         _('The Company in the Invoice and in '
                           'Tax Line %s must be the same.') % tax_line.name)

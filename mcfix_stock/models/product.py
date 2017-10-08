@@ -15,7 +15,7 @@ class ProductTemplate(models.Model):
         self.location_id = False
         self.warehouse_id = False
         self.route_ids = False
-        self.route_from_categ_ids = False
+        # self.route_from_categ_ids = False
 
     @api.multi
     @api.constrains('property_stock_procurement', 'company_id')
@@ -88,17 +88,11 @@ class ProductTemplate(models.Model):
                           'Location Route must be the same.'))
         return True
 
-    @api.multi
-    @api.constrains('route_from_categ_ids', 'company_id')
-    def _check_company_route_from_categ_ids(self):
-        for template in self.sudo():
-            for stock_location_route in template.route_from_categ_ids:
-                if template.company_id and stock_location_route.company_id and\
-                        template.company_id != stock_location_route.company_id:
-                    raise ValidationError(
-                        _('The Company in the Product Template and in '
-                          'Category Routes must be the same.'))
-        return True
+    # @api.multi
+    # @api.constrains('route_from_categ_ids', 'company_id')
+    # def _check_company_route_from_categ_ids(self):
+    #     for template in self.sudo():
+    #         for stock_location_route in template.route_from_categ_ids:
 
     @api.constrains('company_id')
     def _check_company_id(self):

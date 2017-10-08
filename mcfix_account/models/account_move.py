@@ -70,8 +70,8 @@ class AccountMove(models.Model):
                     _('You cannot change the company, as this '
                       'Journal Entry is assigned to Bank Statement Line '
                       '%s in Bank Statement %s.' % (
-                        bank_statement_line.name,
-                        bank_statement_line.statement_id.name)))
+                       bank_statement_line.name,
+                       bank_statement_line.statement_id.name)))
 
     @api.multi
     @api.constrains('journal_id', 'company_id')
