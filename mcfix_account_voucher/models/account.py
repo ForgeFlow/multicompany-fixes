@@ -27,8 +27,8 @@ class AccountAccount(models.Model):
                         _('You cannot change the company, as this '
                           'Account is assigned to Account Voucher Line '
                           '%s in Account Voucher %s.' % (
-                           voucher_line.name,
-                           voucher_line.voucher_id.name)))
+                            voucher_line.name,
+                            voucher_line.voucher_id.name)))
 
 
 class AccountJournal(models.Model):
@@ -80,4 +80,4 @@ class AccountTax(models.Model):
                     _('You cannot change the company, as this '
                       'tax is assigned to Account Voucher Line '
                       '%s in Account Voucher %s.' % (
-                       voucher_line.name, voucher_line.voucher_id.name)))
+                        voucher_line.name, voucher_line.voucher_id.name)))

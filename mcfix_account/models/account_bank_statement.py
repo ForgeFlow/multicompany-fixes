@@ -127,7 +127,7 @@ class AccountBankStatement(models.Model):
     def _check_company_move_line_ids(self):
         for bank_statement in self.sudo():
             for move_line in bank_statement.move_line_ids:
-                if bank_statement.company_id and \
+                if bank_statement.company_id and move_line.company_id and \
                         bank_statement.company_id != move_line.\
                         company_id:
                     raise ValidationError(
@@ -156,8 +156,8 @@ class AccountBankStatement(models.Model):
                     _('You cannot change the company, as this '
                       'Statement is assigned to Bank Statement Line '
                       '%s in Bank Statement %s.' % (
-                       bank_statement_line.name,
-                       bank_statement_line.statement_id.name)))
+                        bank_statement_line.name,
+                        bank_statement_line.statement_id.name)))
 
 
 class AccountBankStatementLine(models.Model):

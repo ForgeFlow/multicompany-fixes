@@ -45,7 +45,7 @@ class ProcurementRule(models.Model):
                     rule.company_id != rule.route_id.company_id:
                 raise ValidationError(
                     _('The Company in the Procurement Rule '
-                       'and in Route must be the same.'))
+                      'and in Route must be the same.'))
         return True
 
     @api.multi

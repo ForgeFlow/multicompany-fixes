@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, models
 
 
 class StockConfigSettings(models.TransientModel):
