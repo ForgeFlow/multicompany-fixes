@@ -76,7 +76,7 @@ class AccountInvoiceLine(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
-        super(AccountInvoiceLine, self)._check_company_id()
+        super(AccountInvoiceLine, self).onchange_company_id()
         self.asset_category_id = False
 
     @api.multi

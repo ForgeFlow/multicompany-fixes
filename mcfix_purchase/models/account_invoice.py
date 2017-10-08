@@ -65,7 +65,7 @@ class AccountInvoice(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id(self):
-        super(AccountInvoice, self).onchange_company_id()
+        super(AccountInvoice, self)._check_company_id()
         for rec in self:
             order = self.env['purchase.order'].search(
                 [('invoice_ids', 'in', [rec.id]),
@@ -82,7 +82,7 @@ class AccountInvoiceLine(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
-        super(AccountInvoiceLine, self)._check_company_id()
+        super(AccountInvoiceLine, self).onchange_company_id()
         self.purchase_line_id = False
         self.purchase_id = False
 

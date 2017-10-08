@@ -27,19 +27,6 @@ class AccountInvoice(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id(self):
-        super(AccountInvoice, self).onchange_company_id()
-        for rec in self:
-            order = self.env['sale.order'].search(
-                [('invoice_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'invoice is assigned to Sales Order '
-                      '%s.' % order.name))
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
         super(AccountInvoice, self)._check_company_id()
         for rec in self:
             order = self.env['sale.order'].search(
@@ -48,7 +35,7 @@ class AccountInvoice(models.Model):
             if order:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'Invoice is assigned to Sales Order '
+                      'invoice is assigned to Sales Order '
                       '%s.' % order.name))
 
 
