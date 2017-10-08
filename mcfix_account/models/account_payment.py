@@ -32,6 +32,14 @@ class AccountPaymentTerm(models.Model):
                     _('You cannot change the company, as this '
                       'Payment Term is assigned to Invoice '
                       '%s.' % invoice.name))
+            invoice_report = self.env['account.invoice.report'].search(
+                [('payment_term_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice_report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Payment Terms is assigned to Invoice Report '
+                      '%s.' % invoice_report.name))
 
 
 class AccountAbstractPayment(models.AbstractModel):
@@ -51,22 +59,6 @@ class AccountAbstractPayment(models.AbstractModel):
                 name.company_id else name[1]
             res += [(rec.id, name)]
         return res
-
-    @api.onchange('company_id')
-    def onchange_company_id(self):
-        self.journal_id = False
-
-    @api.multi
-    @api.constrains('journal_id', 'company_id')
-    def _check_company_journal_id(self):
-        for abstract_payment in self.sudo():
-            if abstract_payment.company_id and abstract_payment.journal_id and\
-                    abstract_payment.company_id != abstract_payment.\
-                    journal_id.company_id:
-                raise ValidationError(
-                    _('The Company in the Abstract Payment and in '
-                      'Payment Journal must be the same.'))
-        return True
 
 
 class AccountPayment(models.Model):

@@ -53,69 +53,106 @@ class AccountAssetCategory(models.Model):
     @api.constrains('account_analytic_id', 'company_id')
     def _check_company_analytic_account(self):
         for asset in self:
-            if asset.company_id and asset.account_analytic_id and\
+            if asset.company_id and asset.account_analytic_id.company_id and\
                     asset.company_id != asset.account_analytic_id.company_id:
-                raise ValidationError(_('The Company in the Asset category '
-                                        'and in Analytic Account must '
-                                        'be the same.'))
+                raise ValidationError(
+                    _('The Company in the Asset category '
+                      'and in Analytic Account must '
+                      'be the same.'))
         return True
 
     @api.multi
     @api.constrains('account_asset_id', 'company_id')
     def _check_company_asset_account(self):
         for asset in self:
-            if asset.company_id and asset.account_asset_id and\
+            if asset.company_id and asset.account_asset_id.company_id and\
                     asset.company_id != asset.account_asset_id.company_id:
-                raise ValidationError(_('The Company in the Asset category '
-                                        'and in Asset Account must '
-                                        'be the same.'))
+                raise ValidationError(
+                    _('The Company in the Asset category '
+                      'and in Asset Account must '
+                      'be the same.'))
         return True
 
     @api.multi
     @api.constrains('account_depreciation_id', 'company_id')
     def _check_company_depreciation_account(self):
         for asset in self:
-            if asset.company_id and asset.account_depreciation_id and\
-                    asset.company_id != asset.account_depreciation_id.\
+            if asset.company_id and asset.account_depreciation_id.company_id \
+                    and asset.company_id != asset.account_depreciation_id.\
                     company_id:
-                raise ValidationError(_('The Company in the Asset category '
-                                        'and in Depreciation Account must '
-                                        'be the same.'))
+                raise ValidationError(
+                    _('The Company in the Asset category '
+                      'and in Depreciation Account must '
+                      'be the same.'))
         return True
 
     @api.multi
     @api.constrains('account_depreciation_expense_id', 'company_id')
     def _check_company_depreciation_expense_account(self):
         for asset in self:
-            if asset.company_id and asset.account_depreciation_expense_id and\
-                    asset.company_id != asset.account_depreciation_expense_id.\
-                    company_id:
-                raise ValidationError(_('The Company in the Asset category '
-                                        'and in Depreciation Expense Account '
-                                        'must be the same.'))
+            if asset.company_id and asset.account_depreciation_expense_id.\
+                    company_id and asset.company_id != asset.\
+                    account_depreciation_expense_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Asset category '
+                      'and in Depreciation Expense Account '
+                      'must be the same.'))
         return True
 
     @api.multi
     @api.constrains('journal_id', 'company_id')
     def _check_company_journal(self):
         for asset in self:
-            if asset.company_id and asset.journal_id and\
+            if asset.company_id and asset.journal_id.company_id and\
                     asset.company_id != asset.journal_id.company_id:
-                raise ValidationError(_('The Company in the Asset category '
-                                        'and in Journal must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Asset category '
+                      'and in Journal must be the same.'))
         return True
 
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            invoice_line = self.env['account.invoice.line'].search(
+                [('asset_category_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice_line:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Asset category is assigned to Invoice Line '
+                      '%s.' % invoice_line.name))
             asset_asset = self.env['account.asset.asset'].search(
                 [('category_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if asset_asset:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'Category is assigned to Asset Asset '
+                      'Asset category is assigned to Asset '
                       '%s.' % asset_asset.name))
+            asset_report = self.env['asset.asset.report'].search(
+                [('asset_category_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if asset_report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Asset category is assigned to Asset Report '
+                      '%s.' % asset_report.name))
+            template = self.env['product.template'].search(
+                [('asset_category_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Asset Type is assigned to Product Template '
+                      '%s.' % template.name))
+            template = self.env['product.template'].search(
+                [('deferred_revenue_category_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Deferred Revenue Type is assigned to Product Template '
+                      '%s.' % template.name))
 
 
 class AccountAssetAsset(models.Model):
@@ -139,12 +176,39 @@ class AccountAssetAsset(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.category_id = False
+        self.invoice_id = False
 
     @api.constrains('category_id', 'company_id')
     def _check_company_asset_categ(self):
         for asset in self.sudo():
             if asset.company_id and asset.category_id and\
                     asset.company_id != asset.category_id.company_id:
-                raise ValidationError(_('The Company in the Asset and in '
-                                        'Asset Category must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Asset and in '
+                      'Asset Category must be the same.'))
         return True
+
+    @api.multi
+    @api.constrains('invoice_id', 'company_id')
+    def _check_company_invoice_id(self):
+        for asset in self.sudo():
+            if asset.company_id and asset.invoice_id.company_id and \
+                    asset.company_id != asset.invoice_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Asset and in '
+                      'Invoice must be the same.'))
+        return True
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            if not rec.company_id:
+                continue
+            asset_report = self.env['asset.asset.report'].search(
+                [('asset_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if asset_report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Asset is assigned to Asset Report '
+                      '%s.' % asset_report.name))

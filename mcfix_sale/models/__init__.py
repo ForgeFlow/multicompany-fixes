@@ -5,6 +5,7 @@ from . import product_pricelist
 from . import res_partner
 from . import account_fiscal_position
 from . import product_product
+from . import product_template
 from . import account_tax
 from . import account_invoice
 from . import account_payment

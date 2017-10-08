@@ -34,3 +34,12 @@ class AccountFiscalPosition(models.Model):
                     _('You cannot change the company, as this '
                       'Fiscal Position is assigned to Invoice '
                       '%s.' % invoice.name))
+            invoice_report = self.env['account.invoice.report'].search(
+                [('fiscal_position_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)],
+                limit=1)
+            if invoice_report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Fiscal Position is assigned to Invoice Report '
+                      '%s.' % invoice_report.name))

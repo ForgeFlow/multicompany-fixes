@@ -13,6 +13,8 @@ class AccountFiscalPosition(models.Model):
     def _check_company_id(self):
         super(AccountFiscalPosition, self)._check_company_id()
         for rec in self:
+            if not rec.company_id:
+                continue
             order = self.env['sale.order'].search(
                 [('fiscal_position_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

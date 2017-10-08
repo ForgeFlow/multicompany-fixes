@@ -9,15 +9,39 @@ from odoo.exceptions import ValidationError
 class CrmTeam(models.Model):
     _inherit = 'crm.team'
 
-    @api.multi
     @api.constrains('company_id')
-    def _check_sales_order_company(self):
+    def _check_company_id(self):
+        super(CrmTeam, self)._check_company_id()
         for rec in self:
-            if rec.company_id:
-                order_id = self.env['sale.order'].search(
-                    [('team_id', '=', rec.id), ('company_id', '!=',
-                                                rec.company_id.id)], limit=1)
-                if order_id:
-                    raise ValidationError(_('Sales Orders already exist '
-                                            'referencing this team in other '
-                                            'companies.'))
+            order = self.env['sale.order'].search(
+                [('team_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if order:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Team is assigned to Sales Order '
+                      '%s.' % order.name))
+            report = self.env['sale.report'].search(
+                [('team_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Team is assigned to Report '
+                      '%s.' % report.name))
+            invoice = self.env['account.invoice'].search(
+                [('team_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Sales Team is assigned to Invoice '
+                      '%s.' % invoice.name))
+            invoice_report = self.env['account.invoice.report'].search(
+                [('team_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if invoice_report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Sales Team is assigned to Invoice Report '
+                      '%s.' % invoice_report.name))

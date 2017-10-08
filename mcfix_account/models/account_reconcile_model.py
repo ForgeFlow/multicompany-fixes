@@ -73,6 +73,70 @@ class AccountReconcileModel(models.Model):
                       'Tax must be the same.'))
         return True
 
+    @api.multi
+    @api.constrains('analytic_account_id', 'company_id')
+    def _check_company_analytic_account_id(self):
+        for reconcile_model in self.sudo():
+            if reconcile_model.company_id and reconcile_model.\
+                    analytic_account_id.company_id and \
+                    reconcile_model.company_id != reconcile_model.\
+                    analytic_account_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Reconciliation Model and in '
+                      'Analytic Account must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('second_account_id', 'company_id')
+    def _check_company_second_account_id(self):
+        for reconcile_model in self.sudo():
+            if reconcile_model.company_id and reconcile_model.\
+                    second_account_id.company_id and \
+                    reconcile_model.company_id != reconcile_model.\
+                    second_account_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Reconciliation Model and in '
+                      'Second Account must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('second_journal_id', 'company_id')
+    def _check_company_second_journal_id(self):
+        for reconcile_model in self.sudo():
+            if reconcile_model.company_id and reconcile_model.\
+                    second_journal_id.company_id and \
+                    reconcile_model.company_id != reconcile_model.\
+                    second_journal_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Reconciliation Model and in '
+                      'Second Journal must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('second_tax_id', 'company_id')
+    def _check_company_second_tax_id(self):
+        for reconcile_model in self.sudo():
+            if reconcile_model.company_id and reconcile_model.second_tax_id.\
+                    company_id and reconcile_model.company_id != \
+                    reconcile_model.second_tax_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Reconciliation Model and in '
+                      'Second Tax must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('second_analytic_account_id', 'company_id')
+    def _check_company_second_analytic_account_id(self):
+        for reconcile_model in self.sudo():
+            if reconcile_model.company_id and reconcile_model.\
+                    second_analytic_account_id.company_id and \
+                    reconcile_model.company_id != reconcile_model.\
+                    second_analytic_account_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Reconciliation Model and in '
+                      'Second Analytic Account must be the same.'))
+        return True
+
 
 class AccountPartialReconcile(models.Model):
     _inherit = 'account.partial.reconcile'
@@ -102,8 +166,8 @@ class AccountPartialReconcile(models.Model):
     def _check_company_debit_move_id(self):
         for partial_reconcile in self.sudo():
             if partial_reconcile.company_id and partial_reconcile.\
-                    debit_move_id and partial_reconcile.company_id != \
-                    partial_reconcile.debit_move_id.company_id:
+                    debit_move_id.company_id and partial_reconcile.company_id \
+                    != partial_reconcile.debit_move_id.company_id:
                 raise ValidationError(
                     _('The Company in the Partial Reconcile and in '
                       ' must be the same.'))
@@ -114,8 +178,8 @@ class AccountPartialReconcile(models.Model):
     def _check_company_credit_move_id(self):
         for partial_reconcile in self.sudo():
             if partial_reconcile.company_id and partial_reconcile.\
-                    credit_move_id and partial_reconcile.company_id != \
-                    partial_reconcile.credit_move_id.company_id:
+                    credit_move_id.company_id and partial_reconcile.company_id\
+                    != partial_reconcile.credit_move_id.company_id:
                 raise ValidationError(
                     _('The Company in the Partial Reconcile and in '
                       ' must be the same.'))

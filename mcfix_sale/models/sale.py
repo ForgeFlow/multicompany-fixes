@@ -63,7 +63,6 @@ class SaleOrder(models.Model):
             self.fiscal_position_id = self.env['account.fiscal.position'].\
                 get_fiscal_position(self.partner_id.id,
                                     self.partner_shipping_id.id)
-        self.payment_acquirer_id = False
         self.pricelist_id = False
         self.project_id = False
         self.related_project_id = False
@@ -122,14 +121,14 @@ class SaleOrder(models.Model):
 
     @api.multi
     @api.constrains('team_id', 'company_id')
-    def _check_team_company(self):
-        for rec in self:
-            if (rec.team_id and rec.team_id.company_id and
-                    rec.team_id.company_id != rec.company_id):
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the sales team '
-                                        'must match with that of the '
-                                        'Quotation/Sales Order.'))
+    def _check_company_team_id(self):
+        for order in self.sudo():
+            if order.company_id and order.team_id and \
+                    order.company_id != order.team_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Sales Order and in '
+                      'Sales Team must be the same.'))
+        return True
 
     @api.multi
     @api.constrains('partner_id', 'company_id')
@@ -146,30 +145,33 @@ class SaleOrder(models.Model):
     @api.constrains('pricelist_id', 'company_id')
     def _check_company_pricelist_id(self):
         for order in self.sudo():
-            if order.company_id and order.pricelist_id and \
+            if order.company_id and order.pricelist_id.company_id and \
                     order.company_id != order.pricelist_id.company_id:
-                raise ValidationError(_('The Company in the Sales Order and in'
-                                        ' Pricelist must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Sales Order and in '
+                      'Pricelist must be the same.'))
         return True
 
     @api.multi
     @api.constrains('project_id', 'company_id')
     def _check_company_project_id(self):
         for order in self.sudo():
-            if order.company_id and order.project_id and \
+            if order.company_id and order.project_id.company_id and \
                     order.company_id != order.project_id.company_id:
-                raise ValidationError(_('The Company in the Sales Order and in'
-                                        ' Project must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Sales Order and in '
+                      'Project must be the same.'))
         return True
 
     @api.multi
     @api.constrains('related_project_id', 'company_id')
     def _check_company_related_project_id(self):
         for order in self.sudo():
-            if order.company_id and order.related_project_id and \
+            if order.company_id and order.related_project_id.company_id and \
                     order.company_id != order.related_project_id.company_id:
-                raise ValidationError(_('The Company in the Sales Order and in'
-                                        ' Analytic Account must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Sales Order and in '
+                      'Analytic Account must be the same.'))
         return True
 
     @api.multi
@@ -177,10 +179,10 @@ class SaleOrder(models.Model):
     def _check_company_invoice_ids(self):
         for order in self.sudo():
             for account_invoice in order.invoice_ids:
-                if order.company_id and \
+                if order.company_id and account_invoice.company_id and \
                         order.company_id != account_invoice.company_id:
                     raise ValidationError(
-                        _('The Company in the Quotation/Sales Order and in '
+                        _('The Company in the Sales Order and in '
                           'Invoice must be the same.'))
         return True
 
@@ -188,10 +190,10 @@ class SaleOrder(models.Model):
     @api.constrains('payment_term_id', 'company_id')
     def _check_company_payment_term_id(self):
         for order in self.sudo():
-            if order.company_id and order.payment_term_id and \
+            if order.company_id and order.payment_term_id.company_id and \
                     order.company_id != order.payment_term_id.company_id:
                 raise ValidationError(
-                    _('The Company in the Quotation/Sales Order and in '
+                    _('The Company in the Sales Order and in '
                       'Payment Term must be the same.'))
         return True
 
@@ -210,13 +212,17 @@ class SaleOrder(models.Model):
     @api.constrains('fiscal_position_id', 'company_id')
     def _check_company_fiscal_position_id(self):
         for order in self.sudo():
-            if order.company_id and order.fiscal_position_id and \
+            if order.company_id and order.fiscal_position_id.company_id and \
                     order.company_id != order.fiscal_position_id.company_id:
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the fiscal position '
-                                        'must match with that of the '
-                                        'Quotation/Sales Order.'))
+                raise ValidationError(
+                    _('The Company in the Sales Order and in '
+                      'Fiscal Position must be the same.'))
         return True
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            pass
 
 
 class SaleOrderLine(models.Model):

@@ -36,3 +36,19 @@ class AccountAnalyticAccount(models.Model):
                     _('You cannot change the company, as this '
                       'Analytic account is assigned to Invoice Tax '
                       '%s.' % invoice_tax.name))
+            reconcile_model = self.env['account.reconcile.model'].search(
+                [('analytic_account_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if reconcile_model:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Analytic Account is assigned to Reconcile Model '
+                      '%s.' % reconcile_model.name))
+            reconcile_model = self.env['account.reconcile.model'].search(
+                [('second_analytic_account_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if reconcile_model:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Analytic Account is assigned to Reconcile Model '
+                      '%s.' % reconcile_model.name))

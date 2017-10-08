@@ -32,7 +32,7 @@ class AccountTax(models.Model):
     def _check_company_children_tax_ids(self):
         for tax in self.sudo():
             for children_tax in tax.children_tax_ids:
-                if tax.company_id and \
+                if tax.company_id and children_tax.company_id and \
                         tax.company_id != children_tax.company_id:
                     raise ValidationError(
                         _('The Company in the Tax and in Children Tax %s '
@@ -43,7 +43,7 @@ class AccountTax(models.Model):
     @api.constrains('account_id', 'company_id')
     def _check_company_account_id(self):
         for tax in self.sudo():
-            if tax.company_id and tax.account_id and \
+            if tax.company_id and tax.account_id.company_id and \
                     tax.company_id != tax.account_id.company_id:
                 raise ValidationError(_('The Company in the Tax and in '
                                         ' must be the same.'))
@@ -53,7 +53,7 @@ class AccountTax(models.Model):
     @api.constrains('refund_account_id', 'company_id')
     def _check_company_refund_account_id(self):
         for tax in self.sudo():
-            if tax.company_id and tax.refund_account_id and \
+            if tax.company_id and tax.refund_account_id.company_id and \
                     tax.company_id != tax.refund_account_id.company_id:
                 raise ValidationError(_('The Company in the Tax and in '
                                         'Tax Account on Refunds must be the'
@@ -123,21 +123,59 @@ class AccountTax(models.Model):
                       'tax is assigned to Account '
                       '%s.' % account.name))
 
+            # Account Reconcile Model
+            reconcile_model = self.env['account.reconcile.model'].search(
+                [('tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if reconcile_model:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is assigned to Reconcile Model '
+                      '%s.' % reconcile_model.name))
+
+            reconcile_model = self.env['account.reconcile.model'].search(
+                [('second_tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if reconcile_model:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is assigned to Reconcile Model '
+                      '%s.' % reconcile_model.name))
+
+            # Account Config Settings
+            config_settings = self.env['account.config.settings'].search(
+                [('default_sale_tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if config_settings:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is assigned to Config Settings '
+                      '%s.' % config_settings.name))
+
+            config_settings = self.env['account.config.settings'].search(
+                [('default_purchase_tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if config_settings:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is assigned to Config Settings '
+                      '%s.' % config_settings.name))
+
             # Product Template
-            # pt = self.env['product.template'].search(
-            #     [('taxes_id', 'in', [rec.id]),
-            #      ('company_id', '!=', rec.company_id.id)], limit=1)
-            # if pt:
-            #     raise ValidationError(
-            #         _('You cannot change the company, as this '
-            #           'tax is assigned as Customer Taxes of Product '
-            #           'Template %s.' % pt.name))
-            #
-            # pt = self.env['product.template'].search(
-            #     [('supplier_taxes_id', 'in', [rec.id]),
-            #      ('company_id', '!=', rec.company_id.id)], limit=1)
-            # if pt:
-            #     raise ValidationError(
-            #         _('You cannot change the company, as this '
-            #           'tax is assigned as Supplier Taxes of Product '
-            #           'Template %s.' % pt.name))
+            template = self.env['product.template'].search(
+                [('taxes_id', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is assigned to Product Template '
+                      '%s.' % template.name))
+
+            template = self.env['product.template'].search(
+                [('supplier_taxes_id', 'in', [rec.id]),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if template:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'tax is assigned to Product Template '
+                      '%s.' % template.name))

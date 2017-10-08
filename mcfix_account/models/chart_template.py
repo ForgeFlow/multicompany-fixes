@@ -43,7 +43,7 @@ class AccountChartTemplate(models.Model):
     def _check_company_tax_template_ids(self):
         for chart_template in self.sudo():
             for tax_template in chart_template.tax_template_ids:
-                if chart_template.company_id and \
+                if chart_template.company_id and tax_template.company_id and \
                         chart_template.company_id != tax_template.\
                         company_id:
                     raise ValidationError(
@@ -72,7 +72,7 @@ class AccountChartTemplate(models.Model):
             if multi_charts_accounts:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'Chart Template is assigned to Multi Charts Account '
+                      'chart template is assigned to Multi Charts Account '
                       '%s.' % multi_charts_accounts.name))
             chart_template = self.search(
                 [('parent_id', '=', rec.id),
@@ -82,6 +82,14 @@ class AccountChartTemplate(models.Model):
                     _('You cannot change the company, as this '
                       'chart template is parent of Chart Template '
                       '%s.' % chart_template.name))
+            config_settings = self.env['account.config.settings'].search(
+                [('chart_template_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if config_settings:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'chart template is assigned to Config Settings '
+                      '%s.' % config_settings.name))
 
 
 class AccountTaxTemplate(models.Model):
@@ -125,7 +133,7 @@ class AccountTaxTemplate(models.Model):
     def _check_company_children_tax_ids(self):
         for tax_template in self.sudo():
             for account in tax_template.children_tax_ids:
-                if tax_template.company_id and \
+                if tax_template.company_id and account.company_id and \
                         tax_template.company_id != account.company_id:
                     raise ValidationError(
                         _(
@@ -169,6 +177,22 @@ class AccountTaxTemplate(models.Model):
                     _('You cannot change the company, as this '
                       'Tax Template is assigned to Chart Template '
                       '%s.' % chart_template.name))
+            config_settings = self.env['account.config.settings'].search(
+                [('sale_tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if config_settings:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Sales tax is assigned to Config Settings '
+                      '%s.' % config_settings.name))
+            config_settings = self.env['account.config.settings'].search(
+                [('purchase_tax_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if config_settings:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase tax is assigned to Config Settings '
+                      '%s.' % config_settings.name))
 
 
 class WizardMultiChartsAccounts(models.TransientModel):
@@ -213,8 +237,8 @@ class WizardMultiChartsAccounts(models.TransientModel):
     def _check_company_sale_tax_id(self):
         for multi_charts_accounts in self.sudo():
             if multi_charts_accounts.company_id and multi_charts_accounts.\
-                    sale_tax_id and multi_charts_accounts.company_id != \
-                    multi_charts_accounts.sale_tax_id.company_id:
+                    sale_tax_id.company_id and multi_charts_accounts.\
+                    company_id != multi_charts_accounts.sale_tax_id.company_id:
                 raise ValidationError(
                     _('The Company in the Multi Charts Accounts and in '
                       'Default Sales Tax must be the same.'))
@@ -225,8 +249,9 @@ class WizardMultiChartsAccounts(models.TransientModel):
     def _check_company_purchase_tax_id(self):
         for multi_charts_accounts in self.sudo():
             if multi_charts_accounts.company_id and multi_charts_accounts.\
-                    purchase_tax_id and multi_charts_accounts.company_id != \
-                    multi_charts_accounts.purchase_tax_id.company_id:
+                    purchase_tax_id.company_id and multi_charts_accounts.\
+                    company_id != multi_charts_accounts.purchase_tax_id.\
+                    company_id:
                 raise ValidationError(
                     _('The Company in the Multi Charts Accounts and in '
                       'Default Purchase Tax must be the same.'))

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'Multi Company Fix CRM Sale',
+    'name': 'Multi Company Fix Sale CRM',
     'version': '10.0.1.0.0',
     'summary': 'Creu Blanca configuration',
     'author': 'Creu Blanca, '

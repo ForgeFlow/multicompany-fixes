@@ -19,3 +19,8 @@ class AccountAnalyticAccount(models.Model):
                 rec.company_id else name[1]
             res += [(rec.id, name)]
         return res
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            pass

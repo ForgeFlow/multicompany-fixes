@@ -26,11 +26,12 @@ class AccountAccount(models.Model):
     def _check_company_tax_ids(self):
         for account in self.sudo():
             for tax in account.tax_ids:
-                if account.company_id and \
+                if account.company_id and tax.company_id and \
                         account.company_id != tax.company_id:
-                    raise ValidationError(_('The Company in the Account and '
-                                            'in Default Taxes %s must be the '
-                                            'same.' % tax.name))
+                    raise ValidationError(
+                        _('The Company in the Account and '
+                          'in Default Taxes %s must be the '
+                          'same.' % tax.name))
         return True
 
     @api.onchange('company_id')
@@ -48,7 +49,7 @@ class AccountAccount(models.Model):
                 if invoice:
                     raise ValidationError(
                         _('You cannot change the company, as this '
-                          'Account is assigned to Invoice '
+                          'account is assigned to Invoice '
                           '%s.' % invoice.name))
 
                 invoice_line = self.env['account.invoice.line'].search(
@@ -57,7 +58,7 @@ class AccountAccount(models.Model):
                 if invoice_line:
                     raise ValidationError(
                         _('You cannot change the company, as this '
-                          'Account is assigned to Invoice Line %s in '
+                          'account is assigned to Invoice Line %s in '
                           'Invoice %s.' % (invoice_line.name,
                                            invoice_line.invoice_id.name)))
 
@@ -67,8 +68,21 @@ class AccountAccount(models.Model):
                 if invoice_tax:
                     raise ValidationError(
                         _('You cannot change the company, as this '
-                          'Tax Account is assigned to Invoice Tax '
+                          'account is assigned to Invoice Tax '
                           '%s.' % invoice_tax.name))
+
+                # Account Bank Statement
+                bank_statement_line = self.env[
+                    'account.bank.statement.line'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if bank_statement_line:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Bank Statement Line '
+                          '%s of Bank Statement %s.' % (
+                            bank_statement_line.name,
+                            bank_statement_line.statement_id.name)))
 
                 # Account Journal
                 journal = self.env['account.journal'].search(
@@ -123,7 +137,7 @@ class AccountAccount(models.Model):
                 if move:
                     raise ValidationError(
                         _('You cannot change the company, as this '
-                          'Account is assigned to Move '
+                          'account is assigned to Move '
                           '%s.' % move.name))
 
                 move_line = self.env['account.move.line'].search(
@@ -132,7 +146,7 @@ class AccountAccount(models.Model):
                 if move_line:
                     raise ValidationError(
                         _('You cannot change the company, as this '
-                          'Account is assigned to Move Line '
+                          'account is assigned to Move Line '
                           '%s in Move %s.' % (move_line.name,
                                               move_line.move_id.name)))
 
@@ -154,3 +168,69 @@ class AccountAccount(models.Model):
                         _('You cannot change the company, as this '
                           'account is assigned as Tax Account on Refunds '
                           'to Tax %s.' % tax.name))
+
+                # Account Reconcile
+                reconcile_model = self.env['account.reconcile.model'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if reconcile_model:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Reconcile Model '
+                          '%s.' % reconcile_model.name))
+
+                reconcile_model = self.env['account.reconcile.model'].search(
+                    [('second_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if reconcile_model:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Reconcile Model '
+                          '%s.' % reconcile_model.name))
+
+                # Account Invoice Report
+                invoice_report = self.env['account.invoice.report'].search(
+                    [('account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if invoice_report:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Invoice Report '
+                          '%s.' % invoice_report.name))
+
+                invoice_report = self.env['account.invoice.report'].search(
+                    [('account_line_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if invoice_report:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Invoice Report '
+                          '%s.' % invoice_report.name))
+
+                # Account Config Settings
+                config_settings = self.env['account.config.settings'].search(
+                    [('transfer_account_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if config_settings:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Config Settings '
+                          '%s.' % config_settings.name))
+
+                # Product Template
+                template = self.env['product.template'].search(
+                    [('property_account_income_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if template:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Product Template '
+                          '%s.' % template.name))
+                template = self.env['product.template'].search(
+                    [('property_account_expense_id', '=', rec.id),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if template:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'account is assigned to Product Template '
+                          '%s.' % template.name))

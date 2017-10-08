@@ -23,11 +23,14 @@ class AccountInvoice(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.refund_invoice_id = False
+        self.payment_term_id = False
+        self.account_id = False
         self.invoice_line_ids = False
         self.tax_line_ids = False
         self.move_id = False
         self.journal_id = False
         self.payment_move_line_ids = False
+        self.fiscal_position_id = False
 
     @api.multi
     @api.onchange('company_id')
@@ -54,53 +57,52 @@ class AccountInvoice(models.Model):
     @api.constrains('refund_invoice_id', 'company_id')
     def _check_company_refund_invoice_id(self):
         for invoice in self.sudo():
-            if invoice.company_id and invoice.refund_invoice_id and \
+            if invoice.company_id and invoice.refund_invoice_id.company_id and\
                     invoice.company_id != invoice.refund_invoice_id.\
                     company_id:
-                raise ValidationError(_('The Company in the Invoice and in '
-                                        'the Refund must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Invoice and in '
+                      'the Refund must be the same.'))
         return True
 
     @api.multi
     @api.constrains('payment_term_id', 'company_id')
     def _check_company_payment_term_id(self):
         for invoice in self.sudo():
-            if invoice.company_id and invoice.payment_term_id and\
+            if invoice.company_id and invoice.payment_term_id.company_id and\
                     invoice.company_id != invoice.payment_term_id.company_id:
-                raise ValidationError(_('The Company in the Invoice and in '
-                                        'Payment Terms must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('fiscal_position_id', 'company_id')
-    def _check_company_fiscal_position_id(self):
-        for invoice in self.sudo():
-            if (
-                invoice.company_id and
-                invoice.fiscal_position_id.company_id and
-                invoice.company_id != invoice.fiscal_position_id.company_id
-            ):
-                raise ValidationError(_('The Company in the Invoice and in '
-                                        'Fiscal Position must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Invoice and in '
+                      'Payment Terms must be the same.'))
         return True
 
     @api.multi
     @api.constrains('account_id', 'company_id')
     def _check_company_account_id(self):
         for invoice in self.sudo():
-            if (
-                invoice.company_id and invoice.account_id and
-                invoice.company_id != invoice.account_id.company_id
-            ):
+            if invoice.company_id and invoice.account_id.company_id and \
+                    invoice.company_id != invoice.account_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Invoice and in '
+                      'Account must be the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('fiscal_position_id', 'company_id')
+    def _check_company_fiscal_position_id(self):
+        for invoice in self.sudo():
+            if invoice.company_id and invoice.fiscal_position_id.company_id \
+                    and invoice.company_id != invoice.fiscal_position_id.\
+                    company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
-                                        'Account must be the same.'))
+                                        'Fiscal Position must be the same.'))
         return True
 
     @api.multi
     @api.constrains('journal_id', 'company_id')
     def _check_company_journal_id(self):
         for invoice in self.sudo():
-            if invoice.company_id and invoice.journal_id and\
+            if invoice.company_id and invoice.journal_id.company_id and\
                     invoice.company_id != invoice.journal_id.company_id:
                 raise ValidationError(_('The Company in the Invoice and in '
                                         'Journal must be the same.'))
@@ -111,10 +113,8 @@ class AccountInvoice(models.Model):
     def _check_company_tax_line_ids(self):
         for invoice in self.sudo():
             for tax_line in invoice.tax_line_ids:
-                if (
-                    invoice.company_id and tax_line.company_id and
-                    invoice.company_id != tax_line.company_id
-                ):
+                if invoice.company_id and tax_line.company_id and\
+                            invoice.company_id != tax_line.company_id:
                     raise ValidationError(
                         _('The Company in the Invoice and in '
                           'Tax Line %s must be the same.') % tax_line.name)
@@ -125,7 +125,7 @@ class AccountInvoice(models.Model):
     def _check_company_invoice_line_ids(self):
         for invoice in self.sudo():
             for invoice_line in invoice.invoice_line_ids:
-                if invoice.company_id and \
+                if invoice.company_id and invoice_line.company_id and\
                         invoice.company_id != invoice_line.company_id:
                     raise ValidationError(
                         _('The Company in the Invoice and in Invoice Line %s '
@@ -136,10 +136,11 @@ class AccountInvoice(models.Model):
     @api.constrains('move_id', 'company_id')
     def _check_company_move_id(self):
         for invoice in self.sudo():
-            if invoice.company_id and invoice.move_id and \
+            if invoice.company_id and invoice.move_id.company_id and \
                     invoice.company_id != invoice.move_id.company_id:
-                raise ValidationError(_('The Company in the Invoice and in '
-                                        'Journal Entry must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Invoice and in '
+                      'Journal Entry must be the same.'))
         return True
 
     @api.multi
@@ -147,7 +148,7 @@ class AccountInvoice(models.Model):
     def _check_company_payment_move_line_ids(self):
         for invoice in self.sudo():
             for move_line in invoice.payment_move_line_ids:
-                if invoice.company_id and \
+                if invoice.company_id and move_line.company_id and \
                         invoice.company_id != move_line.company_id:
                     raise ValidationError(
                         _('The Company in the Invoice and in '
@@ -230,6 +231,7 @@ class AccountInvoiceLine(models.Model):
         self.invoice_id = False
         self.account_id = False
         self.invoice_line_tax_ids = False
+        self.account_analytic_id = False
 
     @api.model
     def change_company_id(self):
@@ -253,8 +255,8 @@ class AccountInvoiceLine(models.Model):
     @api.constrains('invoice_id', 'company_id')
     def _check_company_invoice_id(self):
         for invoice_line in self.sudo():
-            if invoice_line.company_id and invoice_line.invoice_id and \
-                    invoice_line.company_id != invoice_line.\
+            if invoice_line.company_id and invoice_line.invoice_id.company_id\
+                    and invoice_line.company_id != invoice_line.\
                     invoice_id.company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Line and in '
@@ -265,8 +267,8 @@ class AccountInvoiceLine(models.Model):
     @api.constrains('account_id', 'company_id')
     def _check_company_account_id(self):
         for invoice_line in self.sudo():
-            if invoice_line.company_id and invoice_line.account_id and \
-                    invoice_line.company_id != invoice_line.\
+            if invoice_line.company_id and invoice_line.account_id.company_id\
+                    and invoice_line.company_id != invoice_line.\
                     account_id.company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Line and in '
@@ -278,7 +280,7 @@ class AccountInvoiceLine(models.Model):
     def _check_company_invoice_line_tax_ids(self):
         for invoice_line in self.sudo():
             for invoice_line_tax in invoice_line.invoice_line_tax_ids:
-                if invoice_line.company_id and \
+                if invoice_line.company_id and invoice_line_tax.company_id and\
                         invoice_line.company_id != invoice_line_tax.\
                         company_id:
                     raise ValidationError(
@@ -286,9 +288,23 @@ class AccountInvoiceLine(models.Model):
                           'must be the same.') % invoice_line_tax.name)
         return True
 
+    @api.multi
+    @api.constrains('account_analytic_id', 'company_id')
+    def _check_company_account_analytic_id(self):
+        for invoice_line in self.sudo():
+            if invoice_line.company_id and invoice_line.account_analytic_id.\
+                    company_id and invoice_line.company_id != invoice_line.\
+                    account_analytic_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Invoice Line and in '
+                      'Analytic Account must be the same.'))
+        return True
+
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             invoice = self.env['account.invoice'].search(
                 [('invoice_line_ids', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -322,13 +338,14 @@ class AccountInvoiceTax(models.Model):
         self.invoice_id = False
         self.tax_id = False
         self.account_id = False
+        self.account_analytic_id = False
 
     @api.multi
     @api.constrains('invoice_id', 'company_id')
     def _check_company_invoice_id(self):
         for invoice_tax in self.sudo():
-            if invoice_tax.company_id and invoice_tax.invoice_id and \
-                    invoice_tax.company_id != invoice_tax.invoice_id.\
+            if invoice_tax.company_id and invoice_tax.invoice_id.company_id\
+                    and invoice_tax.company_id != invoice_tax.invoice_id.\
                     company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Tax and in '
@@ -339,7 +356,7 @@ class AccountInvoiceTax(models.Model):
     @api.constrains('tax_id', 'company_id')
     def _check_company_tax_id(self):
         for invoice_tax in self.sudo():
-            if invoice_tax.company_id and invoice_tax.tax_id and \
+            if invoice_tax.company_id and invoice_tax.tax_id.company_id and \
                     invoice_tax.company_id != invoice_tax.tax_id.company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Tax and in '
@@ -350,17 +367,31 @@ class AccountInvoiceTax(models.Model):
     @api.constrains('account_id', 'company_id')
     def _check_company_account_id(self):
         for invoice_tax in self.sudo():
-            if invoice_tax.company_id and invoice_tax.account_id and \
-                    invoice_tax.company_id != invoice_tax.account_id.\
+            if invoice_tax.company_id and invoice_tax.account_id.company_id \
+                    and invoice_tax.company_id != invoice_tax.account_id.\
                     company_id:
                 raise ValidationError(
                     _('The Company in the Invoice Tax and in '
                       'Tax Account must be the same.'))
         return True
 
+    @api.multi
+    @api.constrains('account_analytic_id', 'company_id')
+    def _check_company_account_analytic_id(self):
+        for invoice_tax in self.sudo():
+            if invoice_tax.company_id and invoice_tax.account_analytic_id.\
+                    company_id and invoice_tax.company_id != invoice_tax.\
+                    account_analytic_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Invoice Tax and in '
+                      'Analytic account must be the same.'))
+        return True
+
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             invoice = self.env['account.invoice'].search(
                 [('tax_line_ids', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

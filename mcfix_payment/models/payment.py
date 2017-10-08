@@ -29,8 +29,13 @@ class PaymentAcquirer(models.Model):
     @api.constrains('journal_id', 'company_id')
     def _check_company_journal_id(self):
         for acquirer in self.sudo():
-            if acquirer.company_id and acquirer.journal_id and \
+            if acquirer.company_id and acquirer.journal_id.company_id and \
                     acquirer.company_id != acquirer.journal_id.company_id:
                 raise ValidationError(_('The Company in the Payment Acquirer '
                                         'and in Journal must be the same.'))
         return True
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        for rec in self:
+            pass

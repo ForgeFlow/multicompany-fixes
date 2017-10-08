@@ -10,3 +10,5 @@ from . import ir_sequence
 from . import account_tax
 from . import chart_template
 from . import partner
+from . import product
+from . import res_config

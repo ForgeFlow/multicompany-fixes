@@ -20,5 +20,5 @@ class AccountTax(models.Model):
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'Tax is assigned to Purchase Order Line '
-                      '%s of Purchase %s.' % (order_line.name,
-                                              order_line.order_id.name)))
+                      '%s of Purchase Order %s.' % (
+                        order_line.name, order_line.order_id.name)))

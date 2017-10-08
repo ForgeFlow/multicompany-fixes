@@ -18,3 +18,11 @@ class StockWarehouse(models.Model):
                     _('You cannot change the company, as this '
                       'Warehouse is assigned to Sales Order '
                       '%s.' % order.name))
+            report = self.env['sale.report'].search(
+                [('warehouse_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Warehouse is assigned to Report '
+                      '%s.' % report.name))

@@ -25,6 +25,7 @@ class PurchaseOrder(models.Model):
     def onchange_company_id(self):
         self.order_line = False
         self.invoice_ids = False
+        self.picking_ids = False
         self.fiscal_position_id = False
         self.payment_term_id = False
 
@@ -68,7 +69,7 @@ class PurchaseOrder(models.Model):
     def _check_company_order_line(self):
         for order in self.sudo():
             for purchase_order_line in order.order_line:
-                if order.company_id and \
+                if order.company_id and purchase_order_line.company_id and \
                         order.company_id != purchase_order_line.company_id:
                     raise ValidationError(
                         _('The Company in the RFQ/Purchase Order and in '
@@ -80,7 +81,7 @@ class PurchaseOrder(models.Model):
     def _check_company_invoice_ids(self):
         for order in self.sudo():
             for account_invoice in order.invoice_ids:
-                if order.company_id and \
+                if order.company_id and account_invoice.company_id and \
                         order.company_id != account_invoice.company_id:
                     raise ValidationError(
                         _('The Company in the RFQ/Purchase Order and in '
@@ -88,10 +89,22 @@ class PurchaseOrder(models.Model):
         return True
 
     @api.multi
+    @api.constrains('picking_ids', 'company_id')
+    def _check_company_picking_ids(self):
+        for order in self.sudo():
+            for stock_picking in order.picking_ids:
+                if order.company_id and stock_picking.company_id and \
+                        order.company_id != stock_picking.company_id:
+                    raise ValidationError(
+                        _('The Company in the RFQ/Purchase Order and in '
+                          'Reception must be the same.'))
+        return True
+
+    @api.multi
     @api.constrains('payment_term_id', 'company_id')
     def _check_company_payment_term_id(self):
         for order in self.sudo():
-            if order.company_id and order.payment_term_id and \
+            if order.company_id and order.payment_term_id.company_id and \
                     order.company_id != order.payment_term_id.company_id:
                 raise ValidationError(
                     _('Configuration error\n'
@@ -103,7 +116,7 @@ class PurchaseOrder(models.Model):
     @api.constrains('fiscal_position_id', 'company_id')
     def _check_company_fiscal_position_id(self):
         for order in self.sudo():
-            if order.company_id and order.fiscal_position_id and \
+            if order.company_id and order.fiscal_position_id.company_id and \
                     order.company_id != order.fiscal_position_id.company_id:
                 raise ValidationError(
                     _('Configuration error\n'
@@ -140,6 +153,14 @@ class PurchaseOrder(models.Model):
                     _('You cannot change the company, as this '
                       'Purchase Order is assigned to Invoice '
                       '%s.' % invoice.name))
+            picking = self.env['stock.picking'].search(
+                [('purchase_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if picking:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase Order is assigned to Picking '
+                      '%s.' % picking.name))
 
 
 class PurchaseOrderLine(models.Model):
@@ -163,9 +184,11 @@ class PurchaseOrderLine(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.taxes_id = False
+        self.move_ids = False
         self.order_id = False
         self.account_analytic_id = False
         self.invoice_lines = False
+        self.procurement_ids = False
 
     @api.onchange('product_id', 'company_id')
     def onchange_product_id(self):
@@ -196,7 +219,7 @@ class PurchaseOrderLine(models.Model):
     @api.constrains('order_id', 'company_id')
     def _check_company_order_id(self):
         for order_line in self.sudo():
-            if order_line.company_id and order_line.order_id and \
+            if order_line.company_id and order_line.order_id.company_id and \
                     order_line.company_id != order_line.order_id.company_id:
                 raise ValidationError(_('The Company in the Purchase Order '
                                         'Line and in the RFQ/Purchase must be '
@@ -208,7 +231,7 @@ class PurchaseOrderLine(models.Model):
     def _check_company_taxes_id(self):
         for order_line in self.sudo():
             for account_tax in order_line.taxes_id:
-                if order_line.company_id and \
+                if order_line.company_id and account_tax.company_id and \
                         order_line.company_id != account_tax.company_id:
                     raise ValidationError(
                         _('Configuration error\n'
@@ -218,12 +241,24 @@ class PurchaseOrderLine(models.Model):
             return True
 
     @api.multi
+    @api.constrains('move_ids', 'company_id')
+    def _check_company_move_ids(self):
+        for order_line in self.sudo():
+            for stock_move in order_line.move_ids:
+                if order_line.company_id and stock_move.company_id and \
+                        order_line.company_id != stock_move.company_id:
+                    raise ValidationError(
+                        _('The Company in the Purchase Order Line and in '
+                          'Reservation must be the same.'))
+        return True
+
+    @api.multi
     @api.constrains('invoice_lines', 'company_id')
     def _check_company_invoice_lines(self):
         for order_line in self.sudo():
             for account_invoice_line in order_line.invoice_lines:
-                if order_line.company_id and \
-                        order_line.company_id != account_invoice_line.\
+                if order_line.company_id and account_invoice_line.company_id \
+                        and order_line.company_id != account_invoice_line.\
                         company_id:
                     raise ValidationError(
                         _('The Company of the bill line %s must match with '
@@ -235,12 +270,24 @@ class PurchaseOrderLine(models.Model):
     @api.constrains('account_analytic_id', 'company_id')
     def _check_company_account_analytic_id(self):
         for order_line in self.sudo():
-            if order_line.company_id and order_line.account_analytic_id and \
-                    order_line.company_id != order_line.account_analytic_id.\
-                    company_id:
+            if order_line.company_id and order_line.account_analytic_id.\
+                    company_id and order_line.company_id != order_line.\
+                    account_analytic_id.company_id:
                 raise ValidationError(_('The Company in the Purchase Order '
                                         'Line and in Analytic Account must be '
                                         'the same.'))
+        return True
+
+    @api.multi
+    @api.constrains('procurement_ids', 'company_id')
+    def _check_company_procurement_ids(self):
+        for order_line in self.sudo():
+            for procurement_order in order_line.procurement_ids:
+                if order_line.company_id and procurement_order.company_id and \
+                        order_line.company_id != procurement_order.company_id:
+                    raise ValidationError(
+                        _('The Company in the Purchase Order Line and in '
+                          'Procurement must be the same.'))
         return True
 
     @api.multi
@@ -258,13 +305,23 @@ class PurchaseOrderLine(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
+            order = self.env['procurement.order'].search(
+                [('purchase_line_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if order:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase Order Line is assigned to Procurement Order '
+                      '%s.' % order.name))
             invoice_line = self.env['account.invoice.line'].search(
                 [('purchase_line_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_line:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      ' is assigned to Invoice Line '
+                      'Purchase Order Line is assigned to Invoice Line '
                       '%s of Invoice %s.' % (invoice_line.name,
                                              invoice_line.invoice_id.name)))
             order = self.env['purchase.order'].search(
@@ -275,3 +332,11 @@ class PurchaseOrderLine(models.Model):
                     _('You cannot change the company, as this '
                       'Purchase Order Line is assigned to RFQ/Purchase Order '
                       '%s.' % order.name))
+            move = self.env['stock.move'].search(
+                [('purchase_line_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if move:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Purchase Order Line is assigned to Stock Move '
+                      '%s.' % move.name))

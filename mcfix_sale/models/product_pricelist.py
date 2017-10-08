@@ -13,6 +13,8 @@ class ProductPricelist(models.Model):
     def _check_company_id(self):
         super(ProductPricelist, self)._check_company_id()
         for rec in self:
+            if not rec.company_id:
+                continue
             order = self.env['sale.order'].search(
                 [('pricelist_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -21,3 +23,11 @@ class ProductPricelist(models.Model):
                     _('You cannot change the company, as this '
                       'Pricelist is assigned to Sales Order '
                       '%s.' % order.name))
+            report = self.env['sale.report'].search(
+                [('pricelist_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if report:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Pricelist is assigned to Report '
+                      '%s.' % report.name))

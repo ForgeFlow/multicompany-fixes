@@ -21,6 +21,22 @@ class AccountBudgetPost(models.Model):
             res += [(rec.id, name)]
         return res
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.account_ids = False
+
+    @api.multi
+    @api.constrains('account_ids', 'company_id')
+    def _check_company_account_ids(self):
+        for budget_post in self.sudo():
+            for account_account in budget_post.account_ids:
+                if budget_post.company_id and account_account.company_id and \
+                        budget_post.company_id != account_account.company_id:
+                    raise ValidationError(
+                        _('The Company in the Budget Post and in '
+                          'Account must be the same.'))
+        return True
+
 
 class CrossoveredBudget(models.Model):
     _inherit = 'crossovered.budget'
@@ -53,9 +69,10 @@ class CrossoveredBudget(models.Model):
         for budget in self:
             if budget.company_id and budget.creating_user_id and\
                     budget.company_id != budget.creating_user_id.company_id:
-                raise ValidationError(_('The Company in the Budget '
-                                        'and in person responsible'
-                                        'must be the same.'))
+                raise ValidationError(
+                    _('The Company in the Budget '
+                      'and in person responsible'
+                      'must be the same.'))
         return True
 
 
