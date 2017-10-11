@@ -239,14 +239,6 @@ class StockLocationRoute(models.Model):
                     _('You cannot change the company, as this '
                       'Location Route is assigned to Product Template '
                       '%s.' % template.name))
-            # template = self.env['product.template'].search(
-            #     [('route_from_categ_ids', 'in', [rec.id]),
-            #      ('company_id', '!=', rec.company_id.id)], limit=1)
-            # if template:
-            #     raise ValidationError(
-            #         _('You cannot change the company, as this '
-            #           'Category Route is assigned to Product Template '
-            #           '%s.' % template.name))
 
 
 class StockLocation(models.Model):
@@ -326,16 +318,6 @@ class StockLocation(models.Model):
                       '%s in Inventory %s.' % (
                           inventory_line.name,
                           inventory_line.inventory_id.name)))
-            inventory_line = self.env['stock.inventory.line'].search(
-                [('inventory_location_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if inventory_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      ' is assigned to Inventory Line '
-                      '%sin Inventory %s.' % (
-                          inventory_line.name,
-                          inventory_line.inventory_id.name)))
             picking = self.env['stock.picking'].search(
                 [('location_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -360,22 +342,6 @@ class StockLocation(models.Model):
                     _('You cannot change the company, as this '
                       'Location is assigned to Quant '
                       '%s.' % quant.name))
-            quant = self.env['stock.quant'].search(
-                [('negative_dest_location_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if quant:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Location is assigned as Negative Destination to Quant '
-                      '%s.' % quant.name))
-            quant_package = self.env['stock.quant.package'].search(
-                [('location_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if quant_package:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Location is assigned to Quant Package '
-                      '%s.' % quant_package.name))
             location = self.search(
                 [('location_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

@@ -18,25 +18,12 @@ class AccountInvoice(models.Model):
     @api.constrains('team_id', 'company_id')
     def _check_company_team_id(self):
         for invoice in self.sudo():
-            if invoice.company_id and invoice.team_id and \
+            if invoice.company_id and invoice.team_id.company_id and \
                     invoice.company_id != invoice.team_id.company_id:
                 raise ValidationError(
                     _('The Company in the Invoice and in '
                       'Sales Team must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        super(AccountInvoice, self)._check_company_id()
-        for rec in self:
-            order = self.env['sale.order'].search(
-                [('invoice_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'invoice is assigned to Sales Order '
-                      '%s.' % order.name))
 
 
 class AccountInvoiceLine(models.Model):

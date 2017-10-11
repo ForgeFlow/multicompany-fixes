@@ -45,19 +45,6 @@ class StockPicking(models.Model):
                       'Purchase Order must be the same.'))
         return True
 
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        super(StockPicking, self)._check_company_id()
-        for rec in self:
-            order = self.env['purchase.order'].search(
-                [('picking_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Reception is assigned to Purchase Order '
-                      '%s.' % order.name))
-
 
 class StockWarehouse(models.Model):
     _inherit = 'stock.warehouse'

@@ -71,14 +71,6 @@ class StockPicking(models.Model):
                     _('You cannot change the company, as this '
                       'Picking is assigned to Move '
                       '%s.' % move.name))
-            move = self.env['stock.move'].search(
-                [('backorder_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if move:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Picking is assigned to Move '
-                      '%s.' % move.name))
             picking = self.search(
                 [('backorder_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

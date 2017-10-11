@@ -343,15 +343,3 @@ class StockWarehouseOrderpoint(models.Model):
                     _('The Company in the Warehouse Orderpoint and in '
                       ' must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        for rec in self:
-            order = self.env['procurement.order'].search(
-                [('orderpoint_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Warehouse Orderpoint is assigned to Procurement Order '
-                      '%s.' % order.name))

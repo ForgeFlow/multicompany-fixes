@@ -163,14 +163,6 @@ class AccountJournal(models.Model):
                     _('You cannot change the company, as this '
                       'Journal is assigned to Report '
                       '%s.' % common_report.name))
-            config_settings = self.env['account.config.settings'].search(
-                [('currency_exchange_journal_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if config_settings:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Journal is assigned to Config Settings '
-                      '%s.' % config_settings.name))
 
     def write(self, vals):
         for journal in self:

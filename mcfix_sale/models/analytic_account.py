@@ -18,14 +18,6 @@ class AccountAnalyticAccount(models.Model):
                     _('You cannot change the company, as this '
                       'Analytic Account is assigned to Sales Order '
                       '%s.' % order.name))
-            order = self.env['sale.order'].search(
-                [('related_project_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Analytic Account is assigned to Sales Order '
-                      '%s.' % order.name))
             report = self.env['sale.report'].search(
                 [('analytic_account_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

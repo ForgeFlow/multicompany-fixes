@@ -123,15 +123,6 @@ class PurchaseOrder(models.Model):
                       'RFQ/Purchase Order is assigned to Purchase Order Line '
                       '%s of Purchase Order %s.' % (order_line.name,
                                                     order_line.order_id.name)))
-            invoice_line = self.env['account.invoice.line'].search(
-                [('purchase_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if invoice_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Purchase Order is assigned to Invoice Line '
-                      '%s of Invoice %s.' % (invoice_line.name,
-                                             invoice_line.invoice_id.name)))
             invoice = self.env['account.invoice'].search(
                 [('purchase_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -140,14 +131,6 @@ class PurchaseOrder(models.Model):
                     _('You cannot change the company, as this '
                       'Purchase Order is assigned to Invoice '
                       '%s.' % invoice.name))
-            picking = self.env['stock.picking'].search(
-                [('purchase_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if picking:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Purchase Order is assigned to Picking '
-                      '%s.' % picking.name))
 
 
 class PurchaseOrderLine(models.Model):

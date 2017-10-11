@@ -131,15 +131,6 @@ class AccountAccount(models.Model):
                           'Account Journal %s.' % journal.name))
 
                 # Account Move
-                move = self.env['account.move'].search(
-                    [('dummy_account_id', '=', rec.id),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if move:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'account is assigned to Move '
-                          '%s.' % move.name))
-
                 move_line = self.env['account.move.line'].search(
                     [('account_id', '=', rec.id),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -206,16 +197,6 @@ class AccountAccount(models.Model):
                         _('You cannot change the company, as this '
                           'account is assigned to Invoice Report '
                           '%s.' % invoice_report.name))
-
-                # Account Config Settings
-                config_settings = self.env['account.config.settings'].search(
-                    [('transfer_account_id', '=', rec.id),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if config_settings:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'account is assigned to Config Settings '
-                          '%s.' % config_settings.name))
 
                 # Product Template
                 template = self.env['product.template'].search(

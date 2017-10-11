@@ -82,16 +82,3 @@ class SaleOrder(models.Model):
                         _('The Company in the Sales Order and in '
                           'Picking must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        super(SaleOrder, self)._check_company_id()
-        for rec in self:
-            picking = self.env['stock.picking'].search(
-                [('sale_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if picking:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Sales Order is assigned to Picking '
-                      '%s.' % picking.name))
