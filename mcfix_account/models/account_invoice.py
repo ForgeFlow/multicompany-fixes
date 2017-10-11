@@ -24,7 +24,7 @@ class AccountInvoice(models.Model):
     def onchange_company_id(self):
         self.journal_id = self.with_context(
             company_id=self.company_id.id)._default_journal()
-        
+
     @api.multi
     @api.onchange('company_id')
     def _onchange_company_id(self):

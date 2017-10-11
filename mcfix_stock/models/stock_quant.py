@@ -197,7 +197,8 @@ class StockQuantPackage(models.Model):
                     _('You cannot change the company, as this '
                       'Quant Package is assigned to Inventory Line '
                       '%s in Inventory %s.' % (
-                        inventory_line.name, inventory_line.inventory_id.name))
+                          inventory_line.name,
+                          inventory_line.inventory_id.name))
                 )
             quant = self.env['stock.quant'].search(
                 [('package_id', '=', rec.id),

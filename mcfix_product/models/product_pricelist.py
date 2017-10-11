@@ -42,14 +42,6 @@ class Pricelist(models.Model):
                     _('You cannot change the company, as this '
                       'Pricelist is assigned to Pricelist Item '
                       '%s.' % pricelist_item.name))
-            template = self.env['product.template'].search(
-                [('pricelist_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if template:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Pricelist is assigned to Product Template '
-                      '%s.' % template.name))
 
 
 class ProductPricelistItem(models.Model):

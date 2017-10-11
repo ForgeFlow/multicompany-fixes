@@ -324,7 +324,8 @@ class StockLocation(models.Model):
                     _('You cannot change the company, as this '
                       'Location is assigned to Inventory Line '
                       '%s in Inventory %s.' % (
-                       inventory_line.name, inventory_line.inventory_id.name)))
+                          inventory_line.name,
+                          inventory_line.inventory_id.name)))
             inventory_line = self.env['stock.inventory.line'].search(
                 [('inventory_location_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -333,7 +334,8 @@ class StockLocation(models.Model):
                     _('You cannot change the company, as this '
                       ' is assigned to Inventory Line '
                       '%sin Inventory %s.' % (
-                       inventory_line.name, inventory_line.inventory_id.name)))
+                          inventory_line.name,
+                          inventory_line.inventory_id.name)))
             picking = self.env['stock.picking'].search(
                 [('location_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

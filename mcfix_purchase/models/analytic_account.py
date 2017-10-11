@@ -18,7 +18,7 @@ class AccountAnalyticAccount(models.Model):
                     _('You cannot change the company, as this '
                       'Analytic Account is assigned to Purchase Order Line '
                       '%s of Purchase Order %s.' % (
-                       order_line.name, order_line.order_id.name)))
+                          order_line.name, order_line.order_id.name)))
             report = self.env['purchase.report'].search(
                 [('account_analytic_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
