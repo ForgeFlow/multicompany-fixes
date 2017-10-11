@@ -21,6 +21,11 @@ class StockWarehouse(models.Model):
             res += [(rec.id, name)]
         return res
 
+    def _get_crossdock_route_values(self):
+        res = super(StockWarehouse, self)._get_crossdock_route_values()
+        res['company_id'] = self.company_id.id
+        return res
+
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.view_location_id = False
