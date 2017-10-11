@@ -150,7 +150,7 @@ class AccountBankStatement(models.Model):
             bank_statement_line = self.env[
                 'account.bank.statement.line'].search(
                 [('statement_id', '=', rec.id),
-                 ('account.bank.statement', '!=', rec.company_id.id)], limit=1)
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
             if bank_statement_line:
                 raise ValidationError(
                     _('You cannot change the company, as this '

@@ -11,7 +11,6 @@ class ProductTemplate(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id(self):
-        super(ProductTemplate, self)._check_company_id()
         for rec in self:
                 report = self.env['sale.report'].search(
                     [('product_tmpl_id', '=', rec.id),
