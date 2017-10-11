@@ -76,14 +76,6 @@ class ProcurementRule(models.Model):
         for rec in self:
             if not rec.company_id:
                 continue
-            location_route = self.env['stock.location.route'].search(
-                [('pull_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if location_route:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Procurement Rule is assigned to Location Route '
-                      '%s.' % location_route.name))
             move = self.env['stock.move'].search(
                 [('rule_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -109,7 +101,6 @@ class ProcurementOrder(models.Model):
     def onchange_company_id(self):
         super(ProcurementOrder, self).onchange_company_id()
         self.location_id = False
-        self.move_ids = False
         self.move_dest_id = False
         self.route_ids = False
         self.warehouse_id = False
@@ -124,18 +115,6 @@ class ProcurementOrder(models.Model):
                 raise ValidationError(
                     _('The Company in the Procurement Order and in '
                       'Location must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('move_ids', 'company_id')
-    def _check_company_move_ids(self):
-        for order in self.sudo():
-            for stock_move in order.move_ids:
-                if order.company_id and stock_move.company_id and \
-                        order.company_id != stock_move.company_id:
-                    raise ValidationError(
-                        _('The Company in the Procurement Order and in '
-                          'Stock Move must be the same.'))
         return True
 
     @api.multi
@@ -195,12 +174,3 @@ class ProcurementOrder(models.Model):
                     _('You cannot change the company, as this '
                       'Procurement Order is assigned to Move '
                       '%s.' % move.name))
-            warehouse_orderpoint = self.env[
-                'stock.warehouse.orderpoint'].search(
-                [('procurement_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if warehouse_orderpoint:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Procurement Order is assigned to Warehouse Orderpoint '
-                      '%s.' % warehouse_orderpoint.name))

@@ -24,7 +24,6 @@ class AccountMove(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.journal_id = False
-        self.line_ids = False
         self.statement_line_id = False
         self.dummy_account_id = False
 
@@ -61,17 +60,6 @@ class AccountMove(models.Model):
                     _('You cannot change the company, as this '
                       'Journal Entry is assigned to Invoice '
                       '%s.' % invoice.name))
-            bank_statement_line = self.env[
-                'account.bank.statement.line'].search(
-                [('journal_entry_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if bank_statement_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Journal Entry is assigned to Bank Statement Line '
-                      '%s in Bank Statement %s.' % (
-                        bank_statement_line.name,
-                        bank_statement_line.statement_id.name)))
 
     @api.multi
     @api.constrains('journal_id', 'company_id')
@@ -82,18 +70,6 @@ class AccountMove(models.Model):
                 raise ValidationError(
                     _('The Company in the Move and in '
                       'Journal must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('line_ids', 'company_id')
-    def _check_company_line_ids(self):
-        for move in self.sudo():
-            for line in move.line_ids:
-                if move.company_id and line.company_id and \
-                        move.company_id != line.company_id:
-                    raise ValidationError(
-                        _('The Company in the Move and in Journal Item %s '
-                          'must be the same.') % line.name)
         return True
 
     @api.multi
@@ -141,8 +117,6 @@ class AccountMoveLine(models.Model):
         self.account_id = False
         self.move_id = False
         self.statement_id = False
-        self.matched_debit_ids = False
-        self.matched_credit_ids = False
         self.journal_id = False
         self.tax_ids = False
         self.tax_line_id = False
@@ -303,30 +277,6 @@ class AccountMoveLine(models.Model):
         return True
 
     @api.multi
-    @api.constrains('matched_debit_ids', 'company_id')
-    def _check_company_matched_debit_ids(self):
-        for move_line in self.sudo():
-            for matched_debit in move_line.matched_debit_ids:
-                if move_line.company_id and matched_debit.company_id and \
-                        move_line.company_id != matched_debit.company_id:
-                    raise ValidationError(
-                        _('The Company in the Move Line and in  '
-                          'must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('matched_credit_ids', 'company_id')
-    def _check_company_matched_credit_ids(self):
-        for move_line in self.sudo():
-            for matched_credit in move_line.matched_credit_ids:
-                if move_line.company_id and matched_credit.company_id and \
-                        move_line.company_id != matched_credit.company_id:
-                    raise ValidationError(
-                        _('The Company in the Move Line and in Journal %s'
-                          'must be the same.') % matched_credit.name)
-        return True
-
-    @api.multi
     @api.constrains('journal_id', 'company_id')
     def _check_company_journal_id(self):
         for move_line in self.sudo():
@@ -387,14 +337,6 @@ class AccountMoveLine(models.Model):
         for rec in self:
             if not rec.company_id:
                 continue
-            move = self.env['account.move'].search(
-                [('line_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if move:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Journal Item is assigned to Move '
-                      '%s.' % move.name))
             invoice = self.env['account.invoice'].search(
                 [('payment_move_line_ids', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -419,14 +361,6 @@ class AccountMoveLine(models.Model):
                     _('You cannot change the company, as this '
                       'line is assigned to Partial Reconcile '
                       '%s.' % partial_reconcile.name))
-            bank_statement = self.env['account.bank.statement'].search(
-                [('move_line_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if bank_statement:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'line is assigned to Bank Statement '
-                      '%s.' % bank_statement.name))
 
 
 class AccountMoveLineReconcile(models.TransientModel):

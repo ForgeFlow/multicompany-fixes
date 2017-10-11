@@ -26,7 +26,6 @@ class StockPicking(models.Model):
         self.backorder_id = False
         self.location_id = False
         self.location_dest_id = False
-        self.move_lines = False
 
     @api.multi
     @api.constrains('backorder_id', 'company_id')
@@ -59,18 +58,6 @@ class StockPicking(models.Model):
                 raise ValidationError(
                     _('The Company in the Picking and in '
                       'Location must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('move_lines', 'company_id')
-    def _check_company_move_lines(self):
-        for picking in self.sudo():
-            for stock_move in picking.move_lines:
-                if picking.company_id and stock_move.company_id and \
-                        picking.company_id != stock_move.company_id:
-                    raise ValidationError(
-                        _('The Company in the Picking and in '
-                          'Stock Move must be the same.'))
         return True
 
     @api.constrains('company_id')

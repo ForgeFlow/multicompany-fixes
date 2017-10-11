@@ -73,8 +73,6 @@ class ProductTemplate(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.pricelist_id = False
-        self.seller_ids = False
-        self.item_ids = False
 
     @api.multi
     @api.constrains('pricelist_id', 'company_id')
@@ -85,31 +83,6 @@ class ProductTemplate(models.Model):
                 raise ValidationError(
                     _('The Company in the Product Template and in '
                       'Pricelist must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('seller_ids', 'company_id')
-    def _check_company_seller_ids(self):
-        for template in self.sudo():
-            for product_supplierinfo in template.seller_ids:
-                if template.company_id and product_supplierinfo.company_id and\
-                        template.company_id != product_supplierinfo.company_id:
-                    raise ValidationError(
-                        _('The Company in the Product Template and in '
-                          'Seller must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('item_ids', 'company_id')
-    def _check_company_item_ids(self):
-        for template in self.sudo():
-            for product_pricelist_item in template.item_ids:
-                if template.company_id and product_pricelist_item.company_id \
-                        and template.company_id != product_pricelist_item.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Product Template and in '
-                          'Pricelist Items must be the same.'))
         return True
 
     @api.constrains('company_id')
@@ -166,15 +139,3 @@ class ProductSupplierinfo(models.Model):
                     _('The Company in the Supplierinfo and in '
                       'Product Template must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        for rec in self:
-            template = self.env['product.template'].search(
-                [('seller_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if template:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Supplierinfo is assigned to Product Template '
-                      '%s.' % template.name))

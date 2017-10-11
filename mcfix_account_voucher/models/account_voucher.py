@@ -25,7 +25,6 @@ class AccountVoucher(models.Model):
     def onchange_company_id(self):
         self.journal_id = False
         self.account_id = False
-        self.line_ids = False
         self.move_id = False
 
     @api.multi
@@ -48,18 +47,6 @@ class AccountVoucher(models.Model):
                 raise ValidationError(
                     _('The Company in the Voucher and in '
                       'Account must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('line_ids', 'company_id')
-    def _check_company_line_ids(self):
-        for voucher in self.sudo():
-            for account_voucher_line in voucher.line_ids:
-                if voucher.company_id and account_voucher_line.company_id and \
-                        voucher.company_id != account_voucher_line.company_id:
-                    raise ValidationError(
-                        _('The Company in the Voucher and in '
-                          'Voucher Line must be the same.'))
         return True
 
     @api.multi
@@ -160,17 +147,3 @@ class AccountVoucherLine(models.Model):
                         _('The Company in the Voucher Line and in '
                           'Tax must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        for rec in self:
-            if not rec.company_id:
-                continue
-            voucher = self.env['account.voucher'].search(
-                [('line_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if voucher:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Account voucher line is assigned to Voucher '
-                      '%s.' % voucher.name))

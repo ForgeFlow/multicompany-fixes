@@ -40,17 +40,3 @@ class ProcurementOrder(models.Model):
                     _('The Company in the Procurement Order and in '
                       'Purchase Order Line must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        super(ProcurementOrder, self)._check_company_id()
-        for rec in self:
-            order_line = self.env['purchase.order.line'].search(
-                [('procurement_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Procurement Order is assigned to Purchase Order Line '
-                      '%s in Purchase Order %s.' % (
-                       order_line.name, order_line.order_id.name)))

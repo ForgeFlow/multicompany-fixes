@@ -60,6 +60,22 @@ class AccountAbstractPayment(models.AbstractModel):
             res += [(rec.id, name)]
         return res
 
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        self.journal_id = False
+
+    @api.multi
+    @api.constrains('journal_id', 'company_id')
+    def _check_company_journal_id(self):
+        for abstract_payment in self.sudo():
+            if abstract_payment.company_id and abstract_payment.journal_id.\
+                    company_id and abstract_payment.company_id != \
+                    abstract_payment.journal_id.company_id:
+                raise ValidationError(
+                    _('The Company in the Account Payment and in '
+                      'Payment Journal must be the same.'))
+        return True
+
 
 class AccountPayment(models.Model):
     _inherit = "account.payment"

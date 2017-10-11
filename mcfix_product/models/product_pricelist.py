@@ -21,23 +21,6 @@ class Pricelist(models.Model):
             res += [(rec.id, name)]
         return res
 
-    @api.onchange('company_id')
-    def onchange_company_id(self):
-        self.item_ids = False
-
-    @api.multi
-    @api.constrains('item_ids', 'company_id')
-    def _check_company_item_ids(self):
-        for pricelist in self.sudo():
-            for product_pricelist_item in pricelist.item_ids:
-                if pricelist.company_id and \
-                        pricelist.company_id != product_pricelist_item.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Pricelist and in '
-                          'Pricelist Item must be the same.'))
-        return True
-
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
@@ -128,25 +111,3 @@ class ProductPricelistItem(models.Model):
                     _('The Company in the Pricelist Item and in '
                       'Pricelist must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        for rec in self:
-            if not rec.company_id:
-                continue
-            pricelist = self.env['product.pricelist'].search(
-                [('item_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if pricelist:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Pricelist Item is assigned to Pricelist '
-                      '%s.' % pricelist.name))
-            template = self.env['product.template'].search(
-                [('item_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if template:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Pricelist Item is assigned to Product Template '
-                      '%s.' % template.name))

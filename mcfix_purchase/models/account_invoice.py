@@ -109,19 +109,3 @@ class AccountInvoiceLine(models.Model):
                     _('The Company in the Invoice Line and in '
                       'Purchase Order must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        super(AccountInvoiceLine, self)._check_company_id()
-        for rec in self:
-            if not rec.company_id:
-                continue
-            order_line = self.env['purchase.order.line'].search(
-                [('invoice_lines', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Invoice Line is assigned to Purchase Order Line '
-                      '%s of Purchase Order %s.' % (order_line.name,
-                                                    order_line.order_id.name)))

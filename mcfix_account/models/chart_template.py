@@ -24,7 +24,6 @@ class AccountChartTemplate(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.parent_id = False
-        self.tax_template_ids = False
 
     @api.multi
     @api.constrains('parent_id', 'company_id')
@@ -36,20 +35,6 @@ class AccountChartTemplate(models.Model):
                 raise ValidationError(
                     _('The Company in the Chart Template and in '
                       'Parent Chart Template must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('tax_template_ids', 'company_id')
-    def _check_company_tax_template_ids(self):
-        for chart_template in self.sudo():
-            for tax_template in chart_template.tax_template_ids:
-                if chart_template.company_id and tax_template.company_id and \
-                        chart_template.company_id != tax_template.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Chart Template and in '
-                          'Tax Template List %s must be the same.'
-                          ) % tax_template.name)
         return True
 
     @api.constrains('company_id')
@@ -169,14 +154,6 @@ class AccountTaxTemplate(models.Model):
                     _('You cannot change the company, as this '
                       'Purchase Tax is assigned to Multi Charts Account '
                       '%s.' % multi_charts_accounts.name))
-            chart_template = self.env['account.chart.template'].search(
-                [('tax_template_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if chart_template:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Tax Template is assigned to Chart Template '
-                      '%s.' % chart_template.name))
             config_settings = self.env['account.config.settings'].search(
                 [('sale_tax_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

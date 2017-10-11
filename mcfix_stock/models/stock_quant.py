@@ -127,30 +127,6 @@ class StockQuant(models.Model):
                     _('You cannot change the company, as this '
                       'Quant is assigned to Move '
                       '%s.' % move.name))
-            move = self.env['stock.move'].search(
-                [('reserved_quant_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if move:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Reserved Quant is assigned to Move '
-                      '%s.' % move.name))
-            quant_package = self.env['stock.quant.package'].search(
-                [('quant_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if quant_package:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Quant is assigned to Quant Package '
-                      '%s.' % quant_package.name))
-            quant_package = self.env['stock.quant.package'].search(
-                [('children_quant_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if quant_package:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Quant is assigned to Quant Package '
-                      '%s.' % quant_package.name))
 
 
 class StockQuantPackage(models.Model):
@@ -173,24 +149,8 @@ class StockQuantPackage(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
-        self.quant_ids = False
         self.parent_id = False
-        self.ancestor_ids = False
-        self.children_quant_ids = False
-        self.children_ids = False
         self.location_id = False
-
-    @api.multi
-    @api.constrains('quant_ids', 'company_id')
-    def _check_company_quant_ids(self):
-        for quant_package in self.sudo():
-            for stock_quant in quant_package.quant_ids:
-                if quant_package.company_id and stock_quant.company_id and \
-                        quant_package.company_id != stock_quant.company_id:
-                    raise ValidationError(
-                        _('The Company in the Quant Package and in '
-                          'Quant must be the same.'))
-        return True
 
     @api.multi
     @api.constrains('parent_id', 'company_id')
@@ -202,44 +162,6 @@ class StockQuantPackage(models.Model):
                 raise ValidationError(
                     _('The Company in the Quant Package and in '
                       'Parent Package must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('ancestor_ids', 'company_id')
-    def _check_company_ancestor_ids(self):
-        for quant_package in self.sudo():
-            for stock_quant_package in quant_package.ancestor_ids:
-                if quant_package.company_id and stock_quant_package.company_id\
-                        and quant_package.company_id != stock_quant_package.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Quant Package and in '
-                          'Ancestor Package must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('children_quant_ids', 'company_id')
-    def _check_company_children_quant_ids(self):
-        for quant_package in self.sudo():
-            for stock_quant in quant_package.children_quant_ids:
-                if quant_package.company_id and stock_quant.company_id and \
-                        quant_package.company_id != stock_quant.company_id:
-                    raise ValidationError(
-                        _('The Company in the Quant Package and in '
-                          'Child Quant must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('children_ids', 'company_id')
-    def _check_company_children_ids(self):
-        for quant_package in self.sudo():
-            for stock_quant_package in quant_package.children_ids:
-                if quant_package.company_id and stock_quant_package.company_id\
-                        and quant_package.company_id != stock_quant_package.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Quant Package and in '
-                          'Child Package must be the same.'))
         return True
 
     @api.multi
@@ -259,6 +181,14 @@ class StockQuantPackage(models.Model):
         for rec in self:
             if not rec.company_id:
                 continue
+            inventory = self.env['stock.inventory'].search(
+                [('package_id', '=', rec.id),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if inventory:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Quant Package is assigned to Inventory '
+                      '%s.' % inventory.name))
             inventory_line = self.env['stock.inventory.line'].search(
                 [('package_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -285,27 +215,3 @@ class StockQuantPackage(models.Model):
                     _('You cannot change the company, as this '
                       'Quant Package is assigned to Quant Package '
                       '%s.' % quant_package.name))
-            quant_package = self.search(
-                [('ancestor_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if quant_package:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Ancestor Package is assigned to Quant Package '
-                      '%s.' % quant_package.name))
-            quant_package = self.search(
-                [('children_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if quant_package:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Quant Package is assigned to Quant Package '
-                      '%s.' % quant_package.name))
-            inventory = self.env['stock.inventory'].search(
-                [('package_id', '=', rec.id),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if inventory:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Quant Package is assigned to Inventory '
-                      '%s.' % inventory.name))

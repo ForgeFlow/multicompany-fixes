@@ -27,18 +27,15 @@ class StockMove(models.Model):
         self.location_id = False
         self.location_dest_id = False
         self.move_dest_id = False
-        self.move_orig_ids = False
         self.picking_id = False
         self.split_from = False
         self.backorder_id = False
         self.quant_ids = False
-        self.reserved_quant_ids = False
         self.procurement_id = False
         self.rule_id = False
         self.push_rule_id = False
         self.inventory_id = False
         self.origin_returned_move_id = False
-        self.returned_move_ids = False
         self.route_ids = False
         self.warehouse_id = False
 
@@ -87,18 +84,6 @@ class StockMove(models.Model):
         return True
 
     @api.multi
-    @api.constrains('move_orig_ids', 'company_id')
-    def _check_company_move_orig_ids(self):
-        for move in self.sudo():
-            for stock_move in move.move_orig_ids:
-                if move.company_id and stock_move.company_id and \
-                        move.company_id != stock_move.company_id:
-                    raise ValidationError(
-                        _('The Company in the Move and in '
-                          'Origin Move must be the same.'))
-        return True
-
-    @api.multi
     @api.constrains('picking_id', 'company_id')
     def _check_company_picking_id(self):
         for move in self.sudo():
@@ -141,18 +126,6 @@ class StockMove(models.Model):
                     raise ValidationError(
                         _('The Company in the Move and in '
                           'Quant must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('reserved_quant_ids', 'company_id')
-    def _check_company_reserved_quant_ids(self):
-        for move in self.sudo():
-            for stock_quant in move.reserved_quant_ids:
-                if move.company_id and stock_quant.company_id and \
-                        move.company_id != stock_quant.company_id:
-                    raise ValidationError(
-                        _('The Company in the Move and in '
-                          'Reserved Quant must be the same.'))
         return True
 
     @api.multi
@@ -211,18 +184,6 @@ class StockMove(models.Model):
         return True
 
     @api.multi
-    @api.constrains('returned_move_ids', 'company_id')
-    def _check_company_returned_move_ids(self):
-        for move in self.sudo():
-            for stock_move in move.returned_move_ids:
-                if move.company_id and stock_move.company_id and \
-                        move.company_id != stock_move.company_id:
-                    raise ValidationError(
-                        _('The Company in the Move and in '
-                          'Returned Move must be the same.'))
-        return True
-
-    @api.multi
     @api.constrains('route_ids', 'company_id')
     def _check_company_route_ids(self):
         for move in self.sudo():
@@ -248,14 +209,6 @@ class StockMove(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
-            order = self.env['procurement.order'].search(
-                [('move_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Move is assigned to Procurement Order '
-                      '%s.' % order.name))
             order = self.env['procurement.order'].search(
                 [('move_dest_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -297,14 +250,6 @@ class StockMove(models.Model):
                       'Move is assigned to Move '
                       '%s.' % move.name))
             move = self.search(
-                [('move_orig_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if move:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Move is assigned to Move '
-                      '%s.' % move.name))
-            move = self.search(
                 [('split_from', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move:
@@ -320,27 +265,3 @@ class StockMove(models.Model):
                     _('You cannot change the company, as this '
                       'Move is assigned to Move '
                       '%s.' % move.name))
-            move = self.search(
-                [('returned_move_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if move:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Move is assigned to Move '
-                      '%s.' % move.name))
-            inventory = self.env['stock.inventory'].search(
-                [('move_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if inventory:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Move is assigned to Inventory '
-                      '%s.' % inventory.name))
-            picking = self.env['stock.picking'].search(
-                [('move_lines', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if picking:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Stock Move is assigned to Picking '
-                      '%s.' % picking.name))

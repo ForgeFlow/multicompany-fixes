@@ -24,8 +24,6 @@ class AccountBankStatement(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.journal_id = False
-        self.line_ids = False
-        self.move_line_ids = False
 
     def reconciliation_widget_preprocess(self):
         # This is the same code as the original method except for the fact
@@ -108,33 +106,6 @@ class AccountBankStatement(models.Model):
                       'Journal must be the same.'))
         return True
 
-    @api.multi
-    @api.constrains('line_ids', 'company_id')
-    def _check_company_line_ids(self):
-        for bank_statement in self.sudo():
-            for account_bank_statement_line in bank_statement.line_ids:
-                if bank_statement.company_id and account_bank_statement_line.\
-                        company_id and bank_statement.company_id != \
-                        account_bank_statement_line.company_id:
-                    raise ValidationError(
-                        _('The Company in the Bank Statement and in '
-                          'Statement line % must be the same.') %
-                        account_bank_statement_line.name)
-        return True
-
-    @api.multi
-    @api.constrains('move_line_ids', 'company_id')
-    def _check_company_move_line_ids(self):
-        for bank_statement in self.sudo():
-            for move_line in bank_statement.move_line_ids:
-                if bank_statement.company_id and move_line.company_id and \
-                        bank_statement.company_id != move_line.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Bank Statement and in '
-                          'Entry line %s must be the same.') % move_line.name)
-        return True
-
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
@@ -182,7 +153,6 @@ class AccountBankStatementLine(models.Model):
         self.account_id = False
         self.statement_id = False
         self.journal_id = False
-        self.journal_entry_ids = False
 
     @api.multi
     @api.constrains('account_id', 'company_id')
@@ -220,19 +190,6 @@ class AccountBankStatementLine(models.Model):
                       'Journal must be the same.'))
         return True
 
-    @api.multi
-    @api.constrains('journal_entry_ids', 'company_id')
-    def _check_company_journal_entry_ids(self):
-        for bank_statement_line in self.sudo():
-            for account_move in bank_statement_line.journal_entry_ids:
-                if bank_statement_line.company_id and account_move.company_id \
-                        and bank_statement_line.company_id != account_move.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Bank Statement Line and in '
-                          'Account Move must be the same.'))
-        return True
-
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
@@ -247,12 +204,3 @@ class AccountBankStatementLine(models.Model):
                     _('You cannot change the company, as this '
                       'Bank statement line is assigned to Move '
                       '%s.' % move.name))
-            bank_statement = self.env['account.bank.statement'].search(
-                [('line_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)],
-                limit=1)
-            if bank_statement:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Bank statement line is assigned to Bank Statement '
-                      '%s.' % bank_statement.name))

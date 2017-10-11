@@ -102,30 +102,6 @@ class AccountInvoice(models.Model):
         return True
 
     @api.multi
-    @api.constrains('tax_line_ids', 'company_id')
-    def _check_company_tax_line_ids(self):
-        for invoice in self.sudo():
-            for tax_line in invoice.tax_line_ids:
-                if invoice.company_id and tax_line.company_id and\
-                        invoice.company_id != tax_line.company_id:
-                    raise ValidationError(
-                        _('The Company in the Invoice and in '
-                          'Tax Line %s must be the same.') % tax_line.name)
-        return True
-
-    @api.multi
-    @api.constrains('invoice_line_ids', 'company_id')
-    def _check_company_invoice_line_ids(self):
-        for invoice in self.sudo():
-            for invoice_line in invoice.invoice_line_ids:
-                if invoice.company_id and invoice_line.company_id and\
-                        invoice.company_id != invoice_line.company_id:
-                    raise ValidationError(
-                        _('The Company in the Invoice and in Invoice Line %s '
-                          'must be the same.') % invoice_line.name)
-        return True
-
-    @api.multi
     @api.constrains('move_id', 'company_id')
     def _check_company_move_id(self):
         for invoice in self.sudo():
@@ -169,14 +145,6 @@ class AccountInvoice(models.Model):
                       'Invoice Reference is assigned to Invoice Line '
                       '%s in Invoice %s.' % (invoice_line.name,
                                              invoice_line.invoice_id.name)))
-            journal = self.env['account.journal'].search(
-                [('invoice_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if journal:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Invoice is assigned to Journal '
-                      '%s.' % journal.name))
             invoice = self.search(
                 [('refund_invoice_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -298,14 +266,6 @@ class AccountInvoiceLine(models.Model):
         for rec in self:
             if not rec.company_id:
                 continue
-            invoice = self.env['account.invoice'].search(
-                [('invoice_line_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if invoice:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Invoice Line is assigned to Invoice '
-                      '%s.' % invoice.name))
 
 
 class AccountInvoiceTax(models.Model):
@@ -379,17 +339,3 @@ class AccountInvoiceTax(models.Model):
                     _('The Company in the Invoice Tax and in '
                       'Analytic account must be the same.'))
         return True
-
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        for rec in self:
-            if not rec.company_id:
-                continue
-            invoice = self.env['account.invoice'].search(
-                [('tax_line_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if invoice:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Tax Line is assigned to Invoice '
-                      '%s.' % invoice.name))

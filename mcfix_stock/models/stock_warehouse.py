@@ -35,7 +35,6 @@ class StockWarehouse(models.Model):
         self.reception_route_id = False
         self.delivery_route_id = False
         self.resupply_wh_ids = False
-        self.resupply_route_ids = False
         self.default_resupply_wh_id = False
 
     @api.multi
@@ -174,19 +173,6 @@ class StockWarehouse(models.Model):
         return True
 
     @api.multi
-    @api.constrains('resupply_route_ids', 'company_id')
-    def _check_company_resupply_route_ids(self):
-        for warehouse in self.sudo():
-            for stock_location_route in warehouse.resupply_route_ids:
-                if warehouse.company_id and stock_location_route.company_id \
-                        and warehouse.company_id != stock_location_route.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Warehouse and in '
-                          'Resupply Route must be the same.'))
-        return True
-
-    @api.multi
     @api.constrains('default_resupply_wh_id', 'company_id')
     def _check_company_default_resupply_wh_id(self):
         for warehouse in self.sudo():
@@ -322,7 +308,6 @@ class StockWarehouseOrderpoint(models.Model):
     def onchange_company_id(self):
         self.warehouse_id = False
         self.location_id = False
-        self.procurement_ids = False
 
     @api.multi
     @api.constrains('warehouse_id', 'company_id')
@@ -346,19 +331,6 @@ class StockWarehouseOrderpoint(models.Model):
                 raise ValidationError(
                     _('The Company in the Warehouse Orderpoint and in '
                       ' must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('procurement_ids', 'company_id')
-    def _check_company_procurement_ids(self):
-        for warehouse_orderpoint in self.sudo():
-            for procurement_order in warehouse_orderpoint.procurement_ids:
-                if warehouse_orderpoint.company_id and procurement_order.\
-                        company_id and warehouse_orderpoint.company_id != \
-                        procurement_order.company_id:
-                    raise ValidationError(
-                        _('The Company in the Warehouse Orderpoint and in '
-                          ' must be the same.'))
         return True
 
     @api.constrains('company_id')

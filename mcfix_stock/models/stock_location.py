@@ -79,14 +79,6 @@ class StockLocationPath(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
-            location_route = self.env['stock.location.route'].search(
-                [('push_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if location_route:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Location Path is assigned to Location Route '
-                      '%s.' % location_route.name))
             move = self.env['stock.move'].search(
                 [('push_rule_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -117,38 +109,10 @@ class StockLocationRoute(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
-        self.pull_ids = False
-        self.push_ids = False
         self.supplied_wh_id = False
         self.supplier_wh_id = False
         self.product_ids = False
         self.warehouse_ids = False
-
-    @api.multi
-    @api.constrains('pull_ids', 'company_id')
-    def _check_company_pull_ids(self):
-        for location_route in self.sudo():
-            for procurement_rule in location_route.pull_ids:
-                if location_route.company_id and procurement_rule.company_id \
-                        and location_route.company_id != procurement_rule.\
-                        company_id:
-                    raise ValidationError(
-                        _('The Company in the Location Route and in '
-                          'Procurement Rule must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('push_ids', 'company_id')
-    def _check_company_push_ids(self):
-        for location_route in self.sudo():
-            for stock_location_path in location_route.push_ids:
-                if location_route.company_id and stock_location_path.\
-                        company_id and location_route.company_id != \
-                        stock_location_path.company_id:
-                    raise ValidationError(
-                        _('The Company in the Location Route and in '
-                          'Location Path must be the same.'))
-        return True
 
     @api.multi
     @api.constrains('supplied_wh_id', 'company_id')
@@ -267,14 +231,6 @@ class StockLocationRoute(models.Model):
                     _('You cannot change the company, as this '
                       'Delivery Route is assigned to Warehouse '
                       '%s.' % warehouse.name))
-            warehouse = self.env['stock.warehouse'].search(
-                [('resupply_route_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if warehouse:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Resupply Route is assigned to Warehouse '
-                      '%s.' % warehouse.name))
             template = self.env['product.template'].search(
                 [('route_ids', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -314,7 +270,6 @@ class StockLocation(models.Model):
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.location_id = False
-        self.child_ids = False
 
     @api.multi
     @api.constrains('location_id', 'company_id')
@@ -324,18 +279,6 @@ class StockLocation(models.Model):
                     location.company_id != location.location_id.company_id:
                 raise ValidationError(_('The Company in both Locations '
                                         'must be the same.'))
-        return True
-
-    @api.multi
-    @api.constrains('child_ids', 'company_id')
-    def _check_company_child_ids(self):
-        for location in self.sudo():
-            for stock_location in location.child_ids:
-                if location.company_id and stock_location.company_id and \
-                        location.company_id != stock_location.company_id:
-                    raise ValidationError(
-                        _('The Company in both Locations '
-                          'must be the same.'))
         return True
 
     @api.constrains('company_id')
@@ -438,14 +381,6 @@ class StockLocation(models.Model):
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'Location is assigned to Location '
-                      '%s.' % location.name))
-            location = self.search(
-                [('child_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if location:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Location is assigned as child to Location '
                       '%s.' % location.name))
             location_path = self.env['stock.location.path'].search(
                 [('location_from_id', '=', rec.id),

@@ -25,19 +25,6 @@ class StockMove(models.Model):
                       'Purchase Order Line must be the same.'))
         return True
 
-    @api.constrains('company_id')
-    def _check_company_id(self):
-        super(StockMove, self)._check_company_id()
-        for rec in self:
-            order_line = self.env['purchase.order.line'].search(
-                [('move_ids', 'in', [rec.id]),
-                 ('company_id', '!=', rec.company_id.id)], limit=1)
-            if order_line:
-                raise ValidationError(
-                    _('You cannot change the company, as this '
-                      'Reservation is assigned to Purchase Order Line '
-                      '%s.' % order_line.name))
-
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
