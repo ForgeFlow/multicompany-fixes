@@ -26,6 +26,12 @@ class StockWarehouse(models.Model):
         res['company_id'] = self.company_id.id
         return res
 
+    def _get_reception_delivery_route_values(self, route_type):
+        res = super(StockWarehouse, self).\
+            _get_reception_delivery_route_values(route_type=route_type)
+        res['company_id'] = self.company_id.id
+        return res
+
     @api.onchange('company_id')
     def onchange_company_id(self):
         self.view_location_id = False

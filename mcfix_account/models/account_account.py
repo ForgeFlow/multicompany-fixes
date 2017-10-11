@@ -81,8 +81,8 @@ class AccountAccount(models.Model):
                         _('You cannot change the company, as this '
                           'account is assigned to Bank Statement Line '
                           '%s of Bank Statement %s.' % (
-                             bank_statement_line.name,
-                             bank_statement_line.statement_id.name)))
+                              bank_statement_line.name,
+                              bank_statement_line.statement_id.name)))
 
                 # Account Journal
                 journal = self.env['account.journal'].search(
