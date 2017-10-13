@@ -80,9 +80,6 @@ class AccountAbstractPayment(models.AbstractModel):
 class AccountPayment(models.Model):
     _inherit = "account.payment"
 
-    company_id = fields.Many2one(store=True, readonly=False,
-                                 related=False, required=True)
-
     @api.multi
     @api.depends('company_id')
     def name_get(self):
