@@ -19,6 +19,6 @@ class ProductProduct(models.Model):
                      ('company_id', '!=', rec.company_id.id)], limit=1)
 
                 if orders_line_id:
-                    raise ValidationError(_('Sales Order lines already exist '
+                    raise ValidationError(_('Sales Order line already exists '
                                             'referencing this product in '
                                             'other companies.'))

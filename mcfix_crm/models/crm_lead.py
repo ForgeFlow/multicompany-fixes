@@ -29,7 +29,7 @@ class CrmLead(models.Model):
     @api.constrains('team_id', 'company_id')
     def _check_company_team_id(self):
         for lead in self.sudo():
-            if lead.company_id and lead.team_id and \
+            if lead.company_id and lead.team_id.company_id and \
                     lead.company_id != lead.team_id.company_id:
                 raise ValidationError(
                     _('The Company in the Lead and in '

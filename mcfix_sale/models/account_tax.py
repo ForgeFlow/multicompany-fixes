@@ -19,7 +19,7 @@ class AccountTax(models.Model):
                      ('company_id', '!=', rec.company_id.id)], limit=1)
 
                 if order_line_id:
-                    raise ValidationError(_('Sales Order lines already exist '
-                                            'referencing this tax in '
-                                            'other company : %s.') %
-                                          order_line_id.company_id.name)
+                    raise ValidationError(
+                        _('Sales Order line already exists referencing this '
+                          'tax in other company : %s.') %
+                        order_line_id.company_id.name)

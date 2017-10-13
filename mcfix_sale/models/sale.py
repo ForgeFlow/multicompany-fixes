@@ -123,7 +123,7 @@ class SaleOrder(models.Model):
     @api.constrains('team_id', 'company_id')
     def _check_company_team_id(self):
         for order in self.sudo():
-            if order.company_id and order.team_id and \
+            if order.company_id and order.team_id.company_id and \
                     order.company_id != order.team_id.company_id:
                 raise ValidationError(
                     _('The Company in the Sales Order and in '

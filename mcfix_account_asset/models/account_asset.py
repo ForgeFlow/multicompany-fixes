@@ -181,7 +181,7 @@ class AccountAssetAsset(models.Model):
     @api.constrains('category_id', 'company_id')
     def _check_company_asset_categ(self):
         for asset in self.sudo():
-            if asset.company_id and asset.category_id and\
+            if asset.company_id and asset.category_id.company_id and\
                     asset.company_id != asset.category_id.company_id:
                 raise ValidationError(
                     _('The Company in the Asset and in '

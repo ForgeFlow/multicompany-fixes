@@ -26,6 +26,6 @@ class ResPartner(models.Model):
 
                 if order_partner_id or order_partner_shipping_id or \
                         order_partner_invoice_id:
-                    raise ValidationError(_('Sales Orders already exist '
+                    raise ValidationError(_('Sales Order already exists '
                                             'referencing this partner in '
                                             'other companies.'))

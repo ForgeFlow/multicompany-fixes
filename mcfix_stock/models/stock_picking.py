@@ -42,7 +42,7 @@ class StockPicking(models.Model):
     @api.constrains('location_id', 'company_id')
     def _check_company_location_id(self):
         for picking in self.sudo():
-            if picking.company_id and picking.location_id and \
+            if picking.company_id and picking.location_id.company_id and \
                     picking.company_id != picking.location_id.company_id:
                 raise ValidationError(
                     _('The Company in the Picking and in '
@@ -53,7 +53,7 @@ class StockPicking(models.Model):
     @api.constrains('location_dest_id', 'company_id')
     def _check_company_location_dest_id(self):
         for picking in self.sudo():
-            if picking.company_id and picking.location_dest_id and \
+            if picking.company_id and picking.location_dest_id.company_id and \
                     picking.company_id != picking.location_dest_id.company_id:
                 raise ValidationError(
                     _('The Company in the Picking and in '

@@ -29,9 +29,9 @@ class AccountBudgetPost(models.Model):
     @api.constrains('account_ids', 'company_id')
     def _check_company_account_ids(self):
         for budget_post in self.sudo():
-            for account_account in budget_post.account_ids:
-                if budget_post.company_id and account_account.company_id and \
-                        budget_post.company_id != account_account.company_id:
+            for account in budget_post.account_ids:
+                if budget_post.company_id and account.company_id and \
+                        budget_post.company_id != account.company_id:
                     raise ValidationError(
                         _('The Company in the Budget Post and in '
                           'Account must be the same.'))
@@ -67,7 +67,7 @@ class CrossoveredBudget(models.Model):
     @api.constrains('creating_user_id', 'company_id')
     def _check_company_creating_user(self):
         for budget in self:
-            if budget.company_id and budget.creating_user_id and\
+            if budget.company_id and budget.creating_user_id.company_id and\
                     budget.company_id != budget.creating_user_id.company_id:
                 raise ValidationError(
                     _('The Company in the Budget '
@@ -83,7 +83,7 @@ class CrossoveredBudgetLines(models.Model):
     @api.constrains('analytic_account_id', 'company_id')
     def _check_company_analytic_account(self):
         for budget in self:
-            if budget.company_id and budget.analytic_account_id and\
+            if budget.company_id and budget.analytic_account_id.company_id and\
                     budget.company_id != budget.analytic_account_id.company_id:
                 raise ValidationError(_('The Company in the Budget '
                                         'and in Analytic Account must '
@@ -94,7 +94,7 @@ class CrossoveredBudgetLines(models.Model):
     @api.constrains('general_budget_id', 'company_id')
     def _check_company_general_budget(self):
         for budget in self:
-            if budget.company_id and budget.general_budget_id and\
+            if budget.company_id and budget.general_budget_id.company_id and\
                     budget.company_id != budget.general_budget_id.company_id:
                 raise ValidationError(_('The Company in the Budget '
                                         'and in Budgetary Position must '
