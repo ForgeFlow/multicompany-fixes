@@ -22,6 +22,8 @@ class TestSaleOrderMC(TestSale):
         # Products
         self.product1 = self.env.ref('product.product_product_7')
         self.product2 = self.env.ref('product.product_product_8')
+        for seller in self.product2.seller_ids:
+            seller.product_tmpl_id = False
         self.product2.write({'company_id': self.company_2.id})
 
         # Multi-company access rights

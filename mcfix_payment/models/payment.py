@@ -37,5 +37,4 @@ class PaymentAcquirer(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id(self):
-        for rec in self:
-            pass
+        pass

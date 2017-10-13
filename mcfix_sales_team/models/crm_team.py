@@ -37,3 +37,7 @@ class CrmTeam(models.Model):
                     ('company_id', '=', forced_company_id)
                 ], limit=1)
         return team
+
+    @api.constrains('company_id')
+    def _check_company_id(self):
+        pass
