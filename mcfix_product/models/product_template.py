@@ -68,4 +68,3 @@ class ProductTemplate(models.Model):
                     _('You cannot change the company, as this '
                       'Product Template is assigned to Supplierinfo '
                       '%s.' % supplierinfo.name))
-
