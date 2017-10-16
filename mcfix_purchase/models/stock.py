@@ -49,12 +49,6 @@ class StockPicking(models.Model):
 class StockWarehouse(models.Model):
     _inherit = 'stock.warehouse'
 
-    @api.multi
-    def _get_buy_pull_rule(self):
-        res = super(StockWarehouse, self)._get_buy_pull_rule()
-        res['company_id'] = self.company_id.id
-        return res
-
     @api.onchange('company_id')
     def onchange_company_id(self):
         super(StockWarehouse, self).onchange_company_id()

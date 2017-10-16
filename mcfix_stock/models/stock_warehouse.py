@@ -21,6 +21,11 @@ class StockWarehouse(models.Model):
             res += [(rec.id, name)]
         return res
 
+    def _get_inter_warehouse_route_values(self):
+        res = super(StockWarehouse, self)._get_inter_warehouse_route_values()
+        res['company_id'] = self.company_id.id
+        return res
+
     def _get_crossdock_route_values(self):
         res = super(StockWarehouse, self)._get_crossdock_route_values()
         res['company_id'] = self.company_id.id

@@ -6,10 +6,23 @@ from odoo.exceptions import ValidationError
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    @api.model
+    def _get_buy_route(self):
+        """ Propose the default Buy rule only if it is suitable for all
+            companies. """
+        route_ids = super(ProductTemplate, self)._get_buy_route()
+        return self.env['stock.location.route'].search(
+            [('company_id', '=', False),
+             ('id', 'in', route_ids)]).ids
+
     @api.onchange('company_id')
     def onchange_company_id(self):
         super(ProductTemplate, self).onchange_company_id()
         self.property_account_creditor_price_difference = False
+        self.route_ids = self.route_ids.filtered(
+            lambda r: (self.company_id and r.company_id == self.company_id) or
+                      (not r.company_id) or (r.company_id and
+                                             not self.company_id))
 
     @api.multi
     @api.constrains('property_account_creditor_price_difference', 'company_id')
