@@ -21,7 +21,17 @@ class TestSaleOrderMC(TestSale):
 
         # Products
         self.product1 = self.env.ref('product.product_product_7')
-        self.product2 = self._create_product("2")
+        uom_unit = self.env.ref('product.product_uom_unit')
+        self.product2 = self.env['product.product'].create({
+            'name': 'Product 2',
+            'uom_id': uom_unit.id,
+            'standard_price': 1799.0,
+            'lst_price': 3000,
+            'type': 'consu',
+            'uom_po_id': uom_unit.id,
+            'taxes_id': False,
+            'supplier_taxes_id': False,
+        })
         self.product2.write({'company_id': self.company_2.id})
 
         # Multi-company access rights
@@ -90,19 +100,6 @@ class TestSaleOrderMC(TestSale):
             self.partner_2,
             self.team_2,
             self.user_3)
-
-    def _create_product(self, name):
-        """Create a Product"""
-        uom_unit = self.env.ref('product.product_uom_unit')
-        product = self.env['product.product'].create({
-            'name': 'Product %s' % name,
-            'uom_id': uom_unit.id,
-            'standard_price': 1799.0,
-            'lst_price': 3000,
-            'type': 'consu',
-            'uom_po_id': uom_unit.id
-        })
-        return product
 
     def _create_partner(self, company):
         """Create a Partner"""

@@ -38,6 +38,8 @@ class TestPurchaseOrderMC(TestPurchaseOrder):
             'uom_id': self.uom_unit.id,
             'lst_price': 3000,
             'uom_po_id': self.uom_unit.id,
+            'taxes_id': False,
+            'supplier_taxes_id': False,
         })
 
         self.product2.write({'company_id': self.company_2.id})
