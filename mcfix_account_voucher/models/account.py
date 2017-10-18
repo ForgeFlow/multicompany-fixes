@@ -55,6 +55,8 @@ class AccountMove(models.Model):
     def _check_company_id(self):
         super(AccountMove, self)._check_company_id()
         for rec in self:
+            if not rec.company_id:
+                continue
             voucher = self.env['account.voucher'].search(
                 [('move_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

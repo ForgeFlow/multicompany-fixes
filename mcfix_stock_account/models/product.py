@@ -40,6 +40,8 @@ class ProductTemplate(models.Model):
     def _check_company_id(self):
         super(ProductTemplate, self)._check_company_id()
         for rec in self:
+            if not rec.company_id:
+                continue
             history = self.env['stock.history'].search(
                 [('product_template_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

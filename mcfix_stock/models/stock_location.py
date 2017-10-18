@@ -79,6 +79,8 @@ class StockLocationPath(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             move = self.env['stock.move'].search(
                 [('push_rule_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -167,6 +169,8 @@ class StockLocationRoute(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             order = self.env['procurement.order'].search(
                 [('route_ids', 'in', [rec.id]),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

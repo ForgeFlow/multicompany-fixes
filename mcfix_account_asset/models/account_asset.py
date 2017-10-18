@@ -202,8 +202,6 @@ class AccountAssetAsset(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
-            if not rec.company_id:
-                continue
             asset_report = self.env['asset.asset.report'].search(
                 [('asset_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

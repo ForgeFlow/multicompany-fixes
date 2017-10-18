@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 Eficent Business and IT Consulting Services S.L.
-# Copyright 2017 Creu Blanca
-# License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
-from odoo import _, api, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
@@ -15,11 +12,11 @@ class ProductTemplate(models.Model):
         for rec in self:
             if not rec.company_id:
                 continue
-            report = self.env['sale.report'].search(
+            pos_order = self.env['report.pos.order'].search(
                 [('product_tmpl_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
-            if report:
+            if pos_order:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'Product Template is assigned to Report '
-                      '%s.' % report.name))
+                      'Product Template is assigned to Pos Order '
+                      '%s.' % pos_order.name))

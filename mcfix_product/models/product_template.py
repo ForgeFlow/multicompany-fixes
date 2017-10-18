@@ -52,6 +52,8 @@ class ProductTemplate(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             pricelist_item = self.env['product.pricelist.item'].search(
                 [('product_tmpl_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

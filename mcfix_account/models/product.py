@@ -14,29 +14,32 @@ class ProductTemplate(models.Model):
         self.property_account_income_id = False
         self.property_account_expense_id = False
 
-    @api.multi
-    @api.constrains('taxes_id', 'company_id')
-    def _check_company_taxes_id(self):
-        for template in self.sudo():
-            for account_tax in template.taxes_id:
-                if template.company_id and account_tax.company_id and \
-                        template.company_id != account_tax.company_id:
-                    raise ValidationError(
-                        _('The Company in the Product Template and in '
-                          'Customer Taxes must be the same.'))
-        return True
+    # point_of_sale / tests / common.py fails
+    # if this is enabled (https://github.com/odoo/odoo/pull/20256 solves it):
 
-    @api.multi
-    @api.constrains('supplier_taxes_id', 'company_id')
-    def _check_company_supplier_taxes_id(self):
-        for template in self.sudo():
-            for account_tax in template.supplier_taxes_id:
-                if template.company_id and account_tax.company_id and \
-                        template.company_id != account_tax.company_id:
-                    raise ValidationError(
-                        _('The Company in the Product Template and in '
-                          'Vendor Taxes must be the same.'))
-        return True
+    # @api.multi
+    # @api.constrains('taxes_id', 'company_id')
+    # def _check_company_taxes_id(self):
+    #     for template in self.sudo():
+    #         for account_tax in template.taxes_id:
+    #             if template.company_id and account_tax.company_id and \
+    #                     template.company_id != account_tax.company_id:
+    #                 raise ValidationError(
+    #                     _('The Company in the Product Template and in '
+    #                       'Customer Taxes must be the same.'))
+    #     return True
+    #
+    # @api.multi
+    # @api.constrains('supplier_taxes_id', 'company_id')
+    # def _check_company_supplier_taxes_id(self):
+    #     for template in self.sudo():
+    #         for account_tax in template.supplier_taxes_id:
+    #             if template.company_id and account_tax.company_id and \
+    #                     template.company_id != account_tax.company_id:
+    #                 raise ValidationError(
+    #                     _('The Company in the Product Template and in '
+    #                       'Vendor Taxes must be the same.'))
+    #     return True
 
     @api.multi
     @api.constrains('property_account_income_id', 'company_id')

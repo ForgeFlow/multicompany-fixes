@@ -39,6 +39,8 @@ class CrmLead(models.Model):
     @api.constrains('company_id')
     def _check_company_id(self):
         for rec in self:
+            if not rec.company_id:
+                continue
             activity_report = self.env['crm.activity.report'].search(
                 [('lead_id', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)

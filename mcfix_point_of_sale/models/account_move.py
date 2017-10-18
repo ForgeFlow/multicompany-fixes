@@ -3,20 +3,20 @@ from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
 
-class CrmLead(models.Model):
-    _inherit = 'crm.lead'
+class AccountMove(models.Model):
+    _inherit = 'account.move'
 
     @api.constrains('company_id')
     def _check_company_id(self):
-        super(CrmLead, self)._check_company_id()
+        super(AccountMove, self)._check_company_id()
         for rec in self:
             if not rec.company_id:
                 continue
-            order = self.env['sale.order'].search(
-                [('opportunity_id', '=', rec.id),
+            order = self.env['pos.order'].sudo().search(
+                [('account_move', '=', rec.id),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order:
                 raise ValidationError(
                     _('You cannot change the company, as this '
-                      'Lead is assigned to Sales Order '
+                      'Journal Entry is assigned to Pos Order '
                       '%s.' % order.name))
