@@ -16,6 +16,7 @@ class AccountTax(models.Model):
             if rec.company_id:
                 order_line_id = self.env['sale.order.line'].search(
                     [('tax_id', 'in', [rec.id]),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
 
                 if order_line_id:

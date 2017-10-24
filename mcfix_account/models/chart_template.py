@@ -61,6 +61,7 @@ class AccountChartTemplate(models.Model):
                       '%s.' % multi_charts_accounts.name))
             chart_template = self.search(
                 [('parent_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if chart_template:
                 raise ValidationError(
@@ -75,6 +76,15 @@ class AccountChartTemplate(models.Model):
                     _('You cannot change the company, as this '
                       'chart template is assigned to Config Settings '
                       '%s.' % config_settings.name))
+            company = self.env['res.company'].search(
+                [('chart_template_id', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('parent_id', '!=', rec.company_id.id)], limit=1)
+            if company:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'chart template is assigned to Company '
+                      '%s.' % company.name))
 
 
 class AccountTaxTemplate(models.Model):

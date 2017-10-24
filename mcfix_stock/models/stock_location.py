@@ -181,6 +181,7 @@ class StockLocationRoute(models.Model):
                       '%s.' % order.name))
             rule = self.env['procurement.rule'].search(
                 [('route_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if rule:
                 raise ValidationError(
@@ -189,6 +190,7 @@ class StockLocationRoute(models.Model):
                       '%s.' % rule.name))
             location_path = self.env['stock.location.path'].search(
                 [('route_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_path:
                 raise ValidationError(
@@ -237,6 +239,7 @@ class StockLocationRoute(models.Model):
                       '%s.' % warehouse.name))
             template = self.env['product.template'].search(
                 [('route_ids', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
@@ -290,6 +293,7 @@ class StockLocation(models.Model):
                       '%s.' % order.name))
             rule = self.env['procurement.rule'].search(
                 [('location_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if rule:
                 raise ValidationError(
@@ -298,6 +302,7 @@ class StockLocation(models.Model):
                       '%s.' % rule.name))
             rule = self.env['procurement.rule'].search(
                 [('location_src_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if rule:
                 raise ValidationError(
@@ -314,6 +319,7 @@ class StockLocation(models.Model):
                       '%s.' % inventory.name))
             inventory_line = self.env['stock.inventory.line'].search(
                 [('location_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if inventory_line:
                 raise ValidationError(
@@ -348,6 +354,7 @@ class StockLocation(models.Model):
                       '%s.' % quant.name))
             location = self.search(
                 [('location_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location:
                 raise ValidationError(
@@ -356,6 +363,7 @@ class StockLocation(models.Model):
                       '%s.' % location.name))
             location_path = self.env['stock.location.path'].search(
                 [('location_from_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_path:
                 raise ValidationError(
@@ -364,6 +372,7 @@ class StockLocation(models.Model):
                       '%s.' % location_path.name))
             location_path = self.env['stock.location.path'].search(
                 [('location_dest_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_path:
                 raise ValidationError(
@@ -445,6 +454,7 @@ class StockLocation(models.Model):
                       '%s.' % warehouse_orderpoint.name))
             template = self.env['product.template'].search(
                 [('property_stock_procurement', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
@@ -453,6 +463,7 @@ class StockLocation(models.Model):
                       '%s.' % template.name))
             template = self.env['product.template'].search(
                 [('property_stock_production', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
@@ -461,6 +472,7 @@ class StockLocation(models.Model):
                       '%s.' % template.name))
             template = self.env['product.template'].search(
                 [('property_stock_inventory', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
@@ -469,9 +481,37 @@ class StockLocation(models.Model):
                       '%s.' % template.name))
             template = self.env['product.template'].search(
                 [('location_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'Location is assigned to Product Template '
                       '%s.' % template.name))
+            partner = self.env['res.partner'].search(
+                [('property_stock_customer', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partner:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Customer Location is assigned to Partner '
+                      '%s.' % partner.name))
+            partner = self.env['res.partner'].search(
+                [('property_stock_supplier', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partner:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Vendor Location is assigned to Partner '
+                      '%s.' % partner.name))
+            company = self.env['res.company'].search(
+                [('internal_transit_location_id', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('parent_id', '!=', rec.company_id.id)], limit=1)
+            if company:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Location is assigned to Company '
+                      '%s.' % company.name))

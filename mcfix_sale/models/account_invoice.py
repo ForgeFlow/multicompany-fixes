@@ -37,6 +37,7 @@ class AccountInvoiceLine(models.Model):
                 continue
             order_line_id = self.env['sale.order.line'].search(
                 [('invoice_lines', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order_line_id:
                 raise ValidationError(

@@ -115,6 +115,7 @@ class AccountAssetCategory(models.Model):
         for rec in self:
             invoice_line = self.env['account.invoice.line'].search(
                 [('asset_category_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_line:
                 raise ValidationError(
@@ -131,6 +132,7 @@ class AccountAssetCategory(models.Model):
                       '%s.' % asset_asset.name))
             asset_report = self.env['asset.asset.report'].search(
                 [('asset_category_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if asset_report:
                 raise ValidationError(
@@ -139,6 +141,7 @@ class AccountAssetCategory(models.Model):
                       '%s.' % asset_report.name))
             template = self.env['product.template'].search(
                 [('asset_category_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
@@ -147,6 +150,7 @@ class AccountAssetCategory(models.Model):
                       '%s.' % template.name))
             template = self.env['product.template'].search(
                 [('deferred_revenue_category_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
@@ -204,6 +208,7 @@ class AccountAssetAsset(models.Model):
         for rec in self:
             asset_report = self.env['asset.asset.report'].search(
                 [('asset_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if asset_report:
                 raise ValidationError(

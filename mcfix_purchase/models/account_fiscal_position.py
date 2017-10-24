@@ -25,6 +25,7 @@ class AccountFiscalPosition(models.Model):
                       '%s.' % order.name))
             report = self.env['purchase.report'].search(
                 [('fiscal_position_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if report:
                 raise ValidationError(

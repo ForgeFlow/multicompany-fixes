@@ -71,6 +71,7 @@ class StockWarehouse(models.Model):
         for rec in self:
             report = self.env['purchase.report'].search(
                 [('picking_type_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if report:
                 raise ValidationError(

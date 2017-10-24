@@ -17,6 +17,7 @@ class CrmTeam(models.Model):
                 continue
             order = self.env['sale.order'].search(
                 [('team_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order:
                 raise ValidationError(
@@ -25,6 +26,7 @@ class CrmTeam(models.Model):
                       '%s.' % order.name))
             report = self.env['sale.report'].search(
                 [('team_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if report:
                 raise ValidationError(
@@ -41,6 +43,7 @@ class CrmTeam(models.Model):
                       '%s.' % invoice.name))
             invoice_report = self.env['account.invoice.report'].search(
                 [('team_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_report:
                 raise ValidationError(

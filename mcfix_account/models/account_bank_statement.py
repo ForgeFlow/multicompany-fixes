@@ -113,6 +113,7 @@ class AccountBankStatement(models.Model):
                 continue
             move_line = self.env['account.move.line'].search(
                 [('statement_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move_line:
                 raise ValidationError(
@@ -123,6 +124,7 @@ class AccountBankStatement(models.Model):
             bank_statement_line = self.env[
                 'account.bank.statement.line'].search(
                 [('statement_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if bank_statement_line:
                 raise ValidationError(
@@ -199,6 +201,7 @@ class AccountBankStatementLine(models.Model):
                 continue
             move = self.env['account.move'].search(
                 [('statement_line_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)],
                 limit=1)
             if move:

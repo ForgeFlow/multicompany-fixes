@@ -47,6 +47,7 @@ class AccountMove(models.Model):
                           'lines.'))
             move_line = self.env['account.move.line'].search(
                 [('move_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move_line:
                 raise ValidationError(
@@ -353,6 +354,7 @@ class AccountMoveLine(models.Model):
                       '%s.' % invoice.name))
             partial_reconcile = self.env['account.partial.reconcile'].search(
                 [('debit_move_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if partial_reconcile:
                 raise ValidationError(
@@ -361,6 +363,7 @@ class AccountMoveLine(models.Model):
                       '%s.' % partial_reconcile.name))
             partial_reconcile = self.env['account.partial.reconcile'].search(
                 [('credit_move_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if partial_reconcile:
                 raise ValidationError(

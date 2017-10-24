@@ -213,6 +213,7 @@ class StockWarehouse(models.Model):
                       '%s.' % order.name))
             rule = self.env['procurement.rule'].search(
                 [('warehouse_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if rule:
                 raise ValidationError(
@@ -221,6 +222,7 @@ class StockWarehouse(models.Model):
                       '%s.' % rule.name))
             rule = self.env['procurement.rule'].search(
                 [('propagate_warehouse_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if rule:
                 raise ValidationError(
@@ -229,6 +231,7 @@ class StockWarehouse(models.Model):
                       '%s.' % rule.name))
             location_path = self.env['stock.location.path'].search(
                 [('warehouse_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_path:
                 raise ValidationError(
@@ -237,6 +240,7 @@ class StockWarehouse(models.Model):
                       '%s.' % location_path.name))
             location_route = self.env['stock.location.route'].search(
                 [('supplied_wh_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_route:
                 raise ValidationError(
@@ -245,6 +249,7 @@ class StockWarehouse(models.Model):
                       '%s.' % location_route.name))
             location_route = self.env['stock.location.route'].search(
                 [('supplier_wh_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_route:
                 raise ValidationError(
@@ -253,6 +258,7 @@ class StockWarehouse(models.Model):
                       '%s.' % location_route.name))
             location_route = self.env['stock.location.route'].search(
                 [('warehouse_ids', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_route:
                 raise ValidationError(
@@ -294,6 +300,7 @@ class StockWarehouse(models.Model):
                       '%s.' % warehouse_orderpoint.name))
             template = self.env['product.template'].search(
                 [('warehouse_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(

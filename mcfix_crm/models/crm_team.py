@@ -29,6 +29,7 @@ class CrmTeam(models.Model):
                 continue
             activity_report = self.env['crm.activity.report'].search(
                 [('team_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if activity_report:
                 raise ValidationError(
@@ -37,6 +38,7 @@ class CrmTeam(models.Model):
                       '%s.' % activity_report.name))
             opportunity_report = self.env['crm.opportunity.report'].search(
                 [('team_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if opportunity_report:
                 raise ValidationError(
@@ -45,9 +47,19 @@ class CrmTeam(models.Model):
                       '%s.' % opportunity_report.name))
             lead = self.env['crm.lead'].search(
                 [('team_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if lead:
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'Sales Team is assigned to Lead '
                       '%s.' % lead.name))
+            partner = self.env['res.partner'].search(
+                [('team_id', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partner:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Sales Team is assigned to Partner '
+                      '%s.' % partner.name))

@@ -135,6 +135,7 @@ class PosOrder(models.Model):
             bank_statement_line = self.env[
                 'account.bank.statement.line'].search(
                 [('pos_statement_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if bank_statement_line:
                 raise ValidationError(
@@ -145,6 +146,7 @@ class PosOrder(models.Model):
                           bank_statement_line.statement_id.name)))
             pos_order = self.env['report.pos.order'].search(
                 [('order_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if pos_order:
                 raise ValidationError(

@@ -58,10 +58,10 @@ class PurchaseOrder(models.Model):
         for rec in self:
             if (rec.partner_id and rec.partner_id.company_id and
                     rec.partner_id.company_id != rec.company_id):
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the Partner '
-                                        'must match with that of the '
-                                        'RFQ/Purchase Order.'))
+                raise ValidationError(
+                    _('Configuration error\n'
+                      'The Company of the Partner must match with that '
+                      'of the RFQ/Purchase Order.'))
 
     @api.multi
     @api.constrains('invoice_ids', 'company_id')
@@ -107,8 +107,8 @@ class PurchaseOrder(models.Model):
                     order.company_id != order.fiscal_position_id.company_id:
                 raise ValidationError(
                     _('Configuration error\n'
-                      'The Company of the fiscal position must match with that'
-                      ' of the RFQ/Purchase Order.'))
+                      'The Company of the fiscal position must match with '
+                      'that of the RFQ/Purchase Order.'))
         return True
 
     @api.constrains('company_id')
@@ -116,6 +116,7 @@ class PurchaseOrder(models.Model):
         for rec in self:
             order_line = self.env['purchase.order.line'].search(
                 [('order_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order_line:
                 raise ValidationError(
@@ -225,11 +226,10 @@ class PurchaseOrderLine(models.Model):
         for rec in self.sudo():
             if (rec.product_id and rec.product_id.company_id and
                     rec.product_id.company_id != rec.company_id):
-                raise ValidationError(_('Configuration error\n'
-                                        'The Company of the product %s '
-                                        'must match with that of the '
-                                        'RFQ/Purchase Order.') %
-                                      rec.product_id.name)
+                raise ValidationError(
+                    _('Configuration error\n'
+                      'The Company of the product %s must match with that of '
+                      'the RFQ/Purchase Order.') % rec.product_id.name)
 
     @api.constrains('company_id')
     def _check_company_id(self):
@@ -246,6 +246,7 @@ class PurchaseOrderLine(models.Model):
                       '%s.' % order.name))
             invoice_line = self.env['account.invoice.line'].search(
                 [('purchase_line_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_line:
                 raise ValidationError(
@@ -255,6 +256,7 @@ class PurchaseOrderLine(models.Model):
                                              invoice_line.invoice_id.name)))
             move = self.env['stock.move'].search(
                 [('purchase_line_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move:
                 raise ValidationError(

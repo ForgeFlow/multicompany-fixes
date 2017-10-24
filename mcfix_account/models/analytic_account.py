@@ -12,6 +12,7 @@ class AccountAnalyticAccount(models.Model):
         for rec in self:
             move_line = self.env['account.move.line'].search(
                 [('analytic_account_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move_line:
                 raise ValidationError(
@@ -21,6 +22,7 @@ class AccountAnalyticAccount(models.Model):
                                           move_line.move_id.name)))
             invoice_line = self.env['account.invoice.line'].search(
                 [('account_analytic_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_line:
                 raise ValidationError(
@@ -30,6 +32,7 @@ class AccountAnalyticAccount(models.Model):
                                              invoice_line.invoice_id.name)))
             invoice_tax = self.env['account.invoice.tax'].search(
                 [('account_analytic_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_tax:
                 raise ValidationError(

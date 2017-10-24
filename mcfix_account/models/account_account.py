@@ -54,6 +54,7 @@ class AccountAccount(models.Model):
 
                 invoice_line = self.env['account.invoice.line'].search(
                     [('account_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if invoice_line:
                     raise ValidationError(
@@ -64,6 +65,7 @@ class AccountAccount(models.Model):
 
                 invoice_tax = self.env['account.invoice.tax'].search(
                     [('account_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if invoice_tax:
                     raise ValidationError(
@@ -75,6 +77,7 @@ class AccountAccount(models.Model):
                 bank_statement_line = self.env[
                     'account.bank.statement.line'].search(
                     [('account_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if bank_statement_line:
                     raise ValidationError(
@@ -133,6 +136,7 @@ class AccountAccount(models.Model):
                 # Account Move
                 move_line = self.env['account.move.line'].search(
                     [('account_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if move_line:
                     raise ValidationError(
@@ -182,6 +186,7 @@ class AccountAccount(models.Model):
                 # Account Invoice Report
                 invoice_report = self.env['account.invoice.report'].search(
                     [('account_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if invoice_report:
                     raise ValidationError(
@@ -191,6 +196,7 @@ class AccountAccount(models.Model):
 
                 invoice_report = self.env['account.invoice.report'].search(
                     [('account_line_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if invoice_report:
                     raise ValidationError(
@@ -201,6 +207,7 @@ class AccountAccount(models.Model):
                 # Product Template
                 template = self.env['product.template'].search(
                     [('property_account_income_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if template:
                     raise ValidationError(
@@ -209,9 +216,72 @@ class AccountAccount(models.Model):
                           '%s.' % template.name))
                 template = self.env['product.template'].search(
                     [('property_account_expense_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if template:
                     raise ValidationError(
                         _('You cannot change the company, as this '
                           'account is assigned to Product Template '
                           '%s.' % template.name))
+
+                # Partner
+                partner = self.env['res.partner'].search(
+                    [('property_account_payable_id', '=', rec.id),
+                     ('company_id', '!=', False),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if partner:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Account Payable is assigned to Partner '
+                          '%s.' % partner.name))
+
+                partner = self.env['res.partner'].search(
+                    [('property_account_receivable_id', '=', rec.id),
+                     ('company_id', '!=', False),
+                     ('company_id', '!=', rec.company_id.id)], limit=1)
+                if partner:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Account Receivable is assigned to Partner '
+                          '%s.' % partner.name))
+
+                # Company
+                company = self.env['res.company'].search(
+                    [('transfer_account_id', '=', rec.id),
+                     ('company_id', '!=', False),
+                     ('parent_id', '!=', rec.company_id.id)], limit=1)
+                if company:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Inter-Banks Transfer Account is assigned to '
+                          'Company %s.' % company.name))
+
+                company = self.env['res.company'].search(
+                    [('property_stock_account_input_categ_id', '=', rec.id),
+                     ('company_id', '!=', False),
+                     ('parent_id', '!=', rec.company_id.id)], limit=1)
+                if company:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Input Account for Stock Valuation is assigned to '
+                          'Company %s.' % company.name))
+
+                company = self.env['res.company'].search(
+                    [('property_stock_account_output_categ_id', '=', rec.id),
+                     ('company_id', '!=', False),
+                     ('parent_id', '!=', rec.company_id.id)], limit=1)
+                if company:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Output Account for Stock Valuation is assigned to '
+                          'Company %s.' % company.name))
+
+                company = self.env['res.company'].search(
+                    [('property_stock_valuation_account_id', '=', rec.id),
+                     ('company_id', '!=', False),
+                     ('parent_id', '!=', rec.company_id.id)], limit=1)
+                if company:
+                    raise ValidationError(
+                        _('You cannot change the company, as this '
+                          'Account Template for Stock Valuation is assigned '
+                          'to Company %s.' % company.name))

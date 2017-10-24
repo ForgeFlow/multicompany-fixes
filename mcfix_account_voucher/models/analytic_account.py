@@ -12,6 +12,7 @@ class AccountAnalyticAccount(models.Model):
         for rec in self:
             voucher_line = self.env['account.voucher.line'].search(
                 [('account_analytic_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if voucher_line:
                 raise ValidationError(

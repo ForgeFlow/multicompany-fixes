@@ -130,6 +130,7 @@ class AccountInvoice(models.Model):
         for rec in self:
             move_line = self.env['account.move.line'].search(
                 [('invoice_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move_line:
                 raise ValidationError(
@@ -138,6 +139,7 @@ class AccountInvoice(models.Model):
                       '%s.' % move_line.name))
             invoice_line = self.env['account.invoice.line'].search(
                 [('invoice_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_line:
                 raise ValidationError(
@@ -155,6 +157,7 @@ class AccountInvoice(models.Model):
                       '%s.' % invoice.name))
             invoice_tax = self.env['account.invoice.tax'].search(
                 [('invoice_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_tax:
                 raise ValidationError(

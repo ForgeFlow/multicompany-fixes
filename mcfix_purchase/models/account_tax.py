@@ -15,6 +15,7 @@ class AccountTax(models.Model):
         for rec in self:
             order_line = self.env['purchase.order.line'].search(
                 [('taxes_id', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order_line:
                 raise ValidationError(

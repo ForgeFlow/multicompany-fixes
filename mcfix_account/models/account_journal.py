@@ -90,6 +90,7 @@ class AccountJournal(models.Model):
         for rec in self:
             move = self.env['account.move'].search(
                 [('journal_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move:
                 raise ValidationError(
@@ -98,6 +99,7 @@ class AccountJournal(models.Model):
                       '%s.' % move.name))
             move_line = self.env['account.move.line'].search(
                 [('journal_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if move_line:
                 raise ValidationError(
@@ -115,6 +117,7 @@ class AccountJournal(models.Model):
                       '%s.' % invoice.name))
             bank_statement_line = self.env['account.bank.statement.line'].\
                 search([('journal_id', '=', rec.id),
+                        ('company_id', '!=', False),
                         ('company_id', '!=', rec.company_id.id)], limit=1)
             if bank_statement_line:
                 raise ValidationError(
@@ -125,6 +128,7 @@ class AccountJournal(models.Model):
                           bank_statement_line.statement_id.name)))
             bank_statement = self.env['account.bank.statement'].search(
                 [('journal_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if bank_statement:
                 raise ValidationError(
@@ -149,6 +153,7 @@ class AccountJournal(models.Model):
                       '%s.' % reconcile_model.name))
             invoice_report = self.env['account.invoice.report'].search(
                 [('journal_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_report:
                 raise ValidationError(
@@ -157,12 +162,22 @@ class AccountJournal(models.Model):
                       '%s.' % invoice_report.name))
             common_report = self.env['account.common.report'].search(
                 [('journal_ids', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if common_report:
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'Journal is assigned to Report '
                       '%s.' % common_report.name))
+            company = self.env['res.company'].search(
+                [('currency_exchange_journal_id', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('parent_id', '!=', rec.company_id.id)], limit=1)
+            if company:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Exchange Gain or Loss Journal is assigned to Company '
+                      '%s.' % company.name))
 
     def write(self, vals):
         for journal in self:

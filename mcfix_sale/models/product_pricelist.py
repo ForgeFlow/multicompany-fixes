@@ -17,6 +17,7 @@ class ProductPricelist(models.Model):
                 continue
             order = self.env['sale.order'].search(
                 [('pricelist_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order:
                 raise ValidationError(
@@ -25,6 +26,7 @@ class ProductPricelist(models.Model):
                       '%s.' % order.name))
             report = self.env['sale.report'].search(
                 [('pricelist_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if report:
                 raise ValidationError(

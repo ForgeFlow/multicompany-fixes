@@ -43,6 +43,7 @@ class CrmLead(models.Model):
                 continue
             activity_report = self.env['crm.activity.report'].search(
                 [('lead_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if activity_report:
                 raise ValidationError(

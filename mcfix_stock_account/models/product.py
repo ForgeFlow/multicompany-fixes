@@ -44,6 +44,7 @@ class ProductTemplate(models.Model):
                 continue
             history = self.env['stock.history'].search(
                 [('product_template_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if history:
                 raise ValidationError(

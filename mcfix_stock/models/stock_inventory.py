@@ -53,6 +53,7 @@ class StockInventory(models.Model):
         for rec in self:
             inventory_line = self.env['stock.inventory.line'].search(
                 [('inventory_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if inventory_line:
                 raise ValidationError(

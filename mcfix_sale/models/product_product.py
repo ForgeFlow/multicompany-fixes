@@ -16,8 +16,8 @@ class ProductProduct(models.Model):
             if rec.company_id:
                 orders_line_id = self.env['sale.order'].search(
                     [('product_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
-
                 if orders_line_id:
                     raise ValidationError(_('Sales Order line already exists '
                                             'referencing this product in '

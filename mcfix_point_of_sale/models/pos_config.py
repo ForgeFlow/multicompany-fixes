@@ -125,6 +125,7 @@ class PosConfig(models.Model):
         for rec in self:
             pos_order = self.env['report.pos.order'].search(
                 [('config_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if pos_order:
                 raise ValidationError(

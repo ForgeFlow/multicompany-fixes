@@ -45,6 +45,7 @@ class ProductTemplate(models.Model):
                 continue
             report = self.env['purchase.report'].search(
                 [('product_tmpl_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if report:
                 raise ValidationError(

@@ -46,7 +46,7 @@ class AccountTax(models.Model):
             if tax.company_id and tax.account_id.company_id and \
                     tax.company_id != tax.account_id.company_id:
                 raise ValidationError(_('The Company in the Tax and in '
-                                        ' must be the same.'))
+                                        'Tax Account must be the same.'))
         return True
 
     @api.multi
@@ -66,6 +66,7 @@ class AccountTax(models.Model):
             # Invoice
             invoice_tax = self.env['account.invoice.tax'].search(
                 [('tax_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_tax:
                 raise ValidationError(
@@ -76,6 +77,7 @@ class AccountTax(models.Model):
 
             invoice_line = self.env['account.invoice.line'].search(
                 [('invoice_line_tax_ids', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_line:
                 raise ValidationError(
@@ -97,6 +99,7 @@ class AccountTax(models.Model):
             # Account Move Line
             aml = self.env['account.move.line'].search(
                 [('tax_ids', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if aml:
                 raise ValidationError(
@@ -106,6 +109,7 @@ class AccountTax(models.Model):
 
             aml = self.env['account.move.line'].search(
                 [('tax_line_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if aml:
                 raise ValidationError(
@@ -164,6 +168,7 @@ class AccountTax(models.Model):
             # Product Template
             template = self.env['product.template'].search(
                 [('taxes_id', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(
@@ -173,6 +178,7 @@ class AccountTax(models.Model):
 
             template = self.env['product.template'].search(
                 [('supplier_taxes_id', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if template:
                 raise ValidationError(

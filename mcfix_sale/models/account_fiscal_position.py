@@ -17,6 +17,7 @@ class AccountFiscalPosition(models.Model):
                 continue
             order = self.env['sale.order'].search(
                 [('fiscal_position_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order:
                 raise ValidationError(

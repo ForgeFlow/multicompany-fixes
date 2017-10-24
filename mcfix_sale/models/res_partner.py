@@ -16,14 +16,16 @@ class ResPartner(models.Model):
             if rec.company_id:
                 order_partner_id = self.env['sale.order'].\
                     search([('partner_id', '=', rec.id),
+                            ('company_id', '!=', False),
                             ('company_id', '!=', rec.company_id.id)], limit=1)
                 order_partner_shipping_id = self.env['sale.order'].search(
                     [('partner_shipping_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 order_partner_invoice_id = self.env['sale.order'].search(
                     [('partner_invoice_id', '=', rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
-
                 if order_partner_id or order_partner_shipping_id or \
                         order_partner_invoice_id:
                     raise ValidationError(_('Sales Order already exists '

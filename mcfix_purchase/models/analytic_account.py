@@ -12,6 +12,7 @@ class AccountAnalyticAccount(models.Model):
         for rec in self:
             order_line = self.env['purchase.order.line'].search(
                 [('account_analytic_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order_line:
                 raise ValidationError(
@@ -21,6 +22,7 @@ class AccountAnalyticAccount(models.Model):
                           order_line.name, order_line.order_id.name)))
             report = self.env['purchase.report'].search(
                 [('account_analytic_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if report:
                 raise ValidationError(

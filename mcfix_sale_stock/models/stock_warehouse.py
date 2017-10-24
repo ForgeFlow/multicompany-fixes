@@ -12,6 +12,7 @@ class StockWarehouse(models.Model):
         for rec in self:
             order = self.env['sale.order'].search(
                 [('warehouse_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order:
                 raise ValidationError(
@@ -20,6 +21,7 @@ class StockWarehouse(models.Model):
                       '%s.' % order.name))
             report = self.env['sale.report'].search(
                 [('warehouse_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if report:
                 raise ValidationError(

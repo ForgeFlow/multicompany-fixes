@@ -28,6 +28,7 @@ class Pricelist(models.Model):
                 continue
             pricelist_item = self.env['product.pricelist.item'].search(
                 [('base_pricelist_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if pricelist_item:
                 raise ValidationError(
@@ -36,6 +37,7 @@ class Pricelist(models.Model):
                       '%s.' % pricelist_item.name))
             pricelist_item = self.env['product.pricelist.item'].search(
                 [('pricelist_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if pricelist_item:
                 raise ValidationError(

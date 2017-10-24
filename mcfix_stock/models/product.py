@@ -108,6 +108,7 @@ class ProductTemplate(models.Model):
                 continue
             location_route = self.env['stock.location.route'].search(
                 [('product_ids', 'in', [rec.id]),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if location_route:
                 raise ValidationError(

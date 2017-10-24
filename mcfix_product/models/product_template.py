@@ -56,6 +56,7 @@ class ProductTemplate(models.Model):
                 continue
             pricelist_item = self.env['product.pricelist.item'].search(
                 [('product_tmpl_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if pricelist_item:
                 raise ValidationError(
@@ -64,6 +65,7 @@ class ProductTemplate(models.Model):
                       '%s.' % pricelist_item.name))
             supplierinfo = self.env['product.supplierinfo'].search(
                 [('product_tmpl_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if supplierinfo:
                 raise ValidationError(

@@ -191,6 +191,7 @@ class StockQuantPackage(models.Model):
                       '%s.' % inventory.name))
             inventory_line = self.env['stock.inventory.line'].search(
                 [('package_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if inventory_line:
                 raise ValidationError(
@@ -210,6 +211,7 @@ class StockQuantPackage(models.Model):
                       '%s.' % quant.name))
             quant_package = self.search(
                 [('parent_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if quant_package:
                 raise ValidationError(

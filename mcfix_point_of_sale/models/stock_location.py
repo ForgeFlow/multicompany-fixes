@@ -20,6 +20,7 @@ class StockLocation(models.Model):
                       '%s.' % order.name))
             pos_order = self.env['report.pos.order'].search(
                 [('location_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if pos_order:
                 raise ValidationError(
@@ -28,6 +29,7 @@ class StockLocation(models.Model):
                       '%s.' % pos_order.name))
             pos_order = self.env['report.pos.order'].search(
                 [('stock_location_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if pos_order:
                 raise ValidationError(

@@ -12,6 +12,7 @@ class AccountPaymentTerm(models.Model):
         for rec in self:
             order = self.env['sale.order'].search(
                 [('payment_term_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if order:
                 raise ValidationError(

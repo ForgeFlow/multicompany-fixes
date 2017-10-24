@@ -34,12 +34,31 @@ class AccountPaymentTerm(models.Model):
                       '%s.' % invoice.name))
             invoice_report = self.env['account.invoice.report'].search(
                 [('payment_term_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)], limit=1)
             if invoice_report:
                 raise ValidationError(
                     _('You cannot change the company, as this '
                       'Payment Terms is assigned to Invoice Report '
                       '%s.' % invoice_report.name))
+            partner = self.env['res.partner'].search(
+                [('property_payment_term_id', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partner:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Customer Payment Term is assigned to Partner '
+                      '%s.' % partner.name))
+            partner = self.env['res.partner'].search(
+                [('property_supplier_payment_term_id', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partner:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Vendor Payment Term is assigned to Partner '
+                      '%s.' % partner.name))
 
 
 class AccountAbstractPayment(models.AbstractModel):

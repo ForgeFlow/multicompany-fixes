@@ -36,6 +36,7 @@ class AccountFiscalPosition(models.Model):
                       '%s.' % invoice.name))
             invoice_report = self.env['account.invoice.report'].search(
                 [('fiscal_position_id', '=', rec.id),
+                 ('company_id', '!=', False),
                  ('company_id', '!=', rec.company_id.id)],
                 limit=1)
             if invoice_report:
@@ -43,3 +44,12 @@ class AccountFiscalPosition(models.Model):
                     _('You cannot change the company, as this '
                       'Fiscal Position is assigned to Invoice Report '
                       '%s.' % invoice_report.name))
+            partner = self.env['res.partner'].search(
+                [('property_account_position_id', '=', rec.id),
+                 ('company_id', '!=', False),
+                 ('company_id', '!=', rec.company_id.id)], limit=1)
+            if partner:
+                raise ValidationError(
+                    _('You cannot change the company, as this '
+                      'Fiscal Position is assigned to Partner '
+                      '%s.' % partner.name))

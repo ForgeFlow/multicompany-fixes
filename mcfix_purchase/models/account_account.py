@@ -14,6 +14,7 @@ class AccountAccount(models.Model):
                 template = self.env['product.template'].search(
                     [('property_account_creditor_price_difference', '=',
                       rec.id),
+                     ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
                 if template:
                     raise ValidationError(
