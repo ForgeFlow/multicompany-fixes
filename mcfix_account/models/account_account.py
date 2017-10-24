@@ -248,7 +248,7 @@ class AccountAccount(models.Model):
                 # Company
                 company = self.env['res.company'].search(
                     [('transfer_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
+                     ('parent_id', '!=', False),
                      ('parent_id', '!=', rec.company_id.id)], limit=1)
                 if company:
                     raise ValidationError(
@@ -258,7 +258,7 @@ class AccountAccount(models.Model):
 
                 company = self.env['res.company'].search(
                     [('property_stock_account_input_categ_id', '=', rec.id),
-                     ('company_id', '!=', False),
+                     ('parent_id', '!=', False),
                      ('parent_id', '!=', rec.company_id.id)], limit=1)
                 if company:
                     raise ValidationError(
@@ -268,7 +268,7 @@ class AccountAccount(models.Model):
 
                 company = self.env['res.company'].search(
                     [('property_stock_account_output_categ_id', '=', rec.id),
-                     ('company_id', '!=', False),
+                     ('parent_id', '!=', False),
                      ('parent_id', '!=', rec.company_id.id)], limit=1)
                 if company:
                     raise ValidationError(
@@ -278,7 +278,7 @@ class AccountAccount(models.Model):
 
                 company = self.env['res.company'].search(
                     [('property_stock_valuation_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
+                     ('parent_id', '!=', False),
                      ('parent_id', '!=', rec.company_id.id)], limit=1)
                 if company:
                     raise ValidationError(

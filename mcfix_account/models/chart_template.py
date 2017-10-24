@@ -78,7 +78,7 @@ class AccountChartTemplate(models.Model):
                       '%s.' % config_settings.name))
             company = self.env['res.company'].search(
                 [('chart_template_id', '=', rec.id),
-                 ('company_id', '!=', False),
+                 ('parent_id', '!=', False),
                  ('parent_id', '!=', rec.company_id.id)], limit=1)
             if company:
                 raise ValidationError(

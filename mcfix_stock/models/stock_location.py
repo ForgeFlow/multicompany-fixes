@@ -508,7 +508,7 @@ class StockLocation(models.Model):
                       '%s.' % partner.name))
             company = self.env['res.company'].search(
                 [('internal_transit_location_id', '=', rec.id),
-                 ('company_id', '!=', False),
+                 ('parent_id', '!=', False),
                  ('parent_id', '!=', rec.company_id.id)], limit=1)
             if company:
                 raise ValidationError(
