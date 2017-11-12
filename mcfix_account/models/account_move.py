@@ -23,7 +23,8 @@ class AccountMove(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
-        self.journal_id = False
+        if self.journal_id.company_id != self.company_id:
+            self.journal_id = False
         self.statement_line_id = False
         self.dummy_account_id = False
 
