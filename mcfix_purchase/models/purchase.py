@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models, _
+from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError
 
 
@@ -136,6 +136,15 @@ class PurchaseOrder(models.Model):
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
+
+    company_id = fields.Many2one('res.company', related=[], compute='_compute_line_company', string='Company', store=True, readonly=True)
+
+    @api.depends('order_id', 'order_id.company_id')
+    def _compute_line_company(self):
+        for line in self:
+            line.company_id = line.order_id.company_id
+            if not line.order_id and 'default_company_id' in self.env.context:
+                line.company_id = self.env.context['default_company_id']
 
     @api.multi
     @api.depends('company_id')
