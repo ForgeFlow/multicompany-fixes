@@ -137,7 +137,9 @@ class PurchaseOrder(models.Model):
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
-    company_id = fields.Many2one('res.company', related=[], compute='_compute_line_company', string='Company', store=True, readonly=True)
+    company_id = fields.Many2one(
+        'res.company', related=[], compute='_compute_line_company',
+        string='Company', store=True, readonly=True)
 
     @api.depends('order_id', 'order_id.company_id')
     def _compute_line_company(self):
