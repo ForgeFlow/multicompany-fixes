@@ -3,8 +3,8 @@ from odoo import models, fields, api, _
 from odoo.exceptions import MissingError
 
 
-class MulticomanyPropertyAbstract(models.AbstractModel):
-    _name = 'multicompany.property.abstract'
+class ModelProperty(models.AbstractModel):
+    _name = 'model.property'
 
     company_id = fields.Many2one(
         comodel_name='res.company',

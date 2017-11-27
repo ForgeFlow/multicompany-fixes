@@ -7,7 +7,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     property_ids = fields.One2many(
-        comodel_name='multicompany.property.product',
+        comodel_name='product.property',
         compute='_compute_properties',
         inverse='_inverse_properties',
         string='Properties'
@@ -15,15 +15,15 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def _inverse_properties(self):
-        ''' Hack here: We do not really store any value here.
+        """ Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
-        model editable, '''
+        model editable. """
         return
 
     @api.multi
     def _compute_properties(self):
         for record in self:
-            property_obj = self.env['multicompany.property.product']
+            property_obj = self.env['product.property']
             companies = self.env['res.company'].search([])
             for company in companies:
                 val = property_obj.create({
@@ -37,7 +37,7 @@ class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     property_ids = fields.One2many(
-        comodel_name='multicompany.property.product',
+        comodel_name='product.property',
         compute='_compute_properties',
         inverse='_inverse_properties',
         string='Properties'
@@ -45,15 +45,15 @@ class ProductProduct(models.Model):
 
     @api.multi
     def _inverse_properties(self):
-        ''' Hack here: We do not really store any value here.
+        """ Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
-        model editable, '''
+        model editable. """
         return
 
     @api.multi
     def _compute_properties(self):
         for record in self:
-            property_obj = self.env['multicompany.property.product']
+            property_obj = self.env['product.property']
             companies = self.env['res.company'].search([])
             for company in companies:
                 val = property_obj.create({
@@ -64,9 +64,9 @@ class ProductProduct(models.Model):
                 record.property_ids += val
 
 
-class MulticompanyPropertyProduct(models.TransientModel):
-    _name = 'multicompany.property.product'
-    _inherit = 'multicompany.property.abstract'
+class ProductProperty(models.TransientModel):
+    _name = 'product.property'
+    _inherit = 'model.property'
 
     _description = "Properties of Products"
 
@@ -91,11 +91,9 @@ class MulticompanyPropertyProduct(models.TransientModel):
 
     @api.one
     def _compute_property_fields(self):
-
         object = self.product_id or self.product_template_id
-        self.get_property_fields(object,
-                                 self.env['ir.property'].with_context(
-                                     force_company=self.company_id.id))
+        self.get_property_fields(object, self.env['ir.property'].with_context(
+            force_company=self.company_id.id))
 
     @api.one
     def get_property_fields(self, object, properties):
@@ -112,8 +110,8 @@ class MulticompanyPropertyProduct(models.TransientModel):
 
     @api.multi
     def write(self, vals):
-        ''' Standard price do not follow the usual workflow
-        as it has special considerations '''
+        """ Standard price do not follow the usual workflow
+        as it has special considerations """
         prop_obj = self.env['ir.property'].with_context(
             force_company=self.company_id.id)
         if 'standard_price' in vals:
@@ -130,11 +128,10 @@ class MulticompanyPropertyProduct(models.TransientModel):
                     self.set_property(obj, 'standard_price',
                                       vals['standard_price'], prop_obj)
                     obj._set_standard_price(vals.get('standard_price', 0.0))
-        fields = self.get_property_fields_list()
-        for field in fields:
+        p_fields = self.get_property_fields_list()
+        for field in p_fields:
             if field in vals:
                 for rec in self:
                     obj = rec.product_id or rec.product_template_id
-                    self.set_property(obj, field,
-                                      vals[field], prop_obj)
-        return super(MulticompanyPropertyProduct, self).write(vals)
+                    self.set_property(obj, field, vals[field], prop_obj)
+        return super(ProductProperty, self).write(vals)

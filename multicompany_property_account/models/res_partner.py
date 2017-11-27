@@ -2,7 +2,7 @@
 from odoo import fields, models, api
 
 
-class ResPartner(models.Model):
+class Partner(models.Model):
     _inherit = 'res.partner'
 
     property_account_payable_id = fields.Many2one(readonly=True)
@@ -12,7 +12,7 @@ class ResPartner(models.Model):
     property_supplier_payment_term_id = fields.Many2one(readonly=True)
 
 
-class ResPartnerProperty(models.TransientModel):
+class PartnerProperty(models.TransientModel):
     _inherit = 'res.partner.property'
 
     property_account_payable_id = fields.Many2one(
@@ -64,7 +64,7 @@ class ResPartnerProperty(models.TransientModel):
 
     @api.one
     def get_property_fields(self, object, properties):
-        super(ResPartnerProperty, self).get_property_fields(object, properties)
+        super(PartnerProperty, self).get_property_fields(object, properties)
         self.property_account_payable_id =\
             self.get_property_value('property_account_payable_id', object,
                                     properties)
@@ -83,7 +83,7 @@ class ResPartnerProperty(models.TransientModel):
 
     @api.multi
     def get_property_fields_list(self):
-        res = super(ResPartnerProperty, self).get_property_fields_list()
+        res = super(PartnerProperty, self).get_property_fields_list()
         res.append('property_account_payable_id')
         res.append('property_account_receivable_id')
         res.append('property_account_position_id')

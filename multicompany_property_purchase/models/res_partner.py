@@ -2,13 +2,13 @@
 from odoo import fields, models, api
 
 
-class ResPartner(models.Model):
+class Partner(models.Model):
     _inherit = 'res.partner'
 
     property_purchase_currency_id = fields.Many2one(readonly=True)
 
 
-class ResPartnerProperties(models.TransientModel):
+class PartnerProperties(models.TransientModel):
     _inherit = 'res.partner.property'
 
     property_purchase_currency_id = fields.Many2one(
@@ -20,21 +20,20 @@ class ResPartnerProperties(models.TransientModel):
 
     @api.one
     def get_property_fields(self, object, properties):
-        super(ResPartnerProperties, self).get_property_fields(object,
-                                                              properties)
+        super(PartnerProperties, self).get_property_fields(object, properties)
         self.property_purchase_currency_id = \
             self.get_property_value('property_purchase_currency_id',
                                     object, properties)
 
     @api.multi
     def get_property_fields_list(self):
-        res = super(ResPartnerProperties, self).get_property_fields_list()
+        res = super(PartnerProperties, self).get_property_fields_list()
         res.append('property_purchase_currency_id')
         return res
 
     @api.model
     def set_properties(self, object, properties=False):
-        super(ResPartnerProperties, self).set_properties()
+        super(PartnerProperties, self).set_properties()
         self.set_property(object,
                           'property_purchase_currency_id',
                           self.property_purchase_currency_id.id, properties)

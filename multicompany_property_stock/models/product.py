@@ -10,7 +10,7 @@ class ProductTemplate(models.Model):
 
 
 class ProductProperty(models.TransientModel):
-    _inherit = 'multicompany.property.product'
+    _inherit = 'product.property'
 
     property_stock_procurement = fields.Many2one(
         'stock.location', "Procurement Location",

@@ -6,15 +6,13 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     property_valuation = fields.Selection(readonly=True)
-
     property_cost_method = fields.Selection(readonly=True)
-
     property_stock_account_input = fields.Many2one(readonly=True)
     property_stock_account_output = fields.Many2one(readonly=True)
 
 
 class ProductProperty(models.TransientModel):
-    _inherit = 'multicompany.property.product'
+    _inherit = 'product.property'
 
     property_valuation = fields.Selection([
         ('manual_periodic', 'Periodic (manual)'),

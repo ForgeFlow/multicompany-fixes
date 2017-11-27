@@ -9,7 +9,7 @@ class ProductTemplate(models.Model):
 
 
 class ProductProperty(models.TransientModel):
-    _inherit = 'multicompany.property.product'
+    _inherit = 'product.property'
 
     project_id = fields.Many2one(
         comodel_name='project.project', string='Project',

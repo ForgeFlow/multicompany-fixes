@@ -9,7 +9,7 @@ class ProductTemplate(models.Model):
 
 
 class ProductProperty(models.TransientModel):
-    _inherit = 'multicompany.property.product'
+    _inherit = 'product.property'
 
     purchase_ok = fields.Boolean(related='product_template_id.purchase_ok')
     property_account_creditor_price_difference = fields.Many2one(

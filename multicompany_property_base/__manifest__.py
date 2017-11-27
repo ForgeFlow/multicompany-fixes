@@ -12,7 +12,8 @@
     'website': 'http://www.creublanca.es',
     'depends': ['base'],
     'data': [
-        'views/partner.xml'
+        'views/partner.xml',
+        'views/company.xml'
     ],
     'installable': True,
     'application': False,

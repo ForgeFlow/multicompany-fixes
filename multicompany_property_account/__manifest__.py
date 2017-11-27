@@ -9,7 +9,7 @@
     'sequence': 30,
     'category': 'Creu Blanca',
     'website': 'http://www.creublanca.es',
-    'depends': ['account', 'multicompany_property',
+    'depends': ['account', 'multicompany_property_base',
                 'multicompany_property_product',
                 'payment'],
     'data': [

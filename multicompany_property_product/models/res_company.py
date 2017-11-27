@@ -10,7 +10,7 @@ class ResCompany(models.Model):
         return self.env['ir.property'].with_context(force_company=self.id).get(
             'property_product_pricelist', 'res.partner')
 
-    property_product_pricelist = fields.Many2One(
+    property_product_pricelist = fields.Many2one(
         comodel_name='product.pricelist',
         string='Pricelist',
         default=get_property_product_pricelist,

@@ -2,7 +2,7 @@
 from odoo import fields, models, api
 
 
-class ResPartner(models.Model):
+class Partner(models.Model):
     _inherit = 'res.partner'
 
     property_ids = fields.One2many(
@@ -14,9 +14,9 @@ class ResPartner(models.Model):
 
     @api.multi
     def _inverse_properties(self):
-        ''' Hack here: We do not really store any value here.
+        """ Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
-        model editable, '''
+        model editable. """
         return
 
     @api.multi
@@ -34,9 +34,9 @@ class ResPartner(models.Model):
             record.property_ids = values
 
 
-class ResPartnerProperty(models.TransientModel):
+class PartnerProperty(models.TransientModel):
     _name = 'res.partner.property'
-    _inherit = 'multicompany.property.abstract'
+    _inherit = 'model.property'
 
     partner_id = fields.Many2one(
         comodel_name='res.partner',
@@ -51,24 +51,24 @@ class ResPartnerProperty(models.TransientModel):
 
     @api.one
     def get_property_fields(self, object, properties):
-        ''' This method must be redefined by modules that
-        introduce property fields in the res.partner model '''
+        """ This method must be redefined by modules that
+        introduce property fields in the res.partner model """
         return
 
     @api.model
     def set_properties(self, object, properties=False):
-        ''' This method must be redefined by modules that
-        introduce property fields in the res.partner model '''
+        """ This method must be redefined by modules that
+        introduce property fields in the res.partner model """
         return
 
     @api.multi
     def write(self, vals):
         prop_obj = self.env['ir.property'].with_context(
             force_company=self.company_id.id)
-        fields = self.get_property_fields_list()
-        for field in fields:
+        p_fields = self.get_property_fields_list()
+        for field in p_fields:
             if field in vals:
                 for rec in self:
                     self.set_property(rec.partner_id, field,
                                       vals[field], prop_obj)
-        return super(ResPartnerProperty, self).write(vals)
+        return super(PartnerProperty, self).write(vals)

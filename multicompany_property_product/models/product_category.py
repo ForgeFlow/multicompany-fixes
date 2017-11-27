@@ -28,7 +28,7 @@ class ProductCategory(models.Model):
             companies = self.env['res.company'].search([])
             for company in companies:
                 val = property_obj.create({
-                    'product_template_id': record.id,
+                    'categ_id': record.id,
                     'company_id': company.id
                 })
                 values.append(val.id)
@@ -37,7 +37,7 @@ class ProductCategory(models.Model):
 
 class ProductCategoryProperty(models.TransientModel):
     _name = 'product.category.property'
-    _inherit = 'multicompany.property.abstract'
+    _inherit = 'model.property'
     _description = "Properties of Product categories"
 
     categ_id = fields.Many2one(
@@ -62,8 +62,8 @@ class ProductCategoryProperty(models.TransientModel):
     def write(self, vals):
         prop_obj = self.env['ir.property'].with_context(
             force_company=self.company_id.id)
-        fields = self.get_property_fields_list()
-        for field in fields:
+        p_fields = self.get_property_fields_list()
+        for field in p_fields:
             if field in vals:
                 for rec in self:
                     self.set_property(rec.partner_id, field,

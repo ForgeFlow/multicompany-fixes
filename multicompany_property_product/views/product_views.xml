@@ -17,9 +17,9 @@
         </field>
     </record>
 
-    <record id="view_multicompany_property_product_tree" model="ir.ui.view">
-        <field name="name">multicompany.property.product.tree</field>
-        <field name="model">multicompany.property.product</field>
+    <record id="view_product_property_tree" model="ir.ui.view">
+        <field name="name">product.property.tree</field>
+        <field name="model">product.property</field>
         <field name="arch" type="xml">
             <tree string="Properties">
                 <field name="product_template_id" invisible="1"/>
@@ -29,9 +29,9 @@
         </field>
     </record>
 
-    <record id="view_multicompany_property_product_form" model="ir.ui.view">
-        <field name="name">multicompany.property.product.form</field>
-        <field name="model">multicompany.property.product</field>
+    <record id="view_product_property_form" model="ir.ui.view">
+        <field name="name">product.property.form</field>
+        <field name="model">product.property</field>
         <field name="arch" type="xml">
             <form>
                 <group>
