@@ -66,15 +66,17 @@ class TestAccountJournalMC(AccountTestUsers):
         with self.assertRaises(ValidationError):
             self.cash_journal.\
                 write({'profit_account_id': self.account_2.id})
+        self.cash_journal.profit_account_id = False
 
         with self.assertRaises(ValidationError):
             self.cash_journal.\
                 write({'loss_account_id': self.account_2.id})
+        self.cash_journal.loss_account_id = False
 
         with self.assertRaises(ValidationError):
             self.cash_journal.account_control_ids += self.account_2
-
         self.cash_journal.account_control_ids = False
+
         self.cash_journal.account_control_ids += self.account_1
 
         with self.assertRaises(ValidationError):
