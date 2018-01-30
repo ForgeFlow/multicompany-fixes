@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_property_form" model="ir.ui.view">
+        <field name="name">product.property.form</field>
+        <field name="model">product.property</field>
+        <field name="inherit_id" ref="multicompany_property_product.view_product_property_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Inventory">
+                    <group name="stock_property" groups="base.group_no_one">
+                        <field name="property_stock_production" domain="[('usage','=','production')]"/>
+                        <field name="property_stock_inventory" domain="[('usage','=','inventory')]"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>
