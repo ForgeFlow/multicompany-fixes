@@ -16,7 +16,7 @@
         'views/partner.xml',
         'views/product.xml',
         'views/product_category.xml',
-        # 'views/company.xml',
+        'views/res_company_views.xml',
     ],
     'installable': True,
     'application': False,
