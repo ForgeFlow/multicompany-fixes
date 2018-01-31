@@ -32,7 +32,9 @@ class AccountBankStatement(models.Model):
                     self).reconciliation_widget_preprocess()
         statements = self
         child_companies = self.env.user.company_id.child_ids
-        child_company_ids = child_companies and tuple(child_companies.ids) or ()
+        if not child_companies:
+            return res
+        child_company_ids = child_companies and tuple(child_companies.ids)
 
         sql_query = """SELECT stl.id
                         FROM account_bank_statement_line stl
