@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ldap installer Form View -->
+    <record id="view_company_form" model="ir.ui.view">
+        <field name="name">res.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Accounting"
+                      groups="account.group_account_manager">
+                    <group>
+                        <field name="chart_template_id" readonly="1"/>
+                        <button
+                                type="action"
+                                name="%(account.action_wizard_multi_chart)d"
+                                attrs="{'invisible': [('chart_template_id', '!=', False)]}"
+                                context="{'company_id': active_id}"
+                                string="Set accounting"
+                        />
+                    </group>
+                    <group attrs="{'invisible': [('chart_template_id', '=', False)]}">
+                        <group>
+                            <field name="default_sale_tax_id"/>
+                            <field name="default_purchase_tax_id"/>
+                            <field name="transfer_account_id"/>
+                        </group>
+                        <group>
+                            <field name="fiscalyear_last_day"/>
+                            <field name="fiscalyear_last_month"/>
+                            <field name="fiscalyear_lock_date"/>
+                            <field name="period_lock_date"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+</odoo>
