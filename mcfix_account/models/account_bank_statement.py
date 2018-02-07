@@ -23,7 +23,8 @@ class AccountBankStatement(models.Model):
 
     @api.onchange('company_id')
     def onchange_company_id(self):
-        self.journal_id = False
+        if self.company_id and self.journal_id.company_id != self.company_id:
+            self.journal_id = False
 
     def reconciliation_widget_preprocess(self):
         # This is the same code as the original method except for the fact
