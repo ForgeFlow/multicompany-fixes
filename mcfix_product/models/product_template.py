@@ -5,6 +5,11 @@ from odoo.exceptions import ValidationError
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        """To be used by other modules"""
+        pass
+
     @api.multi
     @api.depends('company_id')
     def name_get(self):
