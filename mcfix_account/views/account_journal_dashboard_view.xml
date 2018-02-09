@@ -1,0 +1,21 @@
+<odoo>
+
+    <record id="account.open_account_journal_dashboard_kanban"
+            model="ir.actions.act_window">
+        <field name="domain">[('belong_to_company_or_child', '=', True)]</field>
+    </record>
+
+    <record id="account_journal_dashboard_kanban_view" model="ir.ui.view">
+        <field name="name">account.journal.dashboard.kanban</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.account_journal_dashboard_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban/field[@name='name']" position="after">
+                <field name="company_id"/>
+            </xpath>
+            <xpath expr="//kanban/templates//field[@name='name']" position="after">
+                <p>(<field name="company_id"/>)</p>
+            </xpath>
+        </field>
+    </record>
+</odoo>
