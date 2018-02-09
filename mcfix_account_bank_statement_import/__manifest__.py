@@ -1,15 +1,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': 'Multi Company Fix Analytic',
+    'name': 'Multi Company Fix Account Bank Statement Import',
     'version': '11.0.1.0.0',
-    'summary': 'Analytic fixes',
+    'summary': 'Account Bank Statement Import fixes',
     'author': 'Eficent, Odoo Community Association (OCA)',
     'website': 'http://www.eficent.com',
     'license': 'LGPL-3',
-    'depends': ['analytic', 'mcfix_base_setup'],
-    'data': [
-        'views/analytic_account_views.xml',
-    ],
+    'depends': ['account_bank_statement_import', 'mcfix_account'],
     'sequence': 30,
     'installable': True,
     'application': False,
