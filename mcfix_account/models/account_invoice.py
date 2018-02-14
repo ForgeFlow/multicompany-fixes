@@ -230,6 +230,18 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        return self.with_context(
+            force_company=self.invoice_id.company_id.id
+        )._onchange_product_id()
+
+    @api.onchange('account_id')
+    def onchange_account_id(self):
+        return self.with_context(
+            force_company=self.invoice_id.company_id.id
+        )._onchange_account_id()
+
     @api.model
     def change_company_id(self):
         part = self.invoice_id.partner_id

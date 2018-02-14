@@ -21,9 +21,6 @@
             <field name="property_account_expense_id" position="attributes">
                 <attribute name="readonly">1</attribute>
             </field>
-            <field name='supplier_taxes_id' position="attributes">
-                <attribute name="readonly">1</attribute>
-            </field>
         </field>
     </record>
 
