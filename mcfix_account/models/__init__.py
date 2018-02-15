@@ -7,8 +7,9 @@ from . import account_payment
 from . import account_payment_term
 from . import account_reconcile
 from . import account_tax
-from . import chart_template
 from . import account_tax_template
+from . import analytic_account
+from . import chart_template
 from . import ir_sequence
 from . import product
 from . import res_config_settings
