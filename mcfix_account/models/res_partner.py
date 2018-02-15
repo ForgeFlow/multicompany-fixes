@@ -99,7 +99,7 @@ class Partner(models.Model):
             for rec in self:
                 if not rec.company_id:
                     continue
-                field = self.env['account.invoice'].search(
+                field = self.env['account.invoice'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -108,7 +108,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Invoice '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice'].search(
+                field = self.env['account.invoice'].sudo().search(
                     [('commercial_partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -117,7 +117,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Invoice '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.analytic.line'].search(
+                field = self.env['account.analytic.line'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -126,7 +126,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Analytic Line '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.line'].search(
+                field = self.env['account.invoice.line'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -135,7 +135,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Invoice Line '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.bank.statement.line'].search(
+                field = self.env['account.bank.statement.line'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -145,7 +145,7 @@ class Partner(models.Model):
                           'Res Partner is assigned to '
                           'Account Bank Statement Line (%s)'
                           '.' % field.name_get()[0][1]))
-                field = self.env['account.move'].search(
+                field = self.env['account.move'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -154,7 +154,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Move '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.move.line'].search(
+                field = self.env['account.move.line'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -163,7 +163,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Move Line '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.payment'].search(
+                field = self.env['account.payment'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -172,7 +172,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Payment '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].search(
+                field = self.env['account.invoice.report'].sudo().search(
                     [('partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
@@ -181,7 +181,7 @@ class Partner(models.Model):
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Invoice Report '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].search(
+                field = self.env['account.invoice.report'].sudo().search(
                     [('commercial_partner_id', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
