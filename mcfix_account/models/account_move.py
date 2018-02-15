@@ -210,6 +210,18 @@ class AccountMoveLine(models.Model):
         return total_rows
 
     @api.multi
+    def prepare_move_lines_for_reconciliation_widget(
+            self, target_currency=False, target_date=False):
+        ret = super(AccountMoveLine, self).\
+            prepare_move_lines_for_reconciliation_widget(
+            target_currency=target_currency, target_date=target_date)
+        for ret_line in ret:
+            for line in self:
+                if ret_line['id'] == line.id:
+                    ret_line['company_id'] = line.company_id.id
+        return ret
+
+    @api.multi
     @api.constrains('company_id', 'tax_line_id')
     def _check_company_id_tax_line_id(self):
         for rec in self.sudo():
