@@ -12,7 +12,7 @@ class Partner(models.Model):
             for rec in self:
                 if not rec.company_id:
                     continue
-                field = self.env['product.supplierinfo'].search(
+                field = self.env['product.supplierinfo'].sudo().search(
                     [('name', '=', rec.id),
                      ('company_id', '!=', False),
                      ('company_id', '!=', rec.company_id.id)], limit=1)
