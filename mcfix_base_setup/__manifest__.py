@@ -6,7 +6,7 @@
     'author': 'Eficent, Odoo Community Association (OCA)',
     'website': 'http://www.eficent.com',
     'license': 'LGPL-3',
-    'depends': ['mcfix_base', 'base_setup'],
+    'depends': ['base_setup', 'mcfix_base', 'mcfix_web'],
     'sequence': 30,
     'installable': True,
     'application': False,
