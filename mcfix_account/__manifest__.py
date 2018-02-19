@@ -19,6 +19,8 @@
         'views/account_tax_view.xml',
         'views/partner_view.xml',
         'views/product_view.xml',
+        'views/reports.xml',
+        'wizard/account_reports_views.xml',
         'wizard/wizard_tax_adjustments_views.xml',
     ],
     'sequence': 30,
