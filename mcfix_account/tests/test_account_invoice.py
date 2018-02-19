@@ -2,37 +2,19 @@
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
-from odoo.tests.common import TransactionCase
+from ..tests.test_account_chart_template_consistency import \
+    TestAccountChartTemplate
 from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
 
-class TestAccountInvoice(TransactionCase):
+class TestAccountInvoice(TestAccountChartTemplate):
 
     def with_context(self, *args, **kwargs):
         context = dict(args[0] if args else self.env.context, **kwargs)
         self.env = self.env(context=context)
         return self
-
-    def _chart_of_accounts_create(self, company, chart):
-        _logger.debug('Creating chart of account')
-        self.env.user.write({
-            'company_ids': [(4, company.id)],
-            'company_id': company.id,
-        })
-        self.with_context(
-            company_id=company.id, force_company=company.id)
-        wizard = self.env['wizard.multi.charts.accounts'].create({
-            'company_id': company.id,
-            'chart_template_id': chart.id,
-            'code_digits': 6,
-            'currency_id': self.env.ref('base.EUR').id,
-            'transfer_account_id': chart.transfer_account_id.id,
-        })
-        wizard.onchange_chart_template_id()
-        wizard.execute()
-        return True
 
     def setUp(self):
         super(TestAccountInvoice, self).setUp()
@@ -44,19 +26,14 @@ class TestAccountInvoice(TransactionCase):
         self.journal_model = self.env['account.journal']
         self.invoice_model = self.env['account.invoice']
         self.invoice_line_model = self.env['account.invoice.line']
-        ir_model_data = self.env['ir.model.data']
         self.account_template_model = self.env['account.account.template']
         self.chart_template_model = self.env['account.chart.template']
         manager_account_test_group = self.create_full_access(
             ['account.invoice', 'account.account', 'account.journal',
              'res.partner'])
-        self.company = self.env['res.company'].create({
-            'name': 'Test company',
-        })
-        self.company_2 = self.env['res.company'].create({
-            'name': 'Test company 2',
-            'parent_id': self.company.id,
-        })
+
+        self.company_2.parent_id = self.company.id
+
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
@@ -75,33 +52,6 @@ class TestAccountInvoice(TransactionCase):
              })
 
         self.user_type = self.env.ref('account.data_account_type_liquidity')
-
-        self.chart = self.env['account.chart.template'].search([], limit=1)
-        self._chart_of_accounts_create(self.company, self.chart)
-        account_template = self.env['account.account.template'].create({
-            'name': 'Test 1',
-            'code': 'Code_test',
-            'user_type_id': self.user_type.id,
-        })
-        self.chart_2 = self.env['account.chart.template'].create({
-            'name': 'Test Chart',
-            'currency_id': self.env.ref('base.EUR').id,
-            'transfer_account_id': account_template.id,
-            'property_account_receivable_id': account_template.id,
-            'property_account_payable_id': account_template.id,
-        })
-
-        account_template_data = ir_model_data.create(
-            {'name': 'test_template',
-             'model': 'account.account.template',
-             'module': 'account',
-             'res_id': account_template.id,
-             })
-
-        account_template.chart_template_id = self.chart_2
-        self.chart_2.tax_template_ids |= self.chart.tax_template_ids
-
-        self._chart_of_accounts_create(self.company_2, self.chart_2)
 
         self.chart.company_id = self.company
         self.chart_2.company_id = self.company_2
@@ -130,8 +80,6 @@ class TestAccountInvoice(TransactionCase):
             'journal_id': self.cash_journal.id,
             'account_id': self.account.id,
         })
-
-        del account_template_data
 
     def create_full_access(self, list_of_models):
         manager_account_test_group = self.env['res.groups'].sudo().create({
