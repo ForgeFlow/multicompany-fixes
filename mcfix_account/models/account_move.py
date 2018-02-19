@@ -6,10 +6,7 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     company_id = fields.Many2one(
-        readonly=False,
-        states={'posted': [('readonly', True)]},
-        related=False,
-    )
+        readonly=False, states={'posted': [('readonly', True)]}, related=False)
 
     @api.multi
     @api.depends('company_id')
@@ -21,10 +18,11 @@ class AccountMove(models.Model):
     @api.multi
     @api.onchange('company_id')
     def _onchange_company_id(self):
+        default = self.env.context['default_journal_type']
         for record in self:
             record.journal_id = self.env['account.journal'].search([
                 ('company_id', '=', record.company_id.id),
-                ('type', '=', self.env.context['default_journal_type'])
+                ('type', '=', default)
             ], limit=1).id
             record.line_ids = False
 
