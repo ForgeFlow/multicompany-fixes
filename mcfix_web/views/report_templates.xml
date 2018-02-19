@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="internal_layout" inherit_id="web.internal_layout">
+        <xpath expr="//div[1]" position="before">
+            <t t-set="company" t-value="company_id"/>
+        </xpath>
+    </template>
+
+</odoo>
