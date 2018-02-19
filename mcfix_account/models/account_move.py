@@ -1,9 +1,15 @@
-from odoo import api, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
+
+    company_id = fields.Many2one(
+        readonly=False,
+        states={'posted': [('readonly', True)]},
+        related=False,
+    )
 
     @api.multi
     @api.depends('company_id')
@@ -11,6 +17,16 @@ class AccountMove(models.Model):
         names = super(AccountMove, self).name_get()
         res = self.add_company_suffix(names)
         return res
+
+    @api.multi
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        for record in self:
+            record.journal_id = self.env['account.journal'].search([
+                ('company_id', '=', record.company_id.id),
+                ('type', '=', self.env.context['default_journal_type'])
+            ], limit=1).id
+            record.line_ids = False
 
     @api.multi
     @api.constrains('company_id', 'partner_id')
