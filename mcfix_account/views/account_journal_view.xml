@@ -16,6 +16,9 @@
         <field name="model">account.journal</field>
         <field name="inherit_id" ref="account.view_account_journal_form"/>
         <field name="arch" type="xml">
+            <field name="company_id" position="after">
+                <field name="company_partner_id" invisible="1"/>
+            </field>
             <field name="default_debit_account_id" position="attributes">
                 <attribute name="domain">[('company_id', '=', company_id)]</attribute>
             </field>
