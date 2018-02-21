@@ -3,7 +3,7 @@
 
 from ..tests.test_account_chart_template_consistency import \
     TestAccountChartTemplate
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 
 class TestAccountJournalConsistency(TestAccountChartTemplate):
@@ -126,7 +126,7 @@ class TestAccountJournalConsistency(TestAccountChartTemplate):
             'partner_id': self.company.partner_id.id,
         })
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             journal.write({'bank_account_id': bank_account.id})
         journal.bank_account = False
 
