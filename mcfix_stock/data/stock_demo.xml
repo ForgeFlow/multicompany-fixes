@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--  Child Company 1-->
+        <record id="stock.res_partner_company_1" model="res.partner">
+            <field name="company_id"/>
+        </record>
+
+        <record id="stock.res_partner_address_41" model="res.partner">
+            <field name="company_id"/>
+        </record>
+
+    </data>
+</odoo>
+
