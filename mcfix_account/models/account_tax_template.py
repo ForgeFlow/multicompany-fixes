@@ -11,6 +11,13 @@ class AccountTaxTemplate(models.Model):
     company_id = fields.Many2one(default=False, required=False)
 
     @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        names = super(AccountTaxTemplate, self).name_get()
+        res = self.add_company_suffix(names)
+        return res
+
+    @api.multi
     def _get_family(self):
         tax_templates = self
         for tax_template in self:
