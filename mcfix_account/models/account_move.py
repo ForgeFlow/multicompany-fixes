@@ -54,7 +54,7 @@ class AccountMove(models.Model):
                       'Account Partial Reconcile must be the same.'))
 
     @api.multi
-    @api.constrains('company_id', 'dummy_account_id')
+    @api.constrains('company_id')
     def _check_company_id_dummy_account_id(self):
         for rec in self.sudo():
             if rec.company_id and rec.dummy_account_id.company_id and\

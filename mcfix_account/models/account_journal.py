@@ -5,6 +5,12 @@ from odoo.exceptions import UserError, ValidationError
 class AccountJournal(models.Model):
     _inherit = 'account.journal'
 
+    company_partner_id = fields.Many2one(
+        'res.partner', related='company_id.partner_id',
+        string='Account Holder', readonly=True)
+    bank_account_id = fields.Many2one(
+        domain="[('partner_id','=', company_partner_id)]")
+
     @api.multi
     def get_journal_dashboard_datas(self):
         return super(AccountJournal, self.sudo()).get_journal_dashboard_datas()
