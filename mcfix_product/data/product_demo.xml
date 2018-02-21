@@ -18,6 +18,10 @@
             <field name="company_id"></field>
         </record>
 
+        <record id="product.product_product_7" model="product.product">
+            <field name="company_id"></field>
+        </record>
+
         <record id="product.product_product_9" model="product.product">
             <field name="company_id"></field>
         </record>

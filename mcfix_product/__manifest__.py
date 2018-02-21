@@ -7,7 +7,7 @@
     'website': 'http://www.eficent.com',
     'license': 'LGPL-3',
     'depends': ['product', 'mcfix_base_setup'],
-    'data': [
+    'demo': [
         'data/product_demo.xml',
     ],
     'sequence': 30,
