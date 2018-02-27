@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_advance_payment_inv" model="ir.ui.view">
+        <field name="name">Invoice Orders</field>
+        <field name="model">sale.advance.payment.inv</field>
+        <field name="inherit_id" ref="sale.view_sale_advance_payment_inv"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='deposit_account_id']" position="before">
+                <field name="company_ids" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='deposit_account_id']" position="attributes">
+                <attribute name="domain">[('company_id','in',company_ids)]</attribute>
+            </xpath>
+            <xpath expr="//field[@name='deposit_taxes_id']" position="attributes">
+                <attribute name="domain">[('type_tax_use','=','sale'), ('company_id','in',company_ids)]</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
