@@ -15,6 +15,13 @@ class AccountMove(models.Model):
         res = self.add_company_suffix(names)
         return res
 
+    @api.model
+    def create(self, vals):
+        if self._context.get('company_id'):
+            vals['company_id'] = self._context.get('company_id')
+        move = super(AccountMove, self).create(vals)
+        return move
+
     @api.multi
     @api.onchange('company_id')
     def _onchange_company_id(self):

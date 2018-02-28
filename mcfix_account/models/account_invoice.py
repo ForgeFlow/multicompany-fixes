@@ -328,6 +328,11 @@ class AccountInvoiceLine(models.Model):
                     _('The Company in the Account Invoice Line and in '
                       'Account Account must be the same.'))
 
+    @api.constrains('company_id')
+    def _check_company_id_out_model(self):
+        """To be used by other modules"""
+        pass
+
 
 class AccountInvoiceTax(models.Model):
     _inherit = "account.invoice.tax"
