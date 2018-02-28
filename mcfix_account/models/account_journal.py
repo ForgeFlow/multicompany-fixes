@@ -6,6 +6,14 @@ class AccountJournal(models.Model):
     _inherit = 'account.journal'
 
     @api.multi
+    def action_open_reconcile(self):
+        if self.type in ['bank', 'cash']:
+            if len(self.mapped('company_id').ids) > 1:
+                raise UserError(
+                    _('All journals should be of the same company.'))
+        return super(AccountJournal, self).action_open_reconcile()
+
+    @api.multi
     @api.depends('company_id')
     def name_get(self):
         names = super(AccountJournal, self).name_get()

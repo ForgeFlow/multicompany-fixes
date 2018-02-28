@@ -12,19 +12,15 @@ class AccountBankStatement(models.Model):
         res = super(AccountBankStatement,
                     self).reconciliation_widget_preprocess()
         statements = self
-        child_companies = self.env.user.company_id.child_ids
-        if not child_companies:
-            return res
-        child_company_ids = child_companies and tuple(child_companies.ids)
-
         sql_query = """SELECT stl.id
                         FROM account_bank_statement_line stl
                         WHERE account_id IS NULL AND stl.amount != 0.0 AND
                         not exists (select 1 from account_move_line aml where
                         aml.statement_line_id = stl.id)
-                            AND company_id in %s
+                            AND company_id = %s
                             """
-        params = (child_company_ids,)
+        company_id = statements.mapped('company_id').ids[0]
+        params = (company_id,)  # All statements have same company
         if statements:
             sql_query += 'AND stl.statement_id IN %s'
             params += (tuple(statements.ids),)
@@ -46,7 +42,7 @@ class AccountBankStatement(models.Model):
                                 ON acc.id = aml.account_id
                                 JOIN account_bank_statement_line stl
                                 ON aml.ref = stl.name
-                            WHERE (aml.company_id in %s
+                            WHERE (aml.company_id = %s
                                 AND aml.partner_id IS NOT NULL)
                                 AND (
                                     (aml.statement_id IS NULL
@@ -58,7 +54,7 @@ class AccountBankStatement(models.Model):
                                     )
                                 AND aml.ref IN %s
                                 """
-            params = (child_company_ids, (
+            params = (company_id, (
                 st_lines_left[0].journal_id.default_credit_account_id.id,
                 st_lines_left[0].journal_id.default_debit_account_id.id),
                 tuple(refs))
@@ -72,7 +68,7 @@ class AccountBankStatement(models.Model):
                 st_line.browse(line.get('id')).write(
                     {'partner_id': line.get('partner_id')})
 
-        res['st_lines_ids'] += st_lines_left.ids
+        res['st_lines_ids'] = st_lines_left.ids
         return res
 
     @api.multi
