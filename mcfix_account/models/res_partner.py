@@ -77,16 +77,6 @@ class AccountFiscalPosition(models.Model):
                         _('You cannot change the company, as this '
                           'Account Fiscal Position is assigned to '
                           'Account Invoice (%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].search(
-                    [('fiscal_position_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Fiscal Position is assigned to '
-                          'Account Invoice Report (%s)'
-                          '.' % field.name_get()[0][1]))
 
 
 class Partner(models.Model):
@@ -171,22 +161,4 @@ class Partner(models.Model):
                     raise ValidationError(
                         _('You cannot change the company, as this '
                           'Res Partner is assigned to Account Payment '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Invoice Report '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].sudo().search(
-                    [('commercial_partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Invoice Report '
                           '(%s).' % field.name_get()[0][1]))

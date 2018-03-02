@@ -166,26 +166,6 @@ class AccountAccount(models.Model):
                         _('You cannot change the company, as this '
                           'Account Account is assigned to Account Invoice Tax '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].search(
-                    [('account_line_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Invoice Report (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Invoice Report (%s)'
-                          '.' % field.name_get()[0][1]))
                 field = self.env['account.reconcile.model'].search(
                     [('second_account_id', '=', rec.id),
                      ('company_id', '!=', False),

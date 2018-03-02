@@ -61,16 +61,6 @@ class AccountAnalyticAccount(models.Model):
                         _('You cannot change the company, as this '
                           'Account Analytic Account is assigned to '
                           'Account Move Line (%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].search(
-                    [('account_analytic_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Analytic Account is assigned to '
-                          'Account Invoice Report (%s)'
-                          '.' % field.name_get()[0][1]))
 
 
 class AccountAnalyticLine(models.Model):
