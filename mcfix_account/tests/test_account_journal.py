@@ -47,14 +47,6 @@ class TestAccountJournal(TransactionCase):
                     'company_id': self.company.id,
                     })
 
-        self.bank_journal = self.journal_model.sudo(self.user).create({
-            'name': 'Bank Journal 1 - Test',
-            'code': 'test_bank_1',
-            'type': 'bank',
-            'company_id': self.company.id,
-            'bank_account_id': self.partner_bank.id,
-        })
-
     def create_full_access(self, list_of_models):
         manager_account_test_group = self.env['res.groups'].sudo().create({
             'name': 'group_manager_product_test'
@@ -86,4 +78,11 @@ class TestAccountJournal(TransactionCase):
         self.assertEqual(self.bank_journal.bank_account_id, self.partner_bank)
 
     def test_constrains(self):
+        self.bank_journal = self.journal_model.sudo(self.user).create({
+            'name': 'Bank Journal 1 - Test',
+            'code': 'test_bank_1',
+            'type': 'bank',
+            'company_id': self.company.id,
+            'bank_account_id': self.partner_bank.id,
+        })
         self.bank_journal.company_id = self.company_2

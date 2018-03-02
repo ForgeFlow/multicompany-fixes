@@ -6,6 +6,10 @@ class AccountJournal(models.Model):
     _inherit = 'account.journal'
 
     @api.multi
+    def get_journal_dashboard_datas(self):
+        return super(AccountJournal, self.sudo()).get_journal_dashboard_datas()
+
+    @api.multi
     def action_open_reconcile(self):
         if self.type in ['bank', 'cash']:
             if len(self.mapped('company_id').ids) > 1:
@@ -56,7 +60,7 @@ class AccountJournal(models.Model):
                 elif journal.refund_sequence_id.company_id.id != vals[
                         'company_id']:
                     journal.refund_sequence_id.with_context(
-                        bypass_company_validation=True).write(
+                        bypass_company_validation=True).sudo().write(
                         {'company_id': vals['company_id']})
                 if journal.default_debit_account_id.company_id.id != vals[
                         'company_id']:
@@ -271,13 +275,3 @@ class AccountJournal(models.Model):
                         _('You cannot change the company, as this '
                           'Account Journal is assigned to Account Payment '
                           '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.report'].search(
-                    [('journal_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Journal is assigned to '
-                          'Account Invoice Report (%s)'
-                          '.' % field.name_get()[0][1]))
