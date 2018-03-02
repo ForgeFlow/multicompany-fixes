@@ -75,7 +75,7 @@ class TestPaymentAcquirer(TransactionCase):
         return manager_account_test_group
 
     def test_onchanges(self):
-        self.payment_acquirer = self.payment_acquirer_model.sudo(self.user).\
+        self.payment_acquirer = self.payment_acquirer_model.sudo().\
             new({
                 'name': 'Payment Acquirer 1 - Test',
                 'journal_id': self.bank_journal.id,
@@ -86,7 +86,7 @@ class TestPaymentAcquirer(TransactionCase):
         self.assertFalse(self.payment_acquirer.journal_id)
 
     def test_constrains(self):
-        self.payment_acquirer = self.payment_acquirer_model.sudo(self.user).\
+        self.payment_acquirer = self.payment_acquirer_model.sudo().\
             create({
                 'name': 'Payment Acquirer 1 - Test',
                 'journal_id': self.bank_journal.id,
