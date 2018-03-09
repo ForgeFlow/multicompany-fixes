@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="point_of_sale.boni_orange" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.papillon_orange" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.citron" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.limon" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.pamplemousse_rouge_pamplemousse" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.pomme_granny_smith" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.pomme_jonagold" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.pomme_golden_perlim" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.poire_conference" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.peche" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.raisins_noir" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.pomme_de_terre" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.chicon_flandria_extra" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.carotte" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.tomate_en_grappe" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.Onions" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.poivron_rouges" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.poivron_verts" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.poivron_jaunes" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.poireaux_poireaux" model="product.product">
+            <field name="company_id"/>
+        </record>
+        <record id="point_of_sale.courgette" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+
+        <record id="point_of_sale.partner_product_3" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.partner_product_4" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.partner_product_5" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.partner_product_6" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.partner_product_7" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.partner_product_8" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+        <record id="point_of_sale.partner_product_9" model="product.product">
+            <field name="company_id"/>
+        </record>
+</odoo>
