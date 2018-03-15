@@ -7,6 +7,8 @@ class Warehouse(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
+        if not self.name:
+            self.name = self.company_id.name
         if self.company_id and self.partner_id.company_id and \
                 self.partner_id.company_id != self.company_id:
             self.partner_id = self.company_id.partner_id

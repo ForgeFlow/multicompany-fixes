@@ -27,12 +27,25 @@ class AccountInvoice(models.Model):
 
     @api.onchange('partner_id', 'company_id')
     def _onchange_partner_id(self):
-        super(AccountInvoice, self)._onchange_partner_id()
+        res = super(AccountInvoice, self)._onchange_partner_id()
+        company_id = self.company_id.id
         addr = self.partner_id.address_get(['delivery'])
         self.fiscal_position_id = self.env['account.fiscal.position']. \
-            with_context(force_company=self.company_id.id). \
+            with_context(force_company=company_id). \
             get_fiscal_position(self.partner_id.id,
                                 delivery_id=addr['delivery'])
+        domain = {}
+        p = self.partner_id if not company_id else \
+            self.partner_id.with_context(force_company=company_id)
+        if self.type in ('in_invoice', 'out_refund'):
+            bank_ids = p.commercial_partner_id.bank_ids.filtered(
+                lambda b: b.company_id.id == company_id)
+            bank_id = bank_ids[0].id if bank_ids else False
+            self.partner_bank_id = bank_id
+            domain = {'partner_bank_id': [('id', 'in', bank_ids.ids)]}
+        if domain:
+            res['domain'] = domain
+        return res
 
     @api.onchange('company_id')
     def _onchange_company_id(self):

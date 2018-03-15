@@ -1,5 +1,20 @@
-from odoo import api, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
+
+
+class PickingType(models.Model):
+    _inherit = "stock.picking.type"
+
+    company_id = fields.Many2one(
+        'res.company', related='warehouse_id.company_id', string='Company',
+        readonly=True, default=lambda self: self.env.user.company_id)
+
+    @api.multi
+    @api.depends('company_id')
+    def name_get(self):
+        names = super(PickingType, self).name_get()
+        res = self.add_company_suffix(names)
+        return res
 
 
 class Picking(models.Model):
@@ -26,8 +41,16 @@ class Picking(models.Model):
             if self.company_id and self.picking_type_id.warehouse_id.\
                     company_id and self.picking_type_id.warehouse_id.\
                     company_id != self.company_id:
-                self._cache.update(self._convert_to_cache(
-                    {'picking_type_id': False}, update=True))
+                self.picking_type_id = self.env['stock.picking.type'].search(
+                    [('code', '=', self.picking_type_id.code),
+                     ('warehouse_id.company_id', '=', self.company_id.id)],
+                    limit=1)
+                if not self.picking_type_id:
+                    self.picking_type_id = self.env['stock.picking.type'].\
+                        search(
+                        [('code', '=', self.picking_type_id.code),
+                         ('warehouse_id', '=', False)],
+                        limit=1)
             if self.company_id and self.partner_id.company_id and \
                     self.partner_id.company_id != self.company_id:
                 self.partner_id = False
