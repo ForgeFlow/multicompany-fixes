@@ -267,10 +267,11 @@ class StockMoveLine(models.Model):
         'res.company', compute='_compute_company_id', string='Company',
         readonly=True, store=False)
 
-    @api.one
+    @api.multi
     @api.depends('move_id')
     def _compute_company_id(self):
-        if self.move_id:
-            self.company_id = self.move_id.company_id
-        else:
-            self.company_id = self.env.user.company_id
+        for line in self:
+            if line.move_id:
+                line.company_id = line.move_id.company_id
+            else:
+                line.company_id = line.env.user.company_id
