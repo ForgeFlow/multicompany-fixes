@@ -56,8 +56,8 @@ class ReportOverdue(models.AbstractModel):
     def get_report_values(self, docids, data=None):
         res = super(ReportOverdue, self).\
             get_report_values(docids=docids, data=data)
-        res['company_id'] = self.env['res.company'].browse(
-            [self.env.user.company_id.id]),
+        res.update({'company_id': self.env['res.company'].browse(
+            [self.env.user.company_id.id])}),
         return res
 
 
