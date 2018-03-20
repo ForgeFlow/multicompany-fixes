@@ -3,7 +3,13 @@
 
     <template id="internal_layout" inherit_id="web.internal_layout">
         <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company_id"/>
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+                <t t-set="res_company" t-value="company_id"/>
+            </t>
+            <t t-if="not company_id">
+                <t t-set="company" t-value="res_company"/>
+            </t>
         </xpath>
     </template>
 
