@@ -23,9 +23,10 @@ class PurchaseOrder(models.Model):
         res = super(PurchaseOrder, self.with_context(
             force_company=self.company_id.id)).onchange_partner_id()
         if self.partner_id:
-            self.currency_id = \
-                self.partner_id.property_purchase_currency_id.id or \
+            self.currency_id = (
+                self.partner_id.property_purchase_currency_id.id or
                 self.company_id.currency_id.id
+            )
         return res
 
     @api.multi
@@ -45,12 +46,6 @@ class PurchaseOrder(models.Model):
         if self.company_id and self.partner_id.company_id and \
                 self.partner_id.company_id != self.company_id:
             self.partner_id = False
-        if self.company_id and self.fiscal_position_id.company_id and \
-                self.fiscal_position_id.company_id != self.company_id:
-            self.fiscal_position_id = False
-        if self.company_id and self.payment_term_id.company_id and \
-                self.payment_term_id.company_id != self.company_id:
-            self.payment_term_id = False
         if self.company_id and self.dest_address_id.company_id and \
                 self.dest_address_id.company_id != self.company_id:
             self.dest_address_id = False
