@@ -193,3 +193,8 @@ class AccountBankStatementLine(models.Model):
                         _('You cannot change the company, as this '
                           'Account Bank Statement Line is assigned to '
                           'Account Move Line (%s).' % field.name_get()[0][1]))
+
+    def _prepare_reconciliation_move(self, move_ref):
+        result = super()._prepare_reconciliation_move(move_ref)
+        result['company_id'] = self.statement_id.company_id.id
+        return result
