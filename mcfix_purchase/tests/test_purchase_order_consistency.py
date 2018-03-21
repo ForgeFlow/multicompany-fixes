@@ -86,7 +86,7 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         )
 
         self.purchase1.button_confirm()
-        self._create_invoice(self.purchase1, self.partner_1,
+        self.invoice = self._create_invoice(self.purchase1, self.partner_1,
                              self.cash_account_id)
 
     def _create_purchase(self, company, product, tax, partner):
@@ -125,9 +125,8 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
             'active_model': 'purchase.order',
             'company_id': purchase.company_id.id,
         }
-        self.env['account.invoice'].with_context(purchase_context).\
+        return self.env['account.invoice'].with_context(purchase_context).\
             create(invoice_vals)
-        return True
 
     def _create_partners(self, company):
         """ Create a Partner """
@@ -178,3 +177,4 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         with self.assertRaises(ValidationError):
             self.purchase1.order_line.\
                 write({'product_id': self.product2.id})
+        self.assertEqual(self.purchase1.company_id, self.invoice.company_id)
