@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, models, _
+from odoo import api, models, fields, _
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -101,6 +101,12 @@ class AccountMove(models.Model):
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
+
+    # It is non-sensical for account_move_lines to be
+    # have a write access to company_id on account.account.
+    # It causes unnecessary write calls to account.account
+    # and constraint validations.
+    company_id = fields.Many2one(readonly=True)
 
     @api.multi
     @api.depends('company_id')
