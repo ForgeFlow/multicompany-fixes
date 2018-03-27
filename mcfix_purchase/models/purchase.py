@@ -35,14 +35,17 @@ class PurchaseOrder(models.Model):
         res['context']['default_company_id'] = self.company_id.id
         return res
 
+    def set_picking_type(self):
+        self.picking_type_id = self.with_context(
+            company_id=self.company_id.id
+        )._default_picking_type()
+
     @api.onchange('company_id')
     def _onchange_company_id(self):
         if self.company_id and self.picking_type_id.warehouse_id.\
                 company_id and self.picking_type_id.warehouse_id.\
                 company_id != self.company_id:
-            self.picking_type_id = \
-                self.with_context(company_id=self.company_id.id).\
-                _default_picking_type()
+            self.set_picking_type()
         if self.company_id and self.partner_id.company_id and \
                 self.partner_id.company_id != self.company_id:
             self.partner_id = False
@@ -230,3 +233,8 @@ class PurchaseOrderLine(models.Model):
                           'Purchase Order Line is assigned to '
                           'Account Invoice Line (%s)'
                           '.' % field.name_get()[0][1]))
+
+    def _suggest_quantity(self):
+        self.taxes_id = self.taxes_id.filtered(
+            lambda r: r.company_id == self.order_id.company_id)
+        return super()._suggest_quantity()
