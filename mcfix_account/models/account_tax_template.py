@@ -59,8 +59,7 @@ class AccountTaxTemplate(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if self.company_id and self.chart_template_id.company_id and \
-                self.chart_template_id.company_id != self.company_id:
+        if not self.chart_template_id.check_company(self.company_id):
             if self.company_id.chart_template_id:
                 self._cache.update(self._convert_to_cache(
                     {'chart_template_id': self.company_id.chart_template_id},
@@ -71,8 +70,7 @@ class AccountTaxTemplate(models.Model):
     def _check_company_id_children_tax_ids(self):
         for rec in self.sudo():
             for line in rec.children_tax_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Account Tax Template and in '
                           'Account Tax Template (%s) must be '
@@ -82,25 +80,24 @@ class AccountTaxTemplate(models.Model):
     @api.constrains('company_id', 'chart_template_id')
     def _check_company_id_chart_template_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.chart_template_id.company_id and\
-                    rec.company_id != rec.chart_template_id.company_id:
+            if not rec.chart_template_id.check_company(
+                    rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Tax Template and in '
                       'Account Chart Template must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.search(
-                    [('children_tax_ids', 'in', [rec.id]),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Tax Template is assigned to '
-                          'Account Tax Template (%s)'
-                          '.' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [self.children_tax_ids, ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res += [
+            ('account.tax.template', [('children_tax_ids', 'in', self.ids)]),
+        ]
+        return res
