@@ -80,7 +80,7 @@ class AccountTaxTemplate(models.Model):
     @api.constrains('company_id', 'chart_template_id')
     def _check_company_id_chart_template_id(self):
         for rec in self.sudo():
-            if not rec.chart_template_id.company_id.check_company(
+            if not rec.chart_template_id.check_company(
                     rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Tax Template and in '

@@ -57,7 +57,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'wh_input_stock_loc_id')
     def _check_company_id_wh_input_stock_loc_id(self):
         for rec in self.sudo():
-            if not rec.wh_input_stock_loc_id.company_id.check_company(
+            if not rec.wh_input_stock_loc_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -68,7 +68,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'crossdock_route_id')
     def _check_company_id_crossdock_route_id(self):
         for rec in self.sudo():
-            if not rec.crossdock_route_id.company_id.check_company(
+            if not rec.crossdock_route_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -90,7 +90,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'default_resupply_wh_id')
     def _check_company_id_default_resupply_wh_id(self):
         for rec in self.sudo():
-            if not rec.default_resupply_wh_id.company_id.check_company(
+            if not rec.default_resupply_wh_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -101,7 +101,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'wh_qc_stock_loc_id')
     def _check_company_id_wh_qc_stock_loc_id(self):
         for rec in self.sudo():
-            if not rec.wh_qc_stock_loc_id.company_id.check_company(
+            if not rec.wh_qc_stock_loc_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -112,7 +112,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'reception_route_id')
     def _check_company_id_reception_route_id(self):
         for rec in self.sudo():
-            if not rec.reception_route_id.company_id.check_company(
+            if not rec.reception_route_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -123,7 +123,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'mto_pull_id')
     def _check_company_id_mto_pull_id(self):
         for rec in self.sudo():
-            if not rec.mto_pull_id.company_id.check_company(rec.company_id):
+            if not rec.mto_pull_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse and in '
                       'Procurement Rule must be the same.'))
@@ -132,7 +132,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'view_location_id')
     def _check_company_id_view_location_id(self):
         for rec in self.sudo():
-            if not rec.view_location_id.company_id.check_company(
+            if not rec.view_location_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -143,7 +143,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'wh_output_stock_loc_id')
     def _check_company_id_wh_output_stock_loc_id(self):
         for rec in self.sudo():
-            if not rec.wh_output_stock_loc_id.company_id.check_company(
+            if not rec.wh_output_stock_loc_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -154,7 +154,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.company_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse and in '
                       'Res Partner must be the same.'))
@@ -163,7 +163,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'lot_stock_id')
     def _check_company_id_lot_stock_id(self):
         for rec in self.sudo():
-            if not rec.lot_stock_id.company_id.check_company(rec.company_id):
+            if not rec.lot_stock_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse and in '
                       'Stock Location must be the same.'))
@@ -172,7 +172,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'wh_pack_stock_loc_id')
     def _check_company_id_wh_pack_stock_loc_id(self):
         for rec in self.sudo():
-            if not rec.wh_pack_stock_loc_id.company_id.check_company(
+            if not rec.wh_pack_stock_loc_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -194,7 +194,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'delivery_route_id')
     def _check_company_id_delivery_route_id(self):
         for rec in self.sudo():
-            if not rec.delivery_route_id.company_id.check_company(
+            if not rec.delivery_route_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -243,7 +243,7 @@ class Orderpoint(models.Model):
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if not rec.location_id.company_id.check_company(rec.company_id):
+            if not rec.location_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse Orderpoint and in '
                       'Stock Location must be the same.'))
@@ -252,7 +252,7 @@ class Orderpoint(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if not rec.warehouse_id.company_id.check_company(rec.company_id):
+            if not rec.warehouse_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse Orderpoint and in '
                       'Stock Warehouse must be the same.'))
@@ -261,7 +261,7 @@ class Orderpoint(models.Model):
     @api.constrains('company_id', 'product_id')
     def _check_company_id_product_id(self):
         for rec in self.sudo():
-            if not rec.product_id.company_id.check_company(rec.company_id):
+            if not rec.product_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse Orderpoint and in '
                       'Product Product must be the same.'))

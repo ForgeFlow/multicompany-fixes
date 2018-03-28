@@ -15,7 +15,7 @@ class Warehouse(models.Model):
     @api.constrains('company_id', 'buy_pull_id')
     def _check_company_id_buy_pull_id(self):
         for rec in self.sudo():
-            if not rec.buy_pull_id.company_id.check_company(rec.company_id):
+            if not rec.buy_pull_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse and in '
                       'Procurement Rule must be the same.'))

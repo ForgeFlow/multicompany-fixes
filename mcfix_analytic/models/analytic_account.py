@@ -21,7 +21,7 @@ class AccountAnalyticAccount(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.company_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Analytic Account and in '
                       'Res Partner must be the same.'))
@@ -43,7 +43,7 @@ class AccountAnalyticLine(models.Model):
     @api.constrains('company_id', 'account_id')
     def _check_company_id_account_id(self):
         for rec in self.sudo():
-            if not rec.account_id.company_id.check_company(rec.company_id):
+            if not rec.account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Analytic Line and in '
                       'Account Analytic Account must be the same.'))

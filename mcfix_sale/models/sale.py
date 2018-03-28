@@ -43,7 +43,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'team_id')
     def _check_company_id_team_id(self):
         for rec in self.sudo():
-            if not rec.team_id.company_id.check_company(rec.company_id):
+            if not rec.team_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Sale Order and in '
                       'Crm Team must be the same.'))
@@ -52,7 +52,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'partner_invoice_id')
     def _check_company_id_partner_invoice_id(self):
         for rec in self.sudo():
-            if not rec.partner_invoice_id.company_id.check_company(
+            if not rec.partner_invoice_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -63,7 +63,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'partner_shipping_id')
     def _check_company_id_partner_shipping_id(self):
         for rec in self.sudo():
-            if not rec.partner_shipping_id.company_id.check_company(
+            if not rec.partner_shipping_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -74,7 +74,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'fiscal_position_id')
     def _check_company_id_fiscal_position_id(self):
         for rec in self.sudo():
-            if not rec.fiscal_position_id.company_id.check_company(
+            if not rec.fiscal_position_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -85,7 +85,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'pricelist_id')
     def _check_company_id_pricelist_id(self):
         for rec in self.sudo():
-            if not rec.pricelist_id.company_id.check_company(rec.company_id):
+            if not rec.pricelist_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Sale Order and in '
                       'Product Pricelist must be the same.'))
@@ -94,7 +94,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.company_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Sale Order and in '
                       'Res Partner must be the same.'))
@@ -103,7 +103,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'analytic_account_id')
     def _check_company_id_analytic_account_id(self):
         for rec in self.sudo():
-            if not rec.analytic_account_id.company_id.check_company(
+            if not rec.analytic_account_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -125,7 +125,7 @@ class SaleOrder(models.Model):
     @api.constrains('company_id', 'payment_term_id')
     def _check_company_id_payment_term_id(self):
         for rec in self.sudo():
-            if not rec.payment_term_id.company_id.check_company(
+            if not rec.payment_term_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -174,7 +174,7 @@ class SaleOrderLine(models.Model):
     @api.constrains('company_id', 'product_id')
     def _check_company_id_product_id(self):
         for rec in self.sudo():
-            if not rec.product_id.company_id.check_company(rec.company_id):
+            if not rec.product_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Sale Order Line and in '
                       'Product Product must be the same.'))
@@ -194,7 +194,7 @@ class SaleOrderLine(models.Model):
     @api.constrains('company_id', 'order_id')
     def _check_company_id_order_id(self):
         for rec in self.sudo():
-            if not rec.order_id.company_id.check_company(rec.company_id):
+            if not rec.order_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Sale Order Line and in '
                       'Sale Order must be the same.'))

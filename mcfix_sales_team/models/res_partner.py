@@ -15,7 +15,7 @@ class Partner(models.Model):
     @api.constrains('company_id', 'team_id')
     def _check_company_id_team_id(self):
         for rec in self.sudo():
-            if not rec.team_id.company_id.check_company(rec.company_id):
+            if not rec.team_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Res Partner and in '
                       'Crm Team must be the same.'))

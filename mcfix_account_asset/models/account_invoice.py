@@ -20,7 +20,7 @@ class AccountInvoiceLine(models.Model):
     @api.constrains('company_id', 'asset_category_id')
     def _check_company_id_asset_category_id(self):
         for rec in self.sudo():
-            if not rec.asset_category_id.company_id.check_company(
+            if not rec.asset_category_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(

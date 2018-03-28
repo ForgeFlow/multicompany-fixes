@@ -65,7 +65,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if not rec.warehouse_id.company_id.check_company(rec.company_id):
+            if not rec.warehouse_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Stock Warehouse must be the same.'))
@@ -74,7 +74,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'product_id')
     def _check_company_id_product_id(self):
         for rec in self.sudo():
-            if not rec.product_id.company_id.check_company(rec.company_id):
+            if not rec.product_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Product Product must be the same.'))
@@ -83,7 +83,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'picking_id')
     def _check_company_id_picking_id(self):
         for rec in self.sudo():
-            if not rec.picking_id.company_id.check_company(rec.company_id):
+            if not rec.picking_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Stock Picking must be the same.'))
@@ -92,7 +92,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'restrict_partner_id')
     def _check_company_id_restrict_partner_id(self):
         for rec in self.sudo():
-            if not rec.restrict_partner_id.company_id.check_company(
+            if not rec.restrict_partner_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -103,7 +103,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'rule_id')
     def _check_company_id_rule_id(self):
         for rec in self.sudo():
-            if not rec.rule_id.company_id.check_company(rec.company_id):
+            if not rec.rule_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Procurement Rule must be the same.'))
@@ -112,7 +112,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if not rec.location_id.company_id.check_company(rec.company_id):
+            if not rec.location_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Stock Location must be the same.'))
@@ -121,7 +121,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.company_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Res Partner must be the same.'))
@@ -130,7 +130,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'inventory_id')
     def _check_company_id_inventory_id(self):
         for rec in self.sudo():
-            if not rec.inventory_id.company_id.check_company(rec.company_id):
+            if not rec.inventory_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Stock Inventory must be the same.'))
@@ -139,7 +139,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'location_dest_id')
     def _check_company_id_location_dest_id(self):
         for rec in self.sudo():
-            if not rec.location_dest_id.company_id.check_company(
+            if not rec.location_dest_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -161,7 +161,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'push_rule_id')
     def _check_company_id_push_rule_id(self):
         for rec in self.sudo():
-            if not rec.push_rule_id.company_id.check_company(rec.company_id):
+            if not rec.push_rule_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Move and in '
                       'Stock Location Path must be the same.'))
@@ -170,7 +170,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'origin_returned_move_id')
     def _check_company_id_origin_returned_move_id(self):
         for rec in self.sudo():
-            if not rec.origin_returned_move_id.company_id.check_company(
+            if not rec.origin_returned_move_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(

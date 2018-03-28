@@ -9,7 +9,7 @@ class AccountPartialReconcile(models.Model):
     @api.constrains('company_id', 'credit_move_id')
     def _check_company_id_credit_move_id(self):
         for rec in self.sudo():
-            if not rec.credit_move_id.company_id.check_company(rec.company_id):
+            if not rec.credit_move_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Partial Reconcile and in '
                       'Account Move Line must be the same.'))
@@ -18,7 +18,7 @@ class AccountPartialReconcile(models.Model):
     @api.constrains('company_id', 'debit_move_id')
     def _check_company_id_debit_move_id(self):
         for rec in self.sudo():
-            if not rec.debit_move_id.company_id.check_company(rec.company_id):
+            if not rec.debit_move_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Partial Reconcile and in '
                       'Account Move Line must be the same.'))
@@ -64,7 +64,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'second_analytic_account_id')
     def _check_company_id_second_analytic_account_id(self):
         for rec in self.sudo():
-            if not rec.second_analytic_account_id.company_id.check_company(
+            if not rec.second_analytic_account_id.check_company(
                     rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Reconcile Model and in '
@@ -74,7 +74,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'second_account_id')
     def _check_company_id_second_account_id(self):
         for rec in self.sudo():
-            if not rec.second_account_id.company_id.check_company(
+            if not rec.second_account_id.check_company(
                     rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Reconcile Model and in '
@@ -84,7 +84,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'account_id')
     def _check_company_id_account_id(self):
         for rec in self.sudo():
-            if not rec.account_id.company_id.check_company(rec.company_id):
+            if not rec.account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Reconcile Model and in '
                       'Account Account must be the same.'))
@@ -93,7 +93,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'second_journal_id')
     def _check_company_id_second_journal_id(self):
         for rec in self.sudo():
-            if not rec.second_journal_id.company_id.check_company(
+            if not rec.second_journal_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -104,7 +104,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'tax_id')
     def _check_company_id_tax_id(self):
         for rec in self.sudo():
-            if not rec.tax_id.company_id.check_company(rec.company_id):
+            if not rec.tax_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Reconcile Model and in '
                       'Account Tax must be the same.'))
@@ -113,7 +113,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'second_tax_id')
     def _check_company_id_second_tax_id(self):
         for rec in self.sudo():
-            if not rec.second_tax_id.company_id.check_company(rec.company_id):
+            if not rec.second_tax_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Reconcile Model and in '
                       'Account Tax must be the same.'))
@@ -122,7 +122,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'analytic_account_id')
     def _check_company_id_analytic_account_id(self):
         for rec in self.sudo():
-            if not rec.analytic_account_id.company_id.check_company(
+            if not rec.analytic_account_id.check_company(
                     rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Reconcile Model and in '
@@ -132,7 +132,7 @@ class AccountReconcileModel(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.company_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Reconcile Model and in '
                       'Account Journal must be the same.'))

@@ -28,7 +28,7 @@ class AccountAssetCategory(models.Model):
     @api.constrains('company_id', 'account_analytic_id')
     def _check_company_id_account_analytic_id(self):
         for rec in self.sudo():
-            if not rec.account_analytic_id.company_id.check_company(
+            if not rec.account_analytic_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -39,7 +39,7 @@ class AccountAssetCategory(models.Model):
     @api.constrains('company_id', 'account_depreciation_id')
     def _check_company_id_account_depreciation_id(self):
         for rec in self.sudo():
-            if not rec.account_depreciation_id.company_id.check_company(
+            if not rec.account_depreciation_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -60,7 +60,7 @@ class AccountAssetCategory(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.company_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Asset Category and in '
                       'Account Journal must be the same.'))
@@ -69,7 +69,7 @@ class AccountAssetCategory(models.Model):
     @api.constrains('company_id', 'account_asset_id')
     def _check_company_id_account_asset_id(self):
         for rec in self.sudo():
-            if not rec.account_asset_id.company_id.check_company(
+            if not rec.account_asset_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -112,7 +112,7 @@ class AccountAssetAsset(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.company_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Asset Asset and in '
                       'Res Partner must be the same.'))
@@ -121,7 +121,7 @@ class AccountAssetAsset(models.Model):
     @api.constrains('company_id', 'invoice_id')
     def _check_company_id_invoice_id(self):
         for rec in self.sudo():
-            if not rec.invoice_id.company_id.check_company(rec.company_id):
+            if not rec.invoice_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Asset Asset and in '
                       'Account Invoice must be the same.'))
@@ -130,7 +130,7 @@ class AccountAssetAsset(models.Model):
     @api.constrains('company_id', 'category_id')
     def _check_company_id_category_id(self):
         for rec in self.sudo():
-            if not rec.category_id.company_id.check_company(rec.company_id):
+            if not rec.category_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Asset Asset and in '
                       'Account Asset Category must be the same.'))

@@ -24,7 +24,7 @@ class AccountInvoice(models.Model):
     @api.constrains('company_id', 'partner_shipping_id')
     def _check_company_id_partner_shipping_id(self):
         for rec in self.sudo():
-            if not rec.partner_shipping_id.company_id.check_company(
+            if not rec.partner_shipping_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -35,7 +35,7 @@ class AccountInvoice(models.Model):
     @api.constrains('company_id', 'team_id')
     def _check_company_id_team_id(self):
         for rec in self.sudo():
-            if not rec.team_id.company_id.check_company(rec.company_id):
+            if not rec.team_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Invoice and in '
                       'Crm Team must be the same.'))

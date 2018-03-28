@@ -19,7 +19,7 @@ class StockLocation(models.Model):
     @api.constrains('company_id', 'valuation_in_account_id')
     def _check_company_id_valuation_in_account_id(self):
         for rec in self.sudo():
-            if not rec.valuation_in_account_id.company_id.check_company(
+            if not rec.valuation_in_account_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -30,7 +30,7 @@ class StockLocation(models.Model):
     @api.constrains('company_id', 'valuation_out_account_id')
     def _check_company_id_valuation_out_account_id(self):
         for rec in self.sudo():
-            if not rec.valuation_out_account_id.company_id.check_company(
+            if not rec.valuation_out_account_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(

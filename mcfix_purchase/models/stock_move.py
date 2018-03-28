@@ -20,7 +20,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'created_purchase_line_id')
     def _check_company_id_created_purchase_line_id(self):
         for rec in self.sudo():
-            if not rec.created_purchase_line_id.company_id.check_company(
+            if not rec.created_purchase_line_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -31,7 +31,7 @@ class StockMove(models.Model):
     @api.constrains('company_id', 'purchase_line_id')
     def _check_company_id_purchase_line_id(self):
         for rec in self.sudo():
-            if not rec.purchase_line_id.company_id.check_company(
+            if not rec.purchase_line_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(

@@ -30,7 +30,7 @@ class AccountAnalyticLine(models.Model):
     @api.constrains('company_id', 'product_id')
     def _check_company_id_product_id(self):
         for rec in self.sudo():
-            if not rec.product_id.company_id.check_company(rec.company_id):
+            if not rec.product_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Analytic Line and in '
                       'Product Product must be the same.'))
@@ -39,7 +39,7 @@ class AccountAnalyticLine(models.Model):
     @api.constrains('company_id', 'move_id')
     def _check_company_id_move_id(self):
         for rec in self.sudo():
-            if not rec.move_id.company_id.check_company(rec.company_id):
+            if not rec.move_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Analytic Line and in '
                       'Account Move Line must be the same.'))

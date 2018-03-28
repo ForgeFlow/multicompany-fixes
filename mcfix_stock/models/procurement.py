@@ -24,7 +24,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if not rec.location_id.company_id.check_company(rec.company_id):
+            if not rec.location_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Procurement Rule and in '
                       'Stock Location must be the same.'))
@@ -33,7 +33,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'route_id')
     def _check_company_id_route_id(self):
         for rec in self.sudo():
-            if not rec.route_id.company_id.check_company(rec.company_id):
+            if not rec.route_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Procurement Rule and in '
                       'Stock Location Route must be the same.'))
@@ -42,7 +42,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'partner_address_id')
     def _check_company_id_partner_address_id(self):
         for rec in self.sudo():
-            if not rec.partner_address_id.company_id.check_company(
+            if not rec.partner_address_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -53,7 +53,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if not rec.warehouse_id.company_id.check_company(rec.company_id):
+            if not rec.warehouse_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Procurement Rule and in '
                       'Stock Warehouse must be the same.'))
@@ -62,7 +62,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'propagate_warehouse_id')
     def _check_company_id_propagate_warehouse_id(self):
         for rec in self.sudo():
-            if not rec.propagate_warehouse_id.company_id.check_company(
+            if not rec.propagate_warehouse_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -73,7 +73,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'location_src_id')
     def _check_company_id_location_src_id(self):
         for rec in self.sudo():
-            if not rec.location_src_id.company_id.check_company(
+            if not rec.location_src_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(

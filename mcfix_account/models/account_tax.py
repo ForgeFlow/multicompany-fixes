@@ -58,7 +58,7 @@ class AccountTax(models.Model):
     @api.constrains('company_id', 'cash_basis_account')
     def _check_company_id_cash_basis_account(self):
         for rec in self.sudo():
-            if not rec.cash_basis_account.company_id.check_company(
+            if not rec.cash_basis_account.check_company(
                     rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Tax and in '
@@ -68,7 +68,7 @@ class AccountTax(models.Model):
     @api.constrains('company_id', 'refund_account_id')
     def _check_company_id_refund_account_id(self):
         for rec in self.sudo():
-            if not rec.refund_account_id.company_id.check_company(
+            if not rec.refund_account_id.check_company(
                     rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Tax and in '
@@ -89,7 +89,7 @@ class AccountTax(models.Model):
     @api.constrains('company_id', 'account_id')
     def _check_company_id_account_id(self):
         for rec in self.sudo():
-            if not rec.account_id.company_id.check_company(rec.company_id):
+            if not rec.account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Tax and in '
                       'Account Account must be the same.'))

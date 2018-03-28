@@ -9,7 +9,7 @@ class ProductTemplate(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if not rec.warehouse_id.company_id.check_company(rec.company_id):
+            if not rec.warehouse_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Product Template and in '
                       'Stock Warehouse must be the same.'))
@@ -39,7 +39,7 @@ class ProductTemplate(models.Model):
     def _check_company_id_route_ids(self):
         for rec in self.sudo():
             for line in rec.route_ids:
-                if not line.company_id.check_company(rec.company_id):
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Product Template and in '
                           'Stock Location Route (%s) must be the same.'

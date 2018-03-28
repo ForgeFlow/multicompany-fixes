@@ -50,7 +50,7 @@ class ProductProduct(models.Model):
     @api.constrains('company_id', 'product_tmpl_id')
     def _check_company_id_product_tmpl_id(self):
         for rec in self.sudo():
-            if not rec.product_tmpl_id.company_id.check_company(
+            if not rec.product_tmpl_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
