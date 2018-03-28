@@ -45,7 +45,7 @@ class Base(models.AbstractModel):
                     fields.append(self.sudo().env[model].search(domain + [
                         ('company_id', '!=', rec.company_id.id),
                         ('company_id', '!=', 'False'),
-                    ]))
+                    ], limit=1))
                 for fld in fields:
                     if not fld.check_company(rec.company_id):
                         raise ValidationError(_(
