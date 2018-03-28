@@ -204,6 +204,5 @@ class AccountJournal(models.Model):
                 [('second_journal_id', '=', self.id)]),
             self.env['account.reconcile.model'].search(
                 [('journal_id', '=', self.id)]),
-            self.invoice_line_ids,
         ]
         return res
