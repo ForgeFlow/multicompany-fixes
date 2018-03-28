@@ -4,12 +4,10 @@ from odoo import models
 class IrSequence(models.Model):
     _inherit = 'ir.sequence'
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
+    def chart_template_id(self):
+        res = super().chart_template_id()
         res = res + [
-            self.env['account.journal'].search(
-                [('refund_sequence_id', '=', self.id)]),
-            self.env['account.journal'].search(
-                [('sequence_id', '=', self.id)]),
+            ('account.journal', [('refund_sequence_id', '=', self.id)]),
+            ('account.journal', [('sequence_id', '=', self.id)]),
         ]
         return res

@@ -66,34 +66,25 @@ class AccountFiscalPosition(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res.append(self.env['account.invoice'].search(
-            [('fiscal_position_id', '=', self.id)]))
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res.append(('account.invoice', [('fiscal_position_id', '=', self.id)]))
         return res
 
 
 class Partner(models.Model):
     _inherit = 'res.partner'
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
         res = res + [
-            self.env['account.invoice'].sudo().search(
-                [('partner_id', '=', self.id)]),
-            self.env['account.invoice'].sudo().search(
-                [('commercial_partner_id', '=', self.id)]),
-            self.env['account.analytic.line'].sudo().search(
-                [('partner_id', '=', self.id)]),
-            self.env['account.invoice.line'].sudo().search(
-                [('partner_id', '=', self.id)]),
-            self.env['account.bank.statement.line'].sudo().search(
-                [('partner_id', '=', self.id)]),
-            self.env['account.move'].sudo().search(
-                [('partner_id', '=', self.id)]),
-            self.env['account.move.line'].sudo().search(
-                [('partner_id', '=', self.id)]),
-            self.env['account.payment'].sudo().search(
-                [('partner_id', '=', self.id)]),
+            ('account.invoice', [('partner_id', '=', self.id)]),
+            ('account.invoice', [('commercial_partner_id', '=', self.id)]),
+            ('account.analytic.line', [('partner_id', '=', self.id)]),
+            ('account.invoice.line', [('partner_id', '=', self.id)]),
+            ('account.bank.statement.line', [('partner_id', '=', self.id)]),
+            ('account.move', [('partner_id', '=', self.id)]),
+            ('account.move.line', [('partner_id', '=', self.id)]),
+            ('account.payment', [('partner_id', '=', self.id)]),
         ]
         return res

@@ -73,13 +73,14 @@ class AccountMove(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res.append(('account.invoice', [('move_id', '=', self.id)]))
+        return res
+
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
-        res = res + [
-            self.env['account.invoice'].search(
-                [('move_id', '=', self.id)]),
-            self.line_ids,
-        ]
+        res.append(self.line_ids)
         return res
 
 
@@ -343,10 +344,15 @@ class AccountMoveLine(models.Model):
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
         res = res + [
-            self.env['account.invoice'].search(
-                [('payment_move_line_ids', 'in', [self.id])]),
             self.analytic_line_ids,
             self.matched_debit_ids,
             self.matched_credit_ids,
+        ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res += [
+            ('account.invoice', [('payment_move_line_ids', 'in', self.ids)]),
         ]
         return res

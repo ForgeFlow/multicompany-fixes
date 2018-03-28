@@ -35,42 +35,25 @@ class AccountAccount(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res = res + [
-            self.env['account.invoice.line'].search(
-                [('account_id', '=', self.id)]),
-            self.env['account.analytic.line'].search(
-                [('general_account_id', '=', self.id)]),
-            self.env['account.move.line'].search(
-                [('account_id', '=', self.id)]),
-            self.env['account.tax'].search(
-                [('cash_basis_account', '=', self.id)]),
-            self.env['account.tax'].search(
-                [('refund_account_id', '=', self.id)]),
-            self.env['account.tax'].search(
-                [('account_id', '=', self.id)]),
-            self.env['account.payment'].search(
-                [('writeoff_account_id', '=', self.id)]),
-            self.env['account.invoice'].search(
-                [('account_id', '=', self.id)]),
-            self.env['account.invoice.tax'].search(
-                [('account_id', '=', self.id)]),
-            self.env['account.journal'].search(
-                [('account_control_ids', 'in', [self.id])]),
-            self.env['account.journal'].search(
-                [('profit_account_id', 'in', [self.id])]),
-            self.env['account.journal'].search(
-                [('loss_account_id', 'in', [self.id])]),
-            self.env['account.journal'].search(
-                [('default_credit_account_id', 'in', [self.id])]),
-            self.env['account.journal'].search(
-                [('default_debit_account_id', 'in', [self.id])]),
-            self.env['account.reconcile.model'].search(
-                [('second_account_id', '=', self.id)]),
-            self.env['account.reconcile.model'].search(
-                [('account_id', '=', self.id)]),
-            self.env['account.bank.statement.line'].search(
-                [('account_id', '=', self.id)]),
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res += [
+            ('account.invoice.line', [('account_id', '=', self.id)]),
+            ('account.analytic.line', [('general_account_id', '=', self.id)]),
+            ('account.move.line', [('account_id', '=', self.id)]),
+            ('account.tax', [('cash_basis_account', '=', self.id)]),
+            ('account.tax', [('refund_account_id', '=', self.id)]),
+            ('account.tax', [('account_id', '=', self.id)]),
+            ('account.payment', [('writeoff_account_id', '=', self.id)]),
+            ('account.invoice', [('account_id', '=', self.id)]),
+            ('account.invoice.tax', [('account_id', '=', self.id)]),
+            ('account.journal', [('account_control_ids', '=', self.id)]),
+            ('account.journal', [('profit_account_id', '=', self.id)]),
+            ('account.journal', [('loss_account_id', '=', self.id)]),
+            ('account.journal', [('default_credit_account_id', '=', self.id)]),
+            ('account.journal', [('default_debit_account_id', '=', self.id)]),
+            ('account.reconcile.model', [('second_account_id', '=', self.id)]),
+            ('account.reconcile.model', [('account_id', '=', self.id)]),
+            ('account.bank.statement.line', [('account_id', '=', self.id)]),
         ]
         return res

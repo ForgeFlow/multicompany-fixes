@@ -92,7 +92,8 @@ class AccountTaxTemplate(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res.append(self.search([('children_tax_ids', 'in', [self.id])]))
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res.append(
+            ('account.tax.template', [('children_tax_ids', 'in', [self.id])]))
         return res

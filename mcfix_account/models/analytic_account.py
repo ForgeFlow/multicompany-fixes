@@ -9,19 +9,16 @@ class AccountAnalyticAccount(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
         res = res + [
-            self.env['account.invoice.line'].search(
-                [('account_analytic_id', '=', self.id)]),
-            self.env['account.invoice.tax'].search(
-                [('account_analytic_id', '=', self.id)]),
-            self.env['account.reconcile.model'].search(
-                [('second_analytic_account_id', '=', self.id)]),
-            self.env['account.reconcile.model'].search(
-                [('analytic_account_id', '=', self.id)]),
-            self.env['account.move.line'].search(
-                [('analytic_account_id', '=', self.id)]),
+            ('account.invoice.line', [('account_analytic_id', '=', self.id)]),
+            ('account.invoice.tax', [('account_analytic_id', '=', self.id)]),
+            ('account.reconcile.model',
+             [('second_analytic_account_id', '=', self.id)]),
+            ('account.reconcile.model',
+             [('analytic_account_id', '=', self.id)]),
+            ('account.move.line', [('analytic_account_id', '=', self.id)]),
         ]
         return res
 

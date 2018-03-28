@@ -103,27 +103,19 @@ class AccountTax(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
         res = res + [
-            self.env['account.invoice.line'].search(
-                [('invoice_line_tax_ids', 'in', [self.id])]),
-            self.env['product.template'].search(
-                [('taxes_id', 'in', [self.id])]),
-            self.env['product.template'].search(
-                [('supplier_taxes_id', 'in', [self.id])]),
-            self.env['account.account'].search(
-                [('tax_ids', 'in', [self.id])]),
-            self.env['account.invoice.tax'].search(
-                [('tax_id', '=', self.id)]),
-            self.env['account.reconcile.model'].search(
-                [('tax_id', '=', self.id)]),
-            self.env['account.reconcile.model'].search(
-                [('second_tax_id', '=', self.id)]),
-            self.env['account.move.line'].search(
-                [('tax_line_id', '=', self.id)]),
-            self.env['account.move.line'].search(
-                [('tax_ids', 'in', [self.id])]),
-            self.search([('children_tax_ids', 'in', [self.id])]),
+            ('account.invoice.line',
+             [('invoice_line_tax_ids', 'in', [self.id])]),
+            ('product.template', [('taxes_id', 'in', [self.id])]),
+            ('product.template', [('supplier_taxes_id', 'in', [self.id])]),
+            ('account.account', [('tax_ids', 'in', [self.id])]),
+            ('account.invoice.tax', [('tax_id', '=', self.id)]),
+            ('account.reconcile.model', [('tax_id', '=', self.id)]),
+            ('account.reconcile.model', [('second_tax_id', '=', self.id)]),
+            ('account.move.line', [('tax_line_id', '=', self.id)]),
+            ('account.move.line', [('tax_ids', 'in', [self.id])]),
+            ('account.tax', [('children_tax_ids', 'in', [self.id])]),
         ]
         return res

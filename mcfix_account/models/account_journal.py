@@ -186,23 +186,17 @@ class AccountJournal(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
         res = res + [
-            self.env['account.invoice'].search([('journal_id', '=', self.id)]),
-            self.env['account.bank.statement'].search(
-                [('journal_id', '=', self.id)]),
-            self.env['account.bank.statement.line'].search(
-                [('journal_id', '=', self.id)]),
-            self.env['account.move'].search([('journal_id', '=', self.id)]),
-            self.env['account.payment'].search(
-                [('destination_journal_id', '=', self.id)]),
-            self.env['account.payment'].search([('journal_id', '=', self.id)]),
-            self.env['account.move.line'].search(
-                [('journal_id', '=', self.id)]),
-            self.env['account.reconcile.model'].search(
-                [('second_journal_id', '=', self.id)]),
-            self.env['account.reconcile.model'].search(
-                [('journal_id', '=', self.id)]),
+            ('account.invoice', [('journal_id', '=', self.id)]),
+            ('account.bank.statement', [('journal_id', '=', self.id)]),
+            ('account.bank.statement.line', [('journal_id', '=', self.id)]),
+            ('account.move', [('journal_id', '=', self.id)]),
+            ('account.payment', [('destination_journal_id', '=', self.id)]),
+            ('account.payment',[('journal_id', '=', self.id)]),
+            ('account.move.line', [('journal_id', '=', self.id)]),
+            ('account.reconcile.model', [('second_journal_id', '=', self.id)]),
+            ('account.reconcile.model', [('journal_id', '=', self.id)]),
         ]
         return res
