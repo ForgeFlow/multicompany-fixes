@@ -11,7 +11,8 @@ class IrDefault(models.Model):
         super(IrDefault, self).get_model_defaults(
             model_name=model_name, condition=condition)
         cr = self.env.cr
-        query = """ SELECT f.name, d.json_value FROM ir_default d
+        query = """SELECT f.name, d.json_value
+                    FROM ir_default d
                     JOIN ir_model_fields f ON d.field_id=f.id
                     JOIN res_users u ON u.id=%s
                     WHERE f.model=%s
@@ -24,10 +25,11 @@ class IrDefault(models.Model):
         params = [self.env.uid, model_name]
         if condition:
             query = query.format(id1=company, id2="d.condition=%s")
+            # pylint: disable=E8103
             params.append(condition)
         else:
             query = query.format(id1=company, id2="d.condition IS NULL")
-        # pylint: disable=E8103
+            # pylint: disable=E8103
         cr.execute(query, params)
         result = {}
         for row in cr.fetchall():

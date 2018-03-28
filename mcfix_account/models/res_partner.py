@@ -64,101 +64,27 @@ class AccountFiscalPosition(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.invoice'].search(
-                    [('fiscal_position_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Fiscal Position is assigned to '
-                          'Account Invoice (%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res.append(('account.invoice', [('fiscal_position_id', '=', self.id)]))
+        return res
 
 
 class Partner(models.Model):
     _inherit = 'res.partner'
 
-    @api.constrains('company_id')
-    def _check_company_id_out_model(self):
-        super(Partner, self)._check_company_id_out_model()
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.invoice'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Invoice '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice'].sudo().search(
-                    [('commercial_partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Invoice '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.analytic.line'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Analytic Line '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.line'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Invoice Line '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.bank.statement.line'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to '
-                          'Account Bank Statement Line (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['account.move'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Move '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.move.line'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Move Line '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.payment'].sudo().search(
-                    [('partner_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Res Partner is assigned to Account Payment '
-                          '(%s).' % field.name_get()[0][1]))
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res = res + [
+            ('account.invoice', [('partner_id', '=', self.id)]),
+            ('account.invoice', [('commercial_partner_id', '=', self.id)]),
+            ('account.analytic.line', [('partner_id', '=', self.id)]),
+            ('account.invoice.line', [('partner_id', '=', self.id)]),
+            ('account.bank.statement.line', [('partner_id', '=', self.id)]),
+            ('account.move', [('partner_id', '=', self.id)]),
+            ('account.move.line', [('partner_id', '=', self.id)]),
+            ('account.payment', [('partner_id', '=', self.id)]),
+        ]
+        return res

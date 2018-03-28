@@ -62,30 +62,15 @@ class AccountChartTemplate(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.tax.template'].search(
-                    [('chart_template_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Chart Template is assigned to '
-                          'Account Tax Template (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.search(
-                    [('parent_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Chart Template is assigned to '
-                          'Account Chart Template (%s)'
-                          '.' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res = res + [
+            ('account.tax.template', [('chart_template_id', '=', self.id)]),
+            ('account.chart.template', [('parent_id', '=', self.id)]),
+        ]
+        return res
 
 
 class WizardMultiChartsAccounts(models.TransientModel):
@@ -93,22 +78,18 @@ class WizardMultiChartsAccounts(models.TransientModel):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if self.company_id and self.chart_template_id.company_id and \
-                self.chart_template_id.company_id != self.company_id:
+        if not self.chart_template_id.check_company(self.company_id):
             self.chart_template_id = self.company_id.chart_template_id
-        if self.company_id and self.sale_tax_id.company_id and \
-                self.sale_tax_id.company_id != self.company_id:
+        if not self.sale_tax_id.check_company(self.company_id):
             self.sale_tax_id = False
-        if self.company_id and self.purchase_tax_id.company_id and \
-                self.purchase_tax_id.company_id != self.company_id:
+        if not self.purchase_tax_id.check_company(self.company_id):
             self.purchase_tax_id = False
 
     @api.multi
     @api.constrains('company_id', 'sale_tax_id')
     def _check_company_id_sale_tax_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.sale_tax_id.company_id and\
-                    rec.company_id != rec.sale_tax_id.company_id:
+            if not rec.sale_tax_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Wizard Multi Charts Accounts and in '
                       'Account Tax Template must be the same.'))
@@ -117,8 +98,7 @@ class WizardMultiChartsAccounts(models.TransientModel):
     @api.constrains('company_id', 'purchase_tax_id')
     def _check_company_id_purchase_tax_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.purchase_tax_id.company_id and\
-                    rec.company_id != rec.purchase_tax_id.company_id:
+            if not rec.purchase_tax_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Wizard Multi Charts Accounts and in '
                       'Account Tax Template must be the same.'))
@@ -127,8 +107,7 @@ class WizardMultiChartsAccounts(models.TransientModel):
     @api.constrains('company_id', 'chart_template_id')
     def _check_company_id_chart_template_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.chart_template_id.company_id and\
-                    rec.company_id != rec.chart_template_id.company_id:
+            if not rec.chart_template_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Wizard Multi Charts Accounts and in '
                       'Account Chart Template must be the same.'))
