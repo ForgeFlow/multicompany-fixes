@@ -194,7 +194,7 @@ class AccountJournal(models.Model):
             ('account.bank.statement.line', [('journal_id', '=', self.id)]),
             ('account.move', [('journal_id', '=', self.id)]),
             ('account.payment', [('destination_journal_id', '=', self.id)]),
-            ('account.payment',[('journal_id', '=', self.id)]),
+            ('account.payment', [('journal_id', '=', self.id)]),
             ('account.move.line', [('journal_id', '=', self.id)]),
             ('account.reconcile.model', [('second_journal_id', '=', self.id)]),
             ('account.reconcile.model', [('journal_id', '=', self.id)]),
