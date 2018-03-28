@@ -18,7 +18,7 @@ class IrDefault(models.Model):
                 'WHERE ' \
                 'f.model=%s ' \
                 'AND (d.user_id IS NULL OR d.user_id=u.id) ' \
-                'AND (d.company_id IS NULL OR d.company_id=%d) ' \
+                'AND (d.company_id IS NULL OR d.company_id=%s) ' \
                 'AND {condition} ' \
                 'ORDER BY d.user_id, d.company_id, d.id'
         company = self._context.get('default_company_id') or "u.company_id"
