@@ -218,7 +218,7 @@ class StockMoveLine(models.Model):
 
     company_id = fields.Many2one(
         'res.company', compute='_compute_company_id', string='Company',
-        readonly=True, store=False)
+        readonly=True, store=True)
 
     @api.multi
     @api.depends('move_id')
