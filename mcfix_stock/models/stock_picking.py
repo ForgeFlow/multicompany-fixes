@@ -38,9 +38,9 @@ class Picking(models.Model):
     @api.onchange('company_id')
     def _onchange_company_id(self):
         if not self.backorder_id:
-            if self.company_id and self.picking_type_id.warehouse_id.\
-                    company_id and self.picking_type_id.warehouse_id.\
-                    company_id != self.company_id:
+            if not self.picking_type_id.warehouse_id.check_company(
+                self.company_id
+            ):
                 self.picking_type_id = self.env['stock.picking.type'].search(
                     [('code', '=', self.picking_type_id.code),
                      ('warehouse_id.company_id', '=', self.company_id.id)],
@@ -51,29 +51,24 @@ class Picking(models.Model):
                         [('code', '=', self.picking_type_id.code),
                          ('warehouse_id', '=', False)],
                         limit=1)
-            if self.company_id and self.partner_id.company_id and \
-                    self.partner_id.company_id != self.company_id:
+            if not self.partner_id.check_company(self.company_id):
                 self.partner_id = False
-            if self.company_id and self.location_id.company_id and \
-                    self.location_id.company_id != self.company_id:
+            if not self.location_id.check_company(self.company_id):
                 self.location_id = False
-            if self.company_id and self.location_dest_id.company_id and \
-                    self.location_dest_id.company_id != self.company_id:
+            if not self.location_dest_id.check_company(self.company_id):
                 self.location_dest_id = False
-            if self.company_id and self.owner_id.company_id and \
-                    self.owner_id.company_id != self.company_id:
+            if not self.owner_id.check_company(self.company_id):
                 self.owner_id = False
             if self.company_id and self.move_lines:
                 for line in self.move_lines:
-                    if line.company_id and line.company_id != self.company_id:
+                    if line.check_company(self.company_id):
                         line.company_id = self.company_id
 
     @api.multi
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.location_id.company_id and\
-                    rec.company_id != rec.location_id.company_id:
+            if not rec.location_id.company_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Stock Location must be the same.'))
@@ -82,8 +77,7 @@ class Picking(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.partner_id.company_id and\
-                    rec.company_id != rec.partner_id.company_id:
+            if not rec.partner_id.company_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Res Partner must be the same.'))
@@ -92,8 +86,9 @@ class Picking(models.Model):
     @api.constrains('company_id', 'location_dest_id')
     def _check_company_id_location_dest_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.location_dest_id.company_id and\
-                    rec.company_id != rec.location_dest_id.company_id:
+            if not rec.location_dest_id.company_id.check_company(
+                rec.company_id
+            ):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Stock Location must be the same.'))
@@ -102,8 +97,7 @@ class Picking(models.Model):
     @api.constrains('company_id', 'owner_id')
     def _check_company_id_owner_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.owner_id.company_id and\
-                    rec.company_id != rec.owner_id.company_id:
+            if not rec.owner_id.company_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Res Partner must be the same.'))
@@ -112,33 +106,24 @@ class Picking(models.Model):
     @api.constrains('company_id', 'backorder_id')
     def _check_company_id_backorder_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.backorder_id.company_id and\
-                    rec.company_id != rec.backorder_id.company_id:
+            if not rec.backorder_id.company_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Stock Picking must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.search(
-                    [('backorder_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Picking is assigned to Stock Picking '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.move'].search(
-                    [('picking_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Picking is assigned to Stock Move '
-                          '(%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [self.move_lines, self.move_line_ids, ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res = res + [
+            ('stock.picking', [('backorder_id', '=', self.id)]),
+            ('stock.scrap', [('picking_id', '=', self.id)]),
+        ]
+        return res

@@ -10,8 +10,7 @@ class ProductProduct(models.Model):
     def _check_company_id_route_ids(self):
         for rec in self.sudo():
             for line in rec.route_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Product Product and in '
                           'Stock Location Route (%s) must be the same.'

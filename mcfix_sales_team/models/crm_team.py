@@ -1,5 +1,4 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, models
 
 
 class CrmTeam(models.Model):
@@ -7,16 +6,16 @@ class CrmTeam(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['res.partner'].search(
-                    [('team_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Crm Team is assigned to Res Partner '
-                          '(%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [self.message_partner_ids, ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res += [
+            ('res.partner', [('team_id', '=', self.id)]),
+        ]
+        return res
