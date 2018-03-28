@@ -37,8 +37,7 @@ class AccountMove(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.partner_id.company_id and \
-                            rec.company_id != rec.partner_id.company_id:
+            if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Move and in '
                       'Res Partner must be the same.'))
@@ -65,8 +64,7 @@ class AccountMove(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.journal_id.company_id and \
-                            rec.company_id != rec.journal_id.company_id:
+            if not rec.journal_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Move and in '
                       'Account Journal must be the same.'))

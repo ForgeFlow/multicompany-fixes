@@ -39,8 +39,8 @@ class AccountJournal(models.Model):
 
     @api.multi
     def _search_user_company_and_child_journals(self, operator, value):
-        companies = self.env.user.company_id + \
-                    self.env.user.company_id.child_ids
+        companies = self.env.user.company_id
+        companies += self.env.user.company_id.child_ids
         if operator == '=':
             recs = self.search([('company_id', 'in', companies.ids)])
         elif operator == '!=':

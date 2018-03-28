@@ -11,7 +11,7 @@ class IrDefault(models.Model):
         super(IrDefault, self).get_model_defaults(
             model_name=model_name, condition=condition)
         cr = self.env.cr
-        query = """ SELECT f.name, d.json_value 
+        query = """SELECT f.name, d.json_value
                     FROM ir_default d
                     JOIN ir_model_fields f ON d.field_id=f.id
                     JOIN res_users u ON u.id=%s

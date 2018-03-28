@@ -77,8 +77,8 @@ class Partner(models.Model):
     @api.constrains('company_id', 'parent_id')
     def _check_company_id_parent_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.parent_id.company_id and\
-                    rec.company_id != rec.parent_id.company_id:
+            if rec.company_id and rec.parent_id.company_id and \
+                            rec.company_id != rec.parent_id.company_id:
                 raise ValidationError(
                     _('The Company in the Res Partner and in '
                       'the parent Res Partner must be the same.'))
@@ -90,7 +90,7 @@ class Partner(models.Model):
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
         res.append(self.sudo().search(
-                        [('commercial_partner_id', '=', self.id)]))
+            [('commercial_partner_id', '=', self.id)]))
         res.append(self.sudo().search(
-                        [('parent_id', '=', self.id)]))
+            [('parent_id', '=', self.id)]))
         return res
