@@ -25,8 +25,7 @@ class AccountAccount(models.Model):
     def _check_company_id_tax_ids(self):
         for rec in self.sudo():
             for line in rec.tax_ids:
-                if rec.company_id and line.company_id and \
-                                rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Account Account and in '
                           'Account Tax (%s) must be the same.'
@@ -42,7 +41,7 @@ class AccountAccount(models.Model):
             self.env['account.invoice.line'].search(
                 [('account_id', '=', self.id)]),
             self.env['account.analytic.line'].search(
-                [('general_account_id', '=', rec.id)]),
+                [('general_account_id', '=', self.id)]),
             self.env['account.move.line'].search(
                 [('account_id', '=', self.id)]),
             self.env['account.tax'].search(

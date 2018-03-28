@@ -64,22 +64,26 @@ class AccountJournal(models.Model):
                         bypass_company_validation=True).sudo().write(
                         {'company_id': vals['company_id']})
                 elif journal.refund_sequence_id.company_id.id != vals[
-                    'company_id']:
+                    'company_id'
+                ]:
                     journal.refund_sequence_id.with_context(
                         bypass_company_validation=True).sudo().write(
                         {'company_id': vals['company_id']})
                 if journal.default_debit_account_id.company_id.id != vals[
-                    'company_id']:
+                    'company_id'
+                ]:
                     journal.default_debit_account_id.with_context(
                         bypass_company_validation=True).write(
                         {'company_id': vals['company_id']})
                 if journal.default_credit_account_id.company_id.id != vals[
-                    'company_id']:
+                    'company_id'
+                ]:
                     journal.default_credit_account_id.with_context(
                         bypass_company_validation=True).write(
                         {'company_id': vals['company_id']})
                 if journal.bank_account_id.company_id.id != vals[
-                    'company_id']:
+                    'company_id'
+                ]:
                     company = self.env['res.company'].browse(
                         vals['company_id'])
                     journal.bank_account_id.with_context(
@@ -90,21 +94,17 @@ class AccountJournal(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if self.company_id and self.profit_account_id.company_id and \
-                        self.profit_account_id.company_id != self.company_id:
+        if not self.profit_account_id.check_company(self.company_id):
             self.profit_account_id = False
-        if self.company_id and self.loss_account_id.company_id and \
-                        self.loss_account_id.company_id != self.company_id:
+        if not self.loss_account_id.check_company(self.company_id):
             self.loss_account_id = False
-        if self.company_id and self.default_debit_account_id.company_id and \
-                        self.default_debit_account_id.company_id != self.company_id:
+        if not self.default_debit_account_id.check_company(self.company_id):
             self.default_debit_account_id = False
             # self.default_debit_account_id.company_id = self.company_id
-        if self.company_id and self.default_credit_account_id.company_id and \
-                        self.default_credit_account_id.company_id != self.company_id:
+        if not self.default_credit_account_id.check_company(self.company_id):
             self.default_credit_account_id = False
             # self.default_credit_account_id.company_id = self.company_id
-        if self.company_id and self.account_control_ids:
+        if not self.account_control_ids.check_company(self.company_id):
             self.account_control_ids = self.account_control_ids.filtered(
                 lambda a: a.company_id == self.company_id or not a.company_id)
 
@@ -112,8 +112,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'loss_account_id')
     def _check_company_id_loss_account_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.loss_account_id.company_id and \
-                            rec.company_id != rec.loss_account_id.company_id:
+            if not rec.loss_account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Account Account must be the same.'))
@@ -122,8 +121,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'default_debit_account_id')
     def _check_company_id_default_debit_account_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.default_debit_account_id.company_id and \
-                            rec.company_id != rec.default_debit_account_id.company_id:
+            if not rec.default_debit_account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Account Account must be the same.'))
@@ -132,8 +130,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'sequence_id')
     def _check_company_id_sequence_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.sequence_id.company_id and \
-                            rec.company_id != rec.sequence_id.company_id:
+            if not rec.sequence_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Ir Sequence must be the same.'))
@@ -142,8 +139,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'refund_sequence_id')
     def _check_company_id_refund_sequence_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.refund_sequence_id.company_id and \
-                            rec.company_id != rec.refund_sequence_id.company_id:
+            if not rec.refund_sequence_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Ir Sequence must be the same.'))
@@ -152,8 +148,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'profit_account_id')
     def _check_company_id_profit_account_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.profit_account_id.company_id and \
-                            rec.company_id != rec.profit_account_id.company_id:
+            if not rec.profit_account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Account Account must be the same.'))
@@ -163,8 +158,7 @@ class AccountJournal(models.Model):
     def _check_company_id_account_control_ids(self):
         for rec in self.sudo():
             for line in rec.account_control_ids:
-                if rec.company_id and line.company_id and \
-                                rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Account Journal and in '
                           'Account Account (%s) must be the same.'
@@ -174,8 +168,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'default_credit_account_id')
     def _check_company_id_default_credit_account_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.default_credit_account_id.company_id and \
-                            rec.company_id != rec.default_credit_account_id.company_id:
+            if not rec.default_credit_account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Account Account must be the same.'))
@@ -184,8 +177,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'bank_account_id')
     def _check_company_id_bank_account_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.bank_account_id.company_id and \
-                            rec.company_id != rec.bank_account_id.company_id:
+            if not rec.bank_account_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Res Partner Bank must be the same.'))

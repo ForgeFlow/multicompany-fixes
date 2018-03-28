@@ -1,5 +1,4 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import models
 
 
 class ResPartnerBank(models.Model):
