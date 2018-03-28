@@ -57,7 +57,7 @@ class AccountBankStatement(models.Model):
             params = (company_id, (
                 st_lines_left[0].journal_id.default_credit_account_id.id,
                 st_lines_left[0].journal_id.default_debit_account_id.id),
-                tuple(refs))
+                      tuple(refs))
             if statements:
                 sql_query += 'AND stl.id IN %s'
                 params += (tuple(stl_to_assign.ids),)
@@ -75,37 +75,20 @@ class AccountBankStatement(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.journal_id.company_id and\
-                    rec.company_id != rec.journal_id.company_id:
+            if rec.company_id and rec.journal_id.company_id and \
+                            rec.company_id != rec.journal_id.company_id:
                 raise ValidationError(
                     _('The Company in the Account Bank Statement and in '
                       'Account Journal must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.move.line'].search(
-                    [('statement_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Bank Statement is assigned to '
-                          'Account Move Line (%s).' % field.name_get()[0][1]))
-                field = self.env['account.bank.statement.line'].search(
-                    [('statement_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Bank Statement is assigned to '
-                          'Account Bank Statement Line (%s)'
-                          '.' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res = res + [self.move_line_ids, self.line_ids, ]
+        return res
 
 
 class AccountBankStatementLine(models.Model):
@@ -123,7 +106,7 @@ class AccountBankStatementLine(models.Model):
         return res.filtered(lambda x: x.company_id == self.company_id)
 
     def get_statement_line_for_reconciliation_widget(self):
-        data = super(AccountBankStatementLine, self).\
+        data = super(AccountBankStatementLine, self). \
             get_statement_line_for_reconciliation_widget()
         data['company_id'] = self.company_id.id
         return data
@@ -132,8 +115,8 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.partner_id.company_id and\
-                    rec.company_id != rec.partner_id.company_id:
+            if rec.company_id and rec.partner_id.company_id and \
+                            rec.company_id != rec.partner_id.company_id:
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Res Partner must be the same.'))
@@ -142,8 +125,8 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.journal_id.company_id and\
-                    rec.company_id != rec.journal_id.company_id:
+            if rec.company_id and rec.journal_id.company_id and \
+                            rec.company_id != rec.journal_id.company_id:
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Account Journal must be the same.'))
@@ -152,8 +135,8 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'statement_id')
     def _check_company_id_statement_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.statement_id.company_id and\
-                    rec.company_id != rec.statement_id.company_id:
+            if rec.company_id and rec.statement_id.company_id and \
+                            rec.company_id != rec.statement_id.company_id:
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Account Bank Statement must be the same.'))
@@ -162,8 +145,8 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'bank_account_id')
     def _check_company_id_bank_account_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.bank_account_id.company_id and\
-                    rec.company_id != rec.bank_account_id.company_id:
+            if rec.company_id and rec.bank_account_id.company_id and \
+                            rec.company_id != rec.bank_account_id.company_id:
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Res Partner Bank must be the same.'))
@@ -172,27 +155,20 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'account_id')
     def _check_company_id_account_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.account_id.company_id and\
-                    rec.company_id != rec.account_id.company_id:
+            if rec.company_id and rec.account_id.company_id and \
+                            rec.company_id != rec.account_id.company_id:
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Account Account must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.move.line'].search(
-                    [('statement_line_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Bank Statement Line is assigned to '
-                          'Account Move Line (%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res = res + [self.journal_entry_ids, ]
+        return res
 
     def _prepare_reconciliation_move(self, move_ref):
         result = super()._prepare_reconciliation_move(move_ref)

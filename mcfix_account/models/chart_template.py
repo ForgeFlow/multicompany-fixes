@@ -62,30 +62,17 @@ class AccountChartTemplate(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.tax.template'].search(
-                    [('chart_template_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Chart Template is assigned to '
-                          'Account Tax Template (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.search(
-                    [('parent_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Chart Template is assigned to '
-                          'Account Chart Template (%s)'
-                          '.' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res = res + [
+            self.env['account.tax.template'].search(
+                [('chart_template_id', '=', self.id)]),
+            self.search(
+                [('parent_id', '=', self.id)]),
+        ]
+        return res
 
 
 class WizardMultiChartsAccounts(models.TransientModel):

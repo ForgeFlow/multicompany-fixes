@@ -127,28 +127,15 @@ class AccountPayment(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.invoice'].search(
-                    [('payment_ids', 'in', [rec.id]),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Payment is assigned to Account Invoice '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.move.line'].search(
-                    [('payment_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Payment is assigned to Account Move Line '
-                          '(%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res = res + [
+            self.invoice_ids,
+            self.move_line_id,
+        ]
+        return res
 
 
 class AccountRegisterPayments(models.TransientModel):
