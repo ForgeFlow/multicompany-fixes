@@ -3,7 +3,7 @@
 
 from ..tests.test_account_chart_template_consistency import \
     TestAccountChartTemplate
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import ValidationError
 
 
 class TestAccountJournalConsistency(TestAccountChartTemplate):

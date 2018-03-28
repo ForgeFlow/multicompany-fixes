@@ -96,8 +96,7 @@ class TestPaymentAcquirer(TransactionCase):
             self.payment_acquirer.company_id = self.company_2
 
     def test_constrains_journal(self):
-        self.payment_acquirer = self.payment_acquirer_model.sudo(). \
-            create({
+        self.payment_acquirer = self.payment_acquirer_model.sudo().create({
             'name': 'Payment Acquirer 1 - Test',
             'journal_id': self.bank_journal.id,
             'company_id': self.company.id,
