@@ -8,7 +8,7 @@ class ProductTemplate(models.Model):
     # @api.onchange('company_id')
     # def _onchange_company_id(self):
     #     super(ProductTemplate, self)._onchange_company_id()
-    #     if self.company_id and self.route_ids:
+    #     if not self.route_ids.check_company(self.company_id):
     #         self.route_ids = self.env['stock.location.route'].search(
     #                 [('product_ids', 'in', [self.id]),
     #                  ('company_id', '=', False),
@@ -19,8 +19,7 @@ class ProductTemplate(models.Model):
     def _check_company_id_route_ids(self):
         for rec in self.sudo():
             for line in rec.route_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Product Template and in '
                           'Stock Location Route (%s) must be the same.'

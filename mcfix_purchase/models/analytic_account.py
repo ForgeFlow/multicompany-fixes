@@ -1,24 +1,12 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import models
 
 
 class AccountAnalyticAccount(models.Model):
     _inherit = 'account.analytic.account'
 
-    @api.constrains('company_id')
-    def _check_company_id_out_model(self):
-        super(AccountAnalyticAccount, self)._check_company_id_out_model()
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['purchase.order.line'].search(
-                    [('account_analytic_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Analytic Account is assigned to '
-                          'Purchase Order Line (%s)'
-                          '.' % field.name_get()[0][1]))
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res += [
+            ('purchase.order.line', [('account_analytic_id', '=', self.id)]),
+        ]
+        return res
