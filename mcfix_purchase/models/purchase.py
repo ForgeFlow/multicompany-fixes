@@ -109,8 +109,7 @@ class PurchaseOrder(models.Model):
     @api.constrains('company_id', 'fiscal_position_id')
     def _check_company_id_fiscal_position_id(self):
         for rec in self.sudo():
-            if not rec.fiscal_position_id.company_id.\
-                    check_company(rec.company_id):
+            if not rec.fiscal_position_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Purchase Order and in '
                       'Account Fiscal Position must be the same.'))

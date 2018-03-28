@@ -45,15 +45,14 @@ class TestPaymentAcquirer(TransactionCase):
              'company_ids': [(4, self.company.id)],
              })
 
+        self.view_template = self.env['ir.ui.view'].\
+            search([('name', '=', 'default_acquirer_button')])
         self.bank_journal = self.journal_model.sudo(self.user).create({
             'name': 'Bank Journal 1 - Test',
             'code': 'test_bank_1',
             'type': 'bank',
             'company_id': self.company.id,
         })
-
-        self.view_template = self.env['ir.ui.view'].\
-            search([('name', '=', 'default_acquirer_button')])
 
     def create_full_access(self, list_of_models):
         manager_account_test_group = self.env['res.groups'].sudo().create({
@@ -95,6 +94,14 @@ class TestPaymentAcquirer(TransactionCase):
             })
         with self.assertRaises(ValidationError):
             self.payment_acquirer.company_id = self.company_2
-        self.payment_acquirer.company_id = self.company
+
+    def test_constrains_journal(self):
+        self.payment_acquirer = self.payment_acquirer_model.sudo(). \
+            create({
+            'name': 'Payment Acquirer 1 - Test',
+            'journal_id': self.bank_journal.id,
+            'company_id': self.company.id,
+            'view_template_id': self.view_template.id,
+        })
         with self.assertRaises(ValidationError):
             self.payment_acquirer.journal_id.company_id = self.company_2

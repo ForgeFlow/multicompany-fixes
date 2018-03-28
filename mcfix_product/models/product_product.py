@@ -36,17 +36,6 @@ class ProductProduct(models.Model):
             super(ProductProduct, product)._set_standard_price(value)
 
     @api.multi
-    @api.constrains('company_id', 'pricelist_item_ids')
-    def _check_company_id_pricelist_item_ids(self):
-        for rec in self.sudo():
-            for line in rec.pricelist_item_ids:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Product Product and in '
-                          'Product Pricelist Item (%s) must be the same.'
-                          ) % line.name_get()[0][1])
-
-    @api.multi
     @api.constrains('company_id', 'product_tmpl_id')
     def _check_company_id_product_tmpl_id(self):
         for rec in self.sudo():

@@ -126,7 +126,7 @@ class TestAccountJournalConsistency(TestAccountChartTemplate):
             'partner_id': self.company.partner_id.id,
         })
 
-        with self.assertRaises(UserError):
+        with self.assertRaises(ValidationError):
             journal.write({'bank_account_id': bank_account.id})
         journal.bank_account = False
 

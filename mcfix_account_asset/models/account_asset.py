@@ -50,8 +50,9 @@ class AccountAssetCategory(models.Model):
     @api.constrains('company_id', 'account_depreciation_expense_id')
     def _check_company_id_account_depreciation_expense_id(self):
         for rec in self.sudo():
-            if not rec.account_depreciation_expense_id.company_id.\
-                    check_company(rec.company_id):
+            if not rec.account_depreciation_expense_id.check_company(
+                rec.company_id
+            ):
                 raise ValidationError(
                     _('The Company in the Account Asset Category and in '
                       'Account Account must be the same.'))

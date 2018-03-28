@@ -46,7 +46,7 @@ class Base(models.AbstractModel):
 
     def _check_company_id_base_model(self):
         if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
+            for rec in self.sudo():
                 if not rec.company_id:
                     continue
                 fields = rec._check_company_id_fields()
