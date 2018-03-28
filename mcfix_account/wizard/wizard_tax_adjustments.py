@@ -25,17 +25,13 @@ class TaxAdjustments(models.TransientModel):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if self.company_id and self.debit_account_id.company_id and \
-                self.debit_account_id.company_id != self.company_id:
+        if not self.debit_account_id.check_company(self.company_id):
             self.debit_account_id = False
-        if self.company_id and self.credit_account_id.company_id and \
-                self.credit_account_id.company_id != self.company_id:
+        if not self.credit_account_id.check_company(self.company_id):
             self.credit_account_id = False
-        if self.company_id and self.tax_id.company_id and \
-                self.tax_id.company_id != self.company_id:
+        if not self.tax_id.check_company(self.company_id):
             self.tax_id = False
-        if self.company_id and self.journal_id.company_id and \
-                self.journal_id.company_id != self.company_id:
+        if not self.journal_id.check_company(self.company_id):
             self.journal_id = False
 
     @api.multi
