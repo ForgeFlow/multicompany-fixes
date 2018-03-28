@@ -32,12 +32,21 @@ class Base(models.AbstractModel):
     def _check_company_id_fields(self):
         return []
 
+    def _check_company_id_search(self):
+        return []
+
     def _check_company_id_base_model(self):
         if not self.env.context.get('bypass_company_validation', False):
             for rec in self:
                 if not rec.company_id:
                     continue
-                for fld in rec._check_company_id_fields():
+                fields = rec._check_company_id_fields()
+                for model, domain in rec._check_company_id_search():
+                    fields.append(self.sudo().env[model].search(domain + [
+                        ('company_id', '!=', rec.company_id.id),
+                        ('company_id', '!=', 'False'),
+                    ]))
+                for fld in fields:
                     if not fld.check_company(rec.company_id):
                         raise ValidationError(_(
                             'You cannot change the company, as this %s is '
