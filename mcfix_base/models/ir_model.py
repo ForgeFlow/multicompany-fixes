@@ -1,5 +1,6 @@
 import logging
-from odoo import api, models
+from odoo import api, models, _
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -19,6 +20,29 @@ class Base(models.AbstractModel):
                 rec.company_id else name[1]
             res += [(rec.id, name)]
         return res
+
+    def check_company(self, company_id):
+        if not company_id:
+            return True
+        if 'company_id' not in self._fields:
+            return True
+        return not bool(self.filtered(
+            lambda r: r.company_id and r.company_id != company_id))
+
+    def _check_company_id_fields(self):
+        return []
+
+    def _check_company_id_base_model(self):
+        if not self.env.context.get('bypass_company_validation', False):
+            for rec in self:
+                if not rec.company_id:
+                    continue
+                for fld in rec._check_company_id_fields():
+                    if not fld.check_company(rec.company_id):
+                        raise ValidationError(_(
+                            'You cannot change the company, as this %s is '
+                            'assigned to %s (%s).'
+                        ) % (rec._name, fld._name, fld.name_get()[0][1]))
 
     @api.multi
     @api.depends('company_id')
