@@ -62,3 +62,15 @@ class ProductTemplate(models.Model):
                           'Product Template is assigned to '
                           'Product Pricelist Item (%s)'
                           '.' % field.name_get()[0][1]))
+
+    @api.constrains('company_id')
+    def _check_company_id_out_model(self):
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [
+            self.item_ids, self.product_variant_ids,
+            self.variant_seller_ids, self.seller_ids,
+        ]
+        return res
