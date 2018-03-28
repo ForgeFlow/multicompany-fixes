@@ -56,19 +56,16 @@ class Location(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if self.company_id and self.location_id.company_id and \
-                self.location_id.company_id != self.company_id:
+        if not self.location_id.check_company(self.company_id):
             self.location_id = False
-        if self.company_id and self.partner_id.company_id and \
-                self.partner_id.company_id != self.company_id:
+        if not self.partner_id.check_company(self.company_id):
             self.partner_id = False
 
     @api.multi
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.location_id.company_id and\
-                    rec.company_id != rec.location_id.company_id:
+            if not rec.location_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Location and in '
                       'Stock Location must be the same.'))
@@ -77,199 +74,51 @@ class Location(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.partner_id.company_id and\
-                    rec.company_id != rec.partner_id.company_id:
+            if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Location and in '
                       'Res Partner must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['stock.warehouse.orderpoint'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to '
-                          'Stock Warehouse Orderpoint (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['stock.location.path'].search(
-                    [('location_dest_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Location Path '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.location.path'].search(
-                    [('location_from_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Location Path '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.inventory.line'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Inventory Line '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.picking'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Picking '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.picking'].search(
-                    [('location_dest_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Picking '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.inventory'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Inventory '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['product.template'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Product Template '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('wh_input_stock_loc_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Warehouse '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('wh_output_stock_loc_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Warehouse '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('lot_stock_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Warehouse '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('wh_pack_stock_loc_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Warehouse '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('wh_qc_stock_loc_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Warehouse '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('view_location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Warehouse '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.move'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Move '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.move'].search(
-                    [('location_dest_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Move '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Location '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['procurement.rule'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Procurement Rule '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['procurement.rule'].search(
-                    [('location_src_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Procurement Rule '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['stock.quant'].search(
-                    [('location_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location is assigned to Stock Quant '
-                          '(%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [self.child_ids, self.quant_ids, ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res = res + [
+            ('procurement.rule', [('location_id', '=', self.id)]),
+            ('procurement.rule', [('location_src_id', '=', self.id)]),
+            ('product.template', [('location_id', '=', self.id)]),
+            ('stock.inventory', [('location_id', '=', self.id)]),
+            ('stock.inventory.line', [('location_id', '=', self.id)]),
+            ('stock.location.path', [('location_from_id', '=', self.id)]),
+            ('stock.location.path', [('location_dest_id', '=', self.id)]),
+            ('stock.move', [('location_id', '=', self.id)]),
+            ('stock.move', [('location_dest_id', '=', self.id)]),
+            ('stock.move.line', [('location_id', '=', self.id)]),
+            ('stock.move.line', [('location_dest_id', '=', self.id)]),
+            ('stock.picking', [('location_id', '=', self.id)]),
+            ('stock.picking', [('location_dest_id', '=', self.id)]),
+            ('stock.picking.type',
+             [('default_location_dest_id', '=', self.id)]),
+            ('stock.picking.type',
+             [('default_location_src_id', '=', self.id)]),
+            ('stock.scrap', [('location_id', '=', self.id)]),
+            ('stock.scrap', [('scrap_location_id', '=', self.id)]),
+            ('stock.warehouse', [('wh_output_stock_loc_id', '=', self.id)]),
+            ('stock.warehouse', [('wh_qc_stock_loc_id', '=', self.id)]),
+            ('stock.warehouse', [('lot_stock_id', '=', self.id)]),
+            ('stock.warehouse', [('wh_input_stock_loc_id', '=', self.id)]),
+            ('stock.warehouse', [('view_location_id', '=', self.id)]),
+            ('stock.warehouse', [('wh_pack_stock_loc_id', '=', self.id)]),
+            ('stock.warehouse.orderpoint', [('location_id', '=', self.id)]),
+        ]
+        return res
 
 
 class PushedFlow(models.Model):
@@ -277,25 +126,20 @@ class PushedFlow(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if self.company_id and self.route_id.company_id and \
-                self.route_id.company_id != self.company_id:
+        if not self.route_id.check_company(self.company_id):
             self.route_id.company_id = self.company_id
-        # if self.company_id and self.warehouse_id.company_id and \
-        #         self.warehouse_id.company_id != self.company_id:
+        # if not self.warehouse_id.check_company(self.company_id):
         #     self.warehouse_id = self.picking_type_id.warehouse_id
-        if self.company_id and self.location_from_id.company_id and \
-                self.location_from_id.company_id != self.company_id:
+        if not self.location_from_id.check_company(self.company_id):
             self.location_from_id = False
-        if self.company_id and self.location_dest_id.company_id and \
-                self.location_dest_id.company_id != self.company_id:
+        if not self.location_dest_id.check_company(self.company_id):
             self.location_dest_id = False
 
     @api.multi
     @api.constrains('company_id', 'route_id')
     def _check_company_id_route_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.route_id.company_id and\
-                    rec.company_id != rec.route_id.company_id:
+            if not rec.route_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Location Path and in '
                       'Stock Location Route must be the same.'))
@@ -304,8 +148,9 @@ class PushedFlow(models.Model):
     @api.constrains('company_id', 'location_dest_id')
     def _check_company_id_location_dest_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.location_dest_id.company_id and\
-                    rec.company_id != rec.location_dest_id.company_id:
+            if not rec.location_dest_id.check_company(
+                rec.company_id
+            ):
                 raise ValidationError(
                     _('The Company in the Stock Location Path and in '
                       'Stock Location must be the same.'))
@@ -314,8 +159,7 @@ class PushedFlow(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.warehouse_id.company_id and\
-                    rec.company_id != rec.warehouse_id.company_id:
+            if not rec.warehouse_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Location Path and in '
                       'Stock Warehouse must be the same.'))
@@ -324,27 +168,23 @@ class PushedFlow(models.Model):
     @api.constrains('company_id', 'location_from_id')
     def _check_company_id_location_from_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.location_from_id.company_id and\
-                    rec.company_id != rec.location_from_id.company_id:
+            if not rec.location_from_id.check_company(
+                rec.company_id
+            ):
                 raise ValidationError(
                     _('The Company in the Stock Location Path and in '
                       'Stock Location must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['stock.move'].search(
-                    [('push_rule_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Path is assigned to Stock Move '
-                          '(%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res = res + [
+            ('stock.move', [('push_rule_id', '=', self.id)]),
+        ]
+        return res
 
 
 class Route(models.Model):
@@ -358,18 +198,16 @@ class Route(models.Model):
     @api.onchange('company_id')
     def _onchange_company_id(self):
         if not self.move_ids:
-            # if self.company_id and self.supplied_wh_id.company_id and \
-            #         self.supplied_wh_id.company_id != self.company_id:
+            # if not self.supplied_wh_id.check_company(self.company_id):
             #     self.supplied_wh_id = False
-            # if self.company_id and self.supplier_wh_id.company_id and \
-            #         self.supplier_wh_id.company_id != self.company_id:
+            # if not self.supplier_wh_id.check_company(self.company_id):
             #     self.supplier_wh_id = False
-            if self.company_id and self.product_ids:
+            if not self.product_ids.check_company(self.company_id):
                 self.product_ids = self.env['product.template'].search(
                     [('route_ids', 'in', [self.id]),
                      ('company_id', '=', False),
                      ('company_id', '=', self.company_id.id)])
-            if self.company_id and self.warehouse_ids:
+            if not self.warehouse_ids.check_company(self.company_id):
                 if self.company_id and self.warehouse_ids:
                     self.warehouse_ids = self.warehouse_ids.filtered(
                         lambda w: w.company_id == self.company_id)
@@ -379,8 +217,7 @@ class Route(models.Model):
     def _check_company_id_move_ids(self):
         for rec in self.sudo():
             for line in rec.move_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Stock Location Route and in '
                           'Stock Move (%s) must be the same.'
@@ -390,8 +227,7 @@ class Route(models.Model):
     @api.constrains('company_id', 'supplier_wh_id')
     def _check_company_id_supplier_wh_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.supplier_wh_id.company_id and\
-                    rec.company_id != rec.supplier_wh_id.company_id:
+            if not rec.supplier_wh_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Location Route and in '
                       'Stock Warehouse must be the same.'))
@@ -401,8 +237,7 @@ class Route(models.Model):
     def _check_company_id_product_ids(self):
         for rec in self.sudo():
             for line in rec.product_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Stock Location Route and in '
                           'Product Template (%s) must be the same.'
@@ -412,8 +247,7 @@ class Route(models.Model):
     @api.constrains('company_id', 'supplied_wh_id')
     def _check_company_id_supplied_wh_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.supplied_wh_id.company_id and\
-                    rec.company_id != rec.supplied_wh_id.company_id:
+            if not rec.supplied_wh_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Location Route and in '
                       'Stock Warehouse must be the same.'))
@@ -423,8 +257,7 @@ class Route(models.Model):
     def _check_company_id_warehouse_ids(self):
         for rec in self.sudo():
             for line in rec.warehouse_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Stock Location Route and in '
                           'Stock Warehouse (%s) must be the same.'
@@ -432,80 +265,22 @@ class Route(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['stock.location.path'].search(
-                    [('route_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to '
-                          'Stock Location Path (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['product.template'].search(
-                    [('route_ids', 'in', [rec.id]),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to '
-                          'Product Template (%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('crossdock_route_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to '
-                          'Stock Warehouse (%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('route_ids', 'in', [rec.id]),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to '
-                          'Stock Warehouse (%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('reception_route_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to '
-                          'Stock Warehouse (%s).' % field.name_get()[0][1]))
-                field = self.env['stock.warehouse'].search(
-                    [('delivery_route_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to '
-                          'Stock Warehouse (%s).' % field.name_get()[0][1]))
-                field = self.env['stock.move'].search(
-                    [('route_ids', 'in', [rec.id]),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to Stock Move '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['procurement.rule'].search(
-                    [('route_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Stock Location Route is assigned to '
-                          'Procurement Rule (%s).' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [
+            self.pull_ids, self.push_ids, self.move_ids, self.warehouse_ids,
+        ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res = res + [
+            ('stock.move', [('route_ids', 'in', self.ids)]),
+            ('stock.warehouse', [('crossdock_route_id', '=', self.id)]),
+            ('stock.warehouse', [('delivery_route_id', '=', self.id)]),
+            ('stock.warehouse', [('route_ids', 'in', self.ids)]),
+            ('stock.warehouse', [('reception_route_id', '=', self.id)]),
+        ]
+        return res

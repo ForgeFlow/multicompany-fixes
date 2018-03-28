@@ -14,7 +14,7 @@ class AccountAccount(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if self.company_id and self.tax_ids:
+        if not self.tax_ids.check_company(self.company_id):
             self.tax_ids = self.env['account.tax'].search(
                 [('account_id', '=', self.id),
                  ('company_id', '=', False),
@@ -25,8 +25,7 @@ class AccountAccount(models.Model):
     def _check_company_id_tax_ids(self):
         for rec in self.sudo():
             for line in rec.tax_ids:
-                if rec.company_id and line.company_id and \
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Account Account and in '
                           'Account Tax (%s) must be the same.'
@@ -34,165 +33,32 @@ class AccountAccount(models.Model):
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['account.invoice.line'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Invoice Line (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['account.analytic.line'].search(
-                    [('general_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Analytic Line (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['account.move.line'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Move Line (%s).' % field.name_get()[0][1]))
-                field = self.env['account.tax'].search(
-                    [('cash_basis_account', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Tax '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.tax'].search(
-                    [('refund_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Tax '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.tax'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Tax '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.payment'].search(
-                    [('writeoff_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Payment '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Invoice '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.journal'].search(
-                    [('account_control_ids', 'in', [rec.id]),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Journal '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.journal'].search(
-                    [('profit_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Journal '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.journal'].search(
-                    [('default_credit_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Journal '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.journal'].search(
-                    [('default_debit_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Journal '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.journal'].search(
-                    [('loss_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Journal '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.invoice.tax'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to Account Invoice Tax '
-                          '(%s).' % field.name_get()[0][1]))
-                field = self.env['account.reconcile.model'].search(
-                    [('second_account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Reconcile Model (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['account.reconcile.model'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Reconcile Model (%s)'
-                          '.' % field.name_get()[0][1]))
-                field = self.env['account.bank.statement.line'].search(
-                    [('account_id', '=', rec.id),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Account Account is assigned to '
-                          'Account Bank Statement Line (%s)'
-                          '.' % field.name_get()[0][1]))
+        self._check_company_id_base_model()
+
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [self.tax_ids, ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res += [
+            ('account.analytic.line', [('general_account_id', '=', self.id)]),
+            ('account.bank.statement.line', [('account_id', '=', self.id)]),
+            ('account.invoice', [('account_id', '=', self.id)]),
+            ('account.invoice.line', [('account_id', '=', self.id)]),
+            ('account.invoice.tax', [('account_id', '=', self.id)]),
+            ('account.journal', [('profit_account_id', '=', self.id)]),
+            ('account.journal', [('default_debit_account_id', '=', self.id)]),
+            ('account.journal', [('loss_account_id', '=', self.id)]),
+            ('account.journal', [('default_credit_account_id', '=', self.id)]),
+            ('account.journal', [('account_control_ids', 'in', self.ids)]),
+            ('account.move.line', [('account_id', '=', self.id)]),
+            ('account.payment', [('writeoff_account_id', '=', self.id)]),
+            ('account.reconcile.model', [('account_id', '=', self.id)]),
+            ('account.reconcile.model', [('second_account_id', '=', self.id)]),
+            ('account.tax', [('account_id', '=', self.id)]),
+            ('account.tax', [('cash_basis_account', '=', self.id)]),
+            ('account.tax', [('refund_account_id', '=', self.id)]),
+        ]
+        return res

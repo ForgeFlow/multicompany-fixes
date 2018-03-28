@@ -90,11 +90,17 @@ class TestAccountAssetCategory(TransactionCase):
         return manager_account_test_group
 
     def test_onchanges(self):
-        self.asset_category._cache.update(
-            self.asset_category._convert_to_cache(
-                {'company_id': self.company_2.id}, update=True))
-        self.asset_category._onchange_company_id()
-        self.assertFalse(self.asset_category.journal_id)
+        asset_category = self.category_model.sudo(self.user).new({
+            'name': 'Asset Category - Test',
+            'journal_id': self.cash_journal.id,
+            'account_asset_id': self.account.id,
+            'account_depreciation_id': self.account.id,
+            'account_depreciation_expense_id': self.account.id,
+            'company_id': self.company.id,
+        })
+        asset_category.company_id = self.company_2.id
+        asset_category._onchange_company_id()
+        self.assertFalse(asset_category.journal_id)
 
     def test_constrains(self):
         self.cash_journal_2 = self.journal_model.sudo(self.user).create({

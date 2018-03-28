@@ -9,8 +9,7 @@ class ProductTemplate(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.warehouse_id.company_id and\
-                    rec.company_id != rec.warehouse_id.company_id:
+            if not rec.warehouse_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Product Template and in '
                       'Stock Warehouse must be the same.'))
@@ -20,8 +19,7 @@ class ProductTemplate(models.Model):
     def _check_company_id_route_from_categ_ids(self):
         for rec in self.sudo():
             for line in rec.route_from_categ_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Product Template and in '
                           'Stock Location Route (%s) must be the same.'
@@ -31,8 +29,7 @@ class ProductTemplate(models.Model):
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.location_id.company_id and\
-                    rec.company_id != rec.location_id.company_id:
+            if not self.location_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Product Template and in '
                       'Stock Location must be the same.'))
@@ -42,27 +39,20 @@ class ProductTemplate(models.Model):
     def _check_company_id_route_ids(self):
         for rec in self.sudo():
             for line in rec.route_ids:
-                if rec.company_id and line.company_id and\
-                        rec.company_id != line.company_id:
+                if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Product Template and in '
                           'Stock Location Route (%s) must be the same.'
                           ) % line.name_get()[0][1])
 
-    @api.constrains('company_id')
-    def _check_company_id_out_model(self):
-        super(ProductTemplate, self)._check_company_id_out_model()
-        if not self.env.context.get('bypass_company_validation', False):
-            for rec in self:
-                if not rec.company_id:
-                    continue
-                field = self.env['stock.location.route'].search(
-                    [('product_ids', 'in', [rec.id]),
-                     ('company_id', '!=', False),
-                     ('company_id', '!=', rec.company_id.id)], limit=1)
-                if field:
-                    raise ValidationError(
-                        _('You cannot change the company, as this '
-                          'Product Template is assigned to '
-                          'Stock Location Route (%s)'
-                          '.' % field.name_get()[0][1]))
+    def _check_company_id_fields(self):
+        res = super()._check_company_id_fields()
+        res += [self.route_ids, self.route_from_categ_ids, ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res = res + [
+            ('stock.location.route', [('product_ids', 'in', self.ids)]),
+        ]
+        return res

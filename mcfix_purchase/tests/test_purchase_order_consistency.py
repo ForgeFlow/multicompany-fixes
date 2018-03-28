@@ -86,8 +86,8 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         )
 
         self.purchase1.button_confirm()
-        self._create_invoice(self.purchase1, self.partner_1,
-                             self.cash_account_id)
+        self.invoice = self._create_invoice(
+            self.purchase1, self.partner_1, self.cash_account_id)
 
     def _create_purchase(self, company, product, tax, partner):
         """ Create a purchase order.
@@ -125,9 +125,8 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
             'active_model': 'purchase.order',
             'company_id': purchase.company_id.id,
         }
-        self.env['account.invoice'].with_context(purchase_context).\
+        return self.env['account.invoice'].with_context(purchase_context).\
             create(invoice_vals)
-        return True
 
     def _create_partners(self, company):
         """ Create a Partner """
@@ -164,17 +163,15 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         # Assertion on the constraints to ensure the consistency
         # on company dependent fields
         with self.assertRaises(ValidationError):
-            self.purchase1.\
-                write({'partner_id': self.partner_2.id})
+            self.purchase1.write({'partner_id': self.partner_2.id})
         with self.assertRaises(ValidationError):
-            self.purchase1.\
-                write({'payment_term_id': self.payment_terms_2.id})
+            self.purchase1.write({'payment_term_id': self.payment_terms_2.id})
         with self.assertRaises(ValidationError):
-            self.purchase1.\
-                write({'fiscal_position_id': self.fiscal_position_2.id})
+            self.purchase1.write(
+                {'fiscal_position_id': self.fiscal_position_2.id})
         with self.assertRaises(ValidationError):
-            self.purchase1.order_line.\
-                write({'taxes_id': [(6, 0, [self.tax_2.id])]})
+            self.purchase1.order_line.write(
+                {'taxes_id': [(6, 0, [self.tax_2.id])]})
         with self.assertRaises(ValidationError):
-            self.purchase1.order_line.\
-                write({'product_id': self.product2.id})
+            self.purchase1.order_line.write({'product_id': self.product2.id})
+        self.assertEqual(self.purchase1.company_id, self.invoice.company_id)

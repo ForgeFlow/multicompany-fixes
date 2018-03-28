@@ -36,21 +36,12 @@ class ProductProduct(models.Model):
             super(ProductProduct, product)._set_standard_price(value)
 
     @api.multi
-    @api.constrains('company_id', 'pricelist_id')
-    def _check_company_id_pricelist_id(self):
-        for rec in self.sudo():
-            if rec.company_id and rec.pricelist_id.company_id and\
-                    rec.company_id != rec.pricelist_id.company_id:
-                raise ValidationError(
-                    _('The Company in the Product Product and in '
-                      'Product Pricelist must be the same.'))
-
-    @api.multi
     @api.constrains('company_id', 'product_tmpl_id')
     def _check_company_id_product_tmpl_id(self):
         for rec in self.sudo():
-            if rec.company_id and rec.product_tmpl_id.company_id and\
-                    rec.company_id != rec.product_tmpl_id.company_id:
+            if not rec.product_tmpl_id.check_company(
+                rec.company_id
+            ):
                 raise ValidationError(
                     _('The Company in the Product Product and in '
                       'Product Template must be the same.'))
