@@ -9,7 +9,12 @@ class SaleOrder(models.Model):
     def _onchange_company_id(self):
         super(SaleOrder, self)._onchange_company_id()
         if not self.warehouse_id.check_company(self.company_id):
-            self.warehouse_id = False
+            self.set_warehouse()
+
+    def set_warehouse(self):
+        self.warehouse_id = self.with_context(
+            company_id=self.company_id.id
+        )._default_warehouse_id()
 
     @api.multi
     @api.constrains('company_id', 'warehouse_id')
