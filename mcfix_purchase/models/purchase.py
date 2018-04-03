@@ -50,7 +50,7 @@ class PurchaseOrder(models.Model):
             self.partner_id = False
         if not self.dest_address_id.check_company(self.company_id):
             self.dest_address_id = False
-        self.with_context(force_company=self.company_id.id)._compute_tax_id()
+        self.order_line.change_company_id()
 
     @api.multi
     @api.constrains('company_id', 'invoice_ids')
@@ -134,6 +134,11 @@ class PurchaseOrderLine(models.Model):
         self.taxes_id = self.taxes_id.filtered(
             lambda r: r.company_id == self.order_id.company_id)
         return super()._suggest_quantity()
+
+    @api.model
+    def change_company_id(self):
+        for line in self:
+            line._compute_tax_id()
 
     @api.multi
     @api.constrains('company_id', 'taxes_id')
