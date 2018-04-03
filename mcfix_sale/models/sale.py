@@ -23,7 +23,7 @@ class SaleOrder(models.Model):
             self.pricelist_id = False
         if not self.payment_term_id.check_company(self.company_id):
             self.payment_term_id = False
-        self.with_context(force_company=self.company_id.id)._compute_tax_id()
+        self.order_line.change_company_id()
 
     @api.multi
     @api.onchange('partner_id')
@@ -151,6 +151,21 @@ class SaleOrderLine(models.Model):
         names = super(SaleOrderLine, self).name_get()
         res = self.add_company_suffix(names)
         return res
+
+    @api.multi
+    @api.onchange('product_id')
+    def product_id_change(self):
+        self.company_id = self.order_id.company_id
+        result = super().product_id_change()
+        for line in self:
+            line.tax_id = line.tax_id.filtered(
+                lambda r: r.company_id == line.order_id.company_id)
+        return result
+
+    @api.model
+    def change_company_id(self):
+        for line in self:
+            line._compute_tax_id()
 
     @api.multi
     def _prepare_invoice_line(self, qty):

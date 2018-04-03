@@ -9,7 +9,6 @@
     'depends': ['sale', 'mcfix_sales_team', 'mcfix_account'],
     'data': [
         'views/sale_views.xml',
-        'wizard/sale_make_invoice_advance_views.xml',
     ],
     'sequence': 30,
     'installable': True,
