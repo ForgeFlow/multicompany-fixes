@@ -1,16 +1,9 @@
-from odoo import api, fields, models, _
+from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
-
-    taxes_id = fields.Many2many(
-        domain="[('type_tax_use', '=', 'sale'),"
-               "('company_id', '=', company_id)]")
-    supplier_taxes_id = fields.Many2many(
-        domain="[('type_tax_use', '=', 'purchase'),"
-               "('company_id', '=', company_id)]")
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
