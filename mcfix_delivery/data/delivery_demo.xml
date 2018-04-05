@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="delivery.product_product_delivery_normal" model="product.product">
+            <field name="company_id"/>
+        </record>
+
+    </data>
+</odoo>
+
