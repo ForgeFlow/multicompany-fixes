@@ -133,12 +133,20 @@ class PurchaseOrderLine(models.Model):
     def _suggest_quantity(self):
         self.taxes_id = self.taxes_id.filtered(
             lambda r: r.company_id == self.order_id.company_id)
+        if not self.account_analytic_id:
+            self.account_analytic_id = self.default_account_analytic()
         return super()._suggest_quantity()
 
-    @api.model
+    @api.multi
     def change_company_id(self):
         for line in self:
             line._compute_tax_id()
+            if not line.account_analytic_id.check_company(line.company_id):
+                line.account_analytic_id = line.get_default_account_analytic()
+
+    @api.model
+    def default_account_analytic(self):
+        return False
 
     @api.multi
     @api.constrains('company_id', 'taxes_id')
