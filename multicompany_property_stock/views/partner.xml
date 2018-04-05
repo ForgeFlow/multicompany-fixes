@@ -6,10 +6,12 @@
         <field name="inherit_id" ref="multicompany_property_base.view_partner_property_form"/>
         <field name="arch" type="xml">
             <notebook position="inside">
-                <page name="inventory" string="Inventory" groups="base.group_no_one">
-                    <group string="Warehouse" name="warehouse">
-                        <field name="property_stock_customer" domain="[('usage','=','customer')]"/>
-                        <field name="property_stock_supplier" domain="[('usage','=','supplier')]"/>
+                <page name="inventory" string="Inventory">
+                    <group name="container_row_stock" groups="base.group_no_one">
+                        <group string="Warehouse" name="warehouse">
+                            <field name="property_stock_customer" domain="[('usage','=','customer')]"/>
+                            <field name="property_stock_supplier" domain="[('usage','=','supplier')]"/>
+                        </group>
                     </group>
                 </page>
             </notebook>

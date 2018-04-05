@@ -5,9 +5,11 @@
         <field name="model">res.partner.property</field>
         <field name="inherit_id" ref="multicompany_property_stock.view_partner_property_form"/>
         <field name="arch" type="xml">
-            <field name="property_stock_supplier" position="after">
-                <field name="property_delivery_carrier_id"/>
-            </field>
+            <group name="container_row_stock" position="after">
+                <group name="container_row_carrier">
+                    <field name="property_delivery_carrier_id" domain="['|', ('company_id','=',company_id), ('company_id','=', False)]"/>
+                </group>
+            </group>
         </field>
     </record>
 </odoo>

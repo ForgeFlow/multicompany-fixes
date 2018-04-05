@@ -31,59 +31,64 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
         group_manager = self.env.ref('sales_team.group_sale_manager')
         group_user = self.env.ref('sales_team.group_sale_salesman')
         group_mc = self.env.ref('base.group_multi_company')
-        self.manager = self.env['res.users'].create({
-            'name': 'Andrew Manager',
-            'login': 'manager',
-            'email': 'a.m@example.com',
-            'signature': '--\nAndreww',
-            'notification_type': 'email',
-            'groups_id': [(6, 0, [group_manager.id])]
-        })
+        self.manager = self.env['res.users'].with_context(
+            {'no_reset_password': True}).create({
+                'name': 'Andrew Manager',
+                'login': 'manager',
+                'email': 'a.m@example.com',
+                'signature': '--\nAndreww',
+                'notification_type': 'email',
+                'groups_id': [(6, 0, [group_manager.id])]
+            })
         self.manager.write({
             'groups_id': [(4, group_mc.id)]
         })
-        self.user = self.env['res.users'].create({
-            'name': 'Mark User',
-            'login': 'user',
-            'email': 'm.u@example.com',
-            'signature': '--\nMark',
-            'notification_type': 'email',
-            'groups_id': [(6, 0, [group_user.id])]
-        })
+        self.user = self.env['res.users'].with_context(
+            {'no_reset_password': True}).create({
+                'name': 'Mark User',
+                'login': 'user',
+                'email': 'm.u@example.com',
+                'signature': '--\nMark',
+                'notification_type': 'email',
+                'groups_id': [(6, 0, [group_user.id])]
+            })
         self.user.write({
             'groups_id': [(4, group_mc.id)],
             'company_ids': [(4, self.company_2.id)]
         })
-        self.user_2 = self.env['res.users'].create({
-            'name': 'Daisy User 2',
-            'login': 'user_2',
-            'email': 'd.u@example.com',
-            'signature': '--\nDaisy',
-            'notification_type': 'email',
-            'company_id': self.company_2.id,
-            'company_ids': [(4, self.company_2.id)]
-        })
-        self.user_3 = self.env['res.users'].create({
-            'name': 'Daisy User 3',
-            'login': 'user_3',
-            'email': 'd.u@example.com',
-            'signature': '--\nDaisy',
-            'notification_type': 'email',
-            'groups_id': [(6, 0, [group_user.id, group_mc.id])],
-        })
+        self.user_2 = self.env['res.users'].with_context(
+            {'no_reset_password': True}).create({
+                'name': 'Daisy User 2',
+                'login': 'user_2',
+                'email': 'd.u@example.com',
+                'signature': '--\nDaisy',
+                'notification_type': 'email',
+                'company_id': self.company_2.id,
+                'company_ids': [(4, self.company_2.id)]
+            })
+        self.user_3 = self.env['res.users'].with_context(
+            {'no_reset_password': True}).create({
+                'name': 'Daisy User 3',
+                'login': 'user_3',
+                'email': 'd.u@example.com',
+                'signature': '--\nDaisy',
+                'notification_type': 'email',
+                'groups_id': [(6, 0, [group_user.id, group_mc.id])],
+            })
         self.user_3.write({
             'company_ids': [(4, self.company_2.id)],
         })
-        self.user_4 = self.env['res.users'].create({
-            'name': 'Daisy User 4',
-            'login': 'user_4',
-            'email': 'd.u@example.com',
-            'signature': '--\nDaisy',
-            'notification_type': 'email',
-            'company_id': self.company_2.id,
-            'company_ids': [(4, self.company_2.id)],
-            'groups_id': [(6, 0, [group_user.id, group_mc.id])],
-        })
+        self.user_4 = self.env['res.users'].with_context(
+            {'no_reset_password': True}).create({
+                'name': 'Daisy User 4',
+                'login': 'user_4',
+                'email': 'd.u@example.com',
+                'signature': '--\nDaisy',
+                'notification_type': 'email',
+                'company_id': self.company_2.id,
+                'company_ids': [(4, self.company_2.id)],
+                'groups_id': [(6, 0, [group_user.id, group_mc.id])],
+            })
 
         if self.registry.get('stock.move') is not None:
             self.product2.write({'responsible_id': self.user_2.id,
