@@ -5,6 +5,17 @@ from odoo.exceptions import ValidationError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    @api.model
+    def _default_warehouse_id(self):
+        # This method can be removed when
+        # https://github.com/odoo/odoo/pull/24063 is merged.
+        super(SaleOrder, self)._default_warehouse_id()
+        company = self.env.context.get('company_id') or \
+            self.env.user.company_id.id
+        warehouse_ids = self.env['stock.warehouse'].search(
+            [('company_id', '=', company)], limit=1)
+        return warehouse_ids
+
     @api.onchange('company_id')
     def _onchange_company_id(self):
         super(SaleOrder, self)._onchange_company_id()
