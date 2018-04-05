@@ -1,14 +1,9 @@
-from odoo import api, fields, models, _
+from odoo import api, models, _
 from odoo.exceptions import ValidationError
 
 
 class AccountTaxTemplate(models.Model):
     _inherit = 'account.tax.template'
-
-    # We want to force the tax template to be blank always, because multiple
-    # companies can potentially use this template to create taxes. We want
-    # consistency company-wise.
-    company_id = fields.Many2one(default=False, required=False)
 
     @api.multi
     @api.depends('company_id')
