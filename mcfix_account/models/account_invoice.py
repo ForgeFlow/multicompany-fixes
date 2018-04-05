@@ -211,7 +211,12 @@ class AccountInvoiceLine(models.Model):
             self.invoice_id.company_id)
         if account:
             self.account_id = account.id
+        if not self.account_analytic_id.check_company(self.company_id):
+            self.account_analytic_id = self.get_default_account_analytic()
         self._set_taxes()
+
+    def get_default_account_analytic(self):
+        return False
 
     @api.v8
     def get_invoice_line_account(self, type, product, fpos, company):
