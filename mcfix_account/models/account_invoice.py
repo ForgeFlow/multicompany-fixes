@@ -12,18 +12,6 @@ class AccountInvoice(models.Model):
         res = self.add_company_suffix(names)
         return res
 
-    @api.multi
-    @api.onchange('company_id')
-    def onchange_company_id(self):
-        for invoice in self:
-            if not invoice.journal_id.check_company(invoice.company_id):
-                invoice.journal_id = self.env['account.journal'].search(
-                    [('company_id', '=', invoice.company_id.id),
-                     ('type', '=', invoice.journal_id.type)
-                     ], limit=1)
-            for line in invoice.invoice_line_ids:
-                line.change_company_id()
-
     @api.onchange('partner_id', 'company_id')
     def _onchange_partner_id(self):
         res = super(AccountInvoice, self)._onchange_partner_id()
@@ -85,6 +73,13 @@ class AccountInvoice(models.Model):
                 [('invoice_ids', 'in', [self.id]),
                  ('company_id', '!=', False),
                  ('company_id', '!=', self.company_id.id)])
+        if not self.journal_id.check_company(self.company_id):
+            self.journal_id = self.env['account.journal'].search(
+                [('company_id', '=', self.company_id.id),
+                 ('type', '=', self.journal_id.type)
+                 ], limit=1)
+        for line in self.invoice_line_ids:
+            line.change_company_id()
 
     @api.multi
     @api.constrains('company_id', 'payment_term_id')
