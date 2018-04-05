@@ -25,9 +25,7 @@ class AccountInvoice(models.Model):
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        super(AccountInvoice,  self.with_context(
-            force_company=self.company_id.id
-        ))._onchange_company_id()
+        super()._onchange_company_id()
         if not self.purchase_id.check_company(self.company_id):
             if self.refund_invoice_id.purchase_id:
                 self.purchase_id = self.refund_invoice_id.purchase_id
