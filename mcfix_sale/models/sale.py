@@ -5,10 +5,13 @@ from odoo.exceptions import ValidationError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+    def default_analytic_account(self):
+        return False
+
     @api.onchange('company_id')
     def _onchange_company_id(self):
         if not self.analytic_account_id.check_company(self.company_id):
-            self.analytic_account_id = False
+            self.analytic_account_id = self.default_analytic_account()
         if not self.partner_id.check_company(self.company_id):
             self.partner_id = False
         if not self.team_id.check_company(self.company_id):
