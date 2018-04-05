@@ -108,7 +108,6 @@ class TestAccountInvoice(TestAccountChartTemplate):
             'account_id': self.account.id,
         })
         self.invoice2._onchange_partner_id()
-        self.invoice2.onchange_company_id()
         self.invoice2._onchange_company_id()
         self.assertFalse(self.invoice2.partner_id)
         self.assertNotEqual(self.invoice2.journal_id, self.cash_journal)
