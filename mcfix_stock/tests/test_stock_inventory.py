@@ -64,7 +64,7 @@ class TestStockInventory(TransactionCase):
             'usage': 'supplier',
             'company_id': self.company_2.id,
         })
-        template_1 = self.env['product.template'].sudo().create({
+        self.template_1 = self.env['product.template'].sudo().create({
             'name': 'Test',
             'uom_id': self.uom_unit.id,
             'uom_po_id': self.uom_unit.id,
@@ -79,7 +79,7 @@ class TestStockInventory(TransactionCase):
         })
         self.inventory_1 = self.env['stock.inventory'].sudo(self.user).create({
             'name': 'test inventory',
-            'product_id': template_1.product_variant_id.id,
+            'product_id': self.template_1.product_variant_id.id,
             'partner_id': self.partner.id,
             'location_id': location_1.id,
             'company_id': self.company.id,
@@ -121,3 +121,18 @@ class TestStockInventory(TransactionCase):
         self.partner.company_id = self.company
         with self.assertRaises(ValidationError):
             self.inventory_1.location_id = self.location_2
+
+    def test_create_inventory(self):
+        # When creating an inventory without indicating the company,
+        # it should default to the company associated to the location.
+        self.template_1.company_id = False
+        self.partner.company_id = False
+        inventory = self.env['stock.inventory'].sudo(
+            self.user).create({
+                'name': 'test inventory',
+                'product_id': self.template_1.product_variant_id.id,
+                'partner_id': self.partner.id,
+                'location_id': self.location_2.id,
+                'filter': 'product_owner',
+            })
+        self.assertEquals(inventory.company_id, self.company_2)
