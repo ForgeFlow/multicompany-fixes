@@ -5,6 +5,14 @@ from odoo.exceptions import ValidationError
 class Inventory(models.Model):
     _inherit = "stock.inventory"
 
+    @api.model
+    def create(self, vals):
+        if vals.get('location_id') and not vals.get('company_id'):
+            location = self.env['stock.location'].browse(vals['location_id'])
+            if location.company_id:
+                vals['company_id'] = location.company_id.id
+        return super(Inventory, self).create(vals)
+
     @api.onchange('company_id')
     def _onchange_company_id(self):
         if not self.product_id.check_company(self.company_id):
@@ -46,15 +54,6 @@ class Inventory(models.Model):
                 raise ValidationError(
                     _('The Company in the Stock Inventory and in '
                       'Stock Quant Package must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'product_id')
-    def _check_company_id_product_id(self):
-        for rec in self.sudo():
-            if not rec.product_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Inventory and in '
-                      'Product Product must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
@@ -104,12 +103,3 @@ class InventoryLine(models.Model):
                 raise ValidationError(
                     _('The Company in the Stock Inventory Line and in '
                       'Stock Quant Package must be the same.'))
-
-    # @api.multi
-    # @api.constrains('company_id', 'product_id')
-    # def _check_company_id_product_id(self):
-    #     for rec in self.sudo():
-    #         if not rec.product_id.check_company(rec.company_id):
-    #             raise ValidationError(
-    #                 _('The Company in the Stock Inventory Line and in '
-    #                   'Product Product must be the same.'))
