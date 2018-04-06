@@ -67,22 +67,31 @@ class TestAccountJournal(TransactionCase):
         return manager_account_test_group
 
     def test_onchanges(self):
-        self.bank_journal = self.journal_model.sudo(self.user).new({
+        bank_journal = self.journal_model.sudo(self.user).new({
             'name': 'Bank Journal 1 - Test',
             'code': 'test_bank_2',
             'type': 'bank',
             'company_id': self.company_2.id,
             'bank_account_id': self.partner_bank.id,
         })
-        self.bank_journal._onchange_company_id()
-        self.assertEqual(self.bank_journal.bank_account_id, self.partner_bank)
+        bank_journal._onchange_company_id()
+        self.assertEqual(bank_journal.bank_account_id, self.partner_bank)
 
-    def test_constrains(self):
-        self.bank_journal = self.journal_model.sudo(self.user).create({
+    def test_create(self):
+        bank_journal = self.journal_model.sudo(self.user).create({
             'name': 'Bank Journal 1 - Test',
             'code': 'test_bank_1',
             'type': 'bank',
             'company_id': self.company.id,
             'bank_account_id': self.partner_bank.id,
         })
-        self.bank_journal.company_id = self.company_2
+        bank_journal.company_id = self.company_2
+        self.assertEquals(
+            bank_journal.default_debit_account_id.company_id,
+            bank_journal.company_id)
+        self.assertEquals(
+            bank_journal.default_credit_account_id.company_id,
+            bank_journal.company_id)
+        self.assertEquals(
+            bank_journal.sequence_id.company_id,
+            bank_journal.company_id)
