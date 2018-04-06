@@ -59,37 +59,59 @@ class AccountJournal(models.Model):
     def write(self, vals):
         for journal in self:
             if vals.get('company_id'):
-                if journal.sequence_id.company_id.id != vals['company_id']:
-                    journal.sequence_id.with_context(
+                sequence_id = vals.get('sequence_id', journal.sequence_id.id)
+                sequence = self.env[
+                    'ir.sequence'].browse(sequence_id)
+                if sequence and sequence.company_id.id != vals['company_id']:
+                    sequence.with_context(
                         bypass_company_validation=True).sudo().write(
                         {'company_id': vals['company_id']})
-                elif journal.refund_sequence_id.company_id.id != vals[
+                refund_sequence_id = vals.get('refund_sequence_id',
+                                              journal.refund_sequence_id.id)
+                refund_sequence = self.env[
+                    'ir.sequence'].browse(refund_sequence_id)
+                if refund_sequence and refund_sequence.company_id.id != vals[
                     'company_id'
                 ]:
-                    journal.refund_sequence_id.with_context(
+                    refund_sequence.with_context(
                         bypass_company_validation=True).sudo().write(
                         {'company_id': vals['company_id']})
-                if journal.default_debit_account_id.company_id.id != vals[
-                    'company_id'
-                ]:
-                    journal.default_debit_account_id.with_context(
-                        bypass_company_validation=True).write(
-                        {'company_id': vals['company_id']})
-                if journal.default_credit_account_id.company_id.id != vals[
-                    'company_id'
-                ]:
-                    journal.default_credit_account_id.with_context(
-                        bypass_company_validation=True).write(
-                        {'company_id': vals['company_id']})
-                if journal.bank_account_id.company_id.id != vals[
-                    'company_id'
-                ]:
-                    company = self.env['res.company'].browse(
-                        vals['company_id'])
-                    journal.bank_account_id.with_context(
-                        bypass_company_validation=True).write(
-                        {'company_id': company.id,
-                         'partner_id': company.partner_id.id})
+                if vals.get('type', journal.type) in ('bank', 'cash'):
+                    default_debit_account_id = vals.get(
+                        'default_debit_account_id',
+                        journal.default_debit_account_id.id)
+                    default_debit_account = self.env[
+                        'account.account'].browse(default_debit_account_id)
+                    if default_debit_account and \
+                            default_debit_account.company_id.id != vals[
+                            'company_id']:
+                        default_debit_account.with_context(
+                            bypass_company_validation=True).write(
+                            {'company_id': vals['company_id']})
+                    default_credit_account_id = vals.get(
+                        'default_credit_account_id',
+                        journal.default_credit_account_id.id)
+                    default_credit_account = self.env[
+                        'account.account'].browse(default_credit_account_id)
+                    if default_credit_account and \
+                            default_credit_account.company_id.id != vals[
+                            'company_id']:
+                        default_credit_account_id.with_context(
+                            bypass_company_validation=True).write(
+                            {'company_id': vals['company_id']})
+                    bank_account_id = vals.get(
+                        'bank_account_id',
+                        journal.bank_account_id.id)
+                    bank_account = self.env[
+                        'res.partner.bank'].browse(bank_account_id)
+                    if bank_account and bank_account.company_id.id != vals[
+                            'company_id']:
+                        company = self.env['res.company'].browse(
+                            vals['company_id'])
+                        bank_account.with_context(
+                            bypass_company_validation=True).write(
+                            {'company_id': company.id,
+                             'partner_id': company.partner_id.id})
         return super(AccountJournal, self).write(vals)
 
     @api.onchange('company_id')
