@@ -1,9 +1,9 @@
+# Copyright 2018 Creu Blanca
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
-# License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 
 import logging
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -73,33 +73,3 @@ class TestAnalytic(TransactionCase):
         })
         analytic_1._onchange_company_id()
         self.assertNotEqual(analytic_1.partner_id, self.partner_1)
-        analytic_2 = self.env['account.analytic.account'].sudo(self.user).\
-            create({
-                'name': 'Test Analytic',
-                'company_id': self.company_2.id,
-            })
-        with self.assertRaises(ValidationError):
-            analytic_2.partner_id = self.partner_1
-        self.partner_1.company_id = self.company_2
-        analytic_2.partner_id = self.partner_1
-        line = self.env['account.analytic.line'].sudo(self.user).\
-            create({
-                'name': 'Test Analytic',
-                'account_id': analytic_2.id,
-                'company_id': self.company_2.id,
-            })
-        with self.assertRaises(ValidationError):
-            analytic_2.company_id = self.company
-        line.company_id = self.company
-        with self.assertRaises(ValidationError):
-            line.company_id = self.company_2
-
-    def test_partner(self):
-        analytic_1 = self.env['account.analytic.account'].sudo(self.user).\
-            create({
-                'name': 'Test Analytic',
-                'company_id': self.company.id,
-                })
-        analytic_1.partner_id = self.partner_1
-        with self.assertRaises(ValidationError):
-            self.partner_1.company_id = self.company_2
