@@ -55,8 +55,8 @@ class PartnerProperty(models.TransientModel):
 
     @api.multi
     def get_property_fields(self, object, properties):
-        """ This method must be redefined by modules that
-        introduce property fields in the res.partner model """
+        """ We have no property fields in this module, but we still
+        have to implement the method to avoid error."""
         return
 
     @api.multi
