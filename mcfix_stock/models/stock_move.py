@@ -14,10 +14,22 @@ class StockMove(models.Model):
 
     @api.model
     def create(self, vals):
+        # If we did not get the company, try to derive from the picking
         if vals.get('picking_id') and not vals.get('company_id'):
             picking = self.env['stock.picking'].browse(vals['picking_id'])
             vals['company_id'] = \
                 picking.picking_type_id.warehouse_id.company_id.id
+
+        # If we did not get the company or picking, try to derive
+        # from either the source or destination location.
+        if not vals.get('picking_id') and not vals.get('company_id'):
+            location = self.env['stock.location'].browse(vals['location_id'])
+            location_dest = self.env['stock.location'].browse(
+                vals['location_dest_id'])
+            company = location.company_id or location_dest.company_id
+            if company:
+                vals['company_id'] = company.id
+
         return super(StockMove, self).create(vals)
 
     @api.onchange('company_id')
