@@ -24,7 +24,7 @@
         <field name="inherit_id" ref="point_of_sale.view_pos_config_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='name']" position="after">
-                <field name="company_id" invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company"/>
             </xpath>
         </field>
     </record>

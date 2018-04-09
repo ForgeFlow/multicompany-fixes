@@ -1,23 +1,52 @@
-from odoo import api, models, _
+# Copyright 2018 Creu Blanca
+# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
 class PosOrder(models.Model):
     _inherit = "pos.order"
 
+    def _default_company(self):
+        return self._default_session().config_id.company_id
+
+    def _default_session(self):
+        super(PosOrder, self)._default_session()
+        company_id = self.env.context.get('company_id') or \
+            self.env.user.company_id.id
+        return self.env['pos.session'].search(
+            [('state', '=', 'opened'), ('user_id', '=', self.env.uid),
+             ('config_id.company_id', '=', company_id)], limit=1)
+
+    # We override the default in order to provide a default company that is
+    # consistent with the default session.
+    company_id = fields.Many2one(default=_default_company)
+
+    def create(self, vals):
+        company_id = vals.get('company_id', False)
+        session_id = vals.get('session_id', False)
+
+        # If we are creating the pos.order with a session but not a company,
+        # we propose a company that is consistent with the session provided.
+        if session_id and not company_id:
+            session = self.env['pos.session'].browse(session_id)
+            vals['company_id'] = session.config_id.company_id.id
+
+        # If we are creating the pos.order with a specific company but
+        # not a session, we propose a default session that is consistent with
+        # the company provided.
+        if company_id and not session_id:
+            session = self.with_context(
+                company_id=company_id)._default_session()
+            if session:
+                vals['session_id'] = session.id
+        return super(PosOrder, self).create(vals)
+
     @api.onchange('company_id')
     def _onchange_company_id(self):
-        if not self.account_move.check_company(self.company_id):
-            self.account_move = False
         if not self.partner_id.check_company(self.company_id):
             self.partner_id = False
-            # self.partner_id = self.company_id.partner_id
-        if not self.fiscal_position_id.check_company(self.company_id):
-            self.fiscal_position_id = self.invoice_id.fiscal_position_id
-        if not self.picking_id.check_company(self.company_id):
-            self.picking_id = False
-        if not self.invoice_id.check_company(self.company_id):
-            self.invoice_id = False
         if not self.pricelist_id.check_company(self.company_id):
             self.pricelist_id = self.config_id.pricelist_id
 
@@ -88,60 +117,15 @@ class PosOrder(models.Model):
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
-    @api.onchange('company_id')
-    def _onchange_company_id(self):
-        if not self.product_id.check_company(self.company_id):
-            self.product_id = False
-        # if not self.tax_ids.check_company(self.company_id):
-        #     self.tax_ids = self.env['account.tax'].search(
-        #             [('____id', '=', self.id),
-        #              ('company_id', '=', False),
-        #              ('company_id', '=', self.company_id.id)])
-        if not self.order_id.check_company(self.company_id):
-            self.order_id = False
-        # if not self.tax_ids_after_fiscal_position.check_company(
-        #     self.company_id
-        # ):
-        #     self.tax_ids_after_fiscal_position = self.env['account.tax'].\
-        #         search(
-        #             [('____id', '=', self.id),
-        #              ('company_id', '=', False),
-        #              ('company_id', '=', self.company_id.id)])
-
-    # @api.multi
-    # @api.constrains('company_id', 'product_id')
-    # def _check_company_id_product_id(self):
-    #     for rec in self.sudo():
-    #         if not rec.product_id.check_company(rec.company_id):
-    #             raise ValidationError(
-    #                 _('The Company in the Pos Order Line and in '
-    #                   'Product Product must be the same.'))
+    company_id = fields.Many2one(
+        related='order_id.company_id', default=False, readonly=True,
+    )
 
     @api.multi
-    @api.constrains('company_id', 'tax_ids')
+    @api.constrains('tax_ids')
     def _check_company_id_tax_ids(self):
         for rec in self.sudo():
             for line in rec.tax_ids:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Pos Order Line and in '
-                          'Account Tax (%s) must be the same.'
-                          ) % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'order_id')
-    def _check_company_id_order_id(self):
-        for rec in self.sudo():
-            if not rec.order_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Pos Order Line and in '
-                      'Pos Order must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'tax_ids_after_fiscal_position')
-    def _check_company_id_tax_ids_after_fiscal_position(self):
-        for rec in self.sudo():
-            for line in rec.tax_ids_after_fiscal_position:
                 if not line.check_company(rec.company_id):
                     raise ValidationError(
                         _('The Company in the Pos Order Line and in '

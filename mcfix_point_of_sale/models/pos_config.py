@@ -1,9 +1,36 @@
+# Copyright 2018 Creu Blanca
+# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
 class PosConfig(models.Model):
     _inherit = 'pos.config'
+
+    def _default_sale_journal(self):
+        super(PosConfig, self)._default_sale_journal()
+        company = self.env.context.get('company_id') or \
+            self.env.user.company_id.id
+        journal = self.env.ref('point_of_sale.pos_sale_journal',
+                               raise_if_not_found=False)
+        if journal and journal.sudo().company_id == company:
+            return journal
+        return self._default_invoice_journal()
+
+    def _default_invoice_journal(self):
+        super(PosConfig, self)._default_invoice_journal()
+        company_id = self.env.context.get('company_id') or \
+            self.env.user.company_id.id
+        return self.env['account.journal'].search(
+            [('type', '=', 'sale'), ('company_id', '=', company_id)], limit=1)
+
+    def _get_default_location(self):
+        super(PosConfig, self)._get_default_location()
+        company_id = self.env.context.get('company_id') or \
+            self.env.user.company_id.id
+        return self.env['stock.warehouse'].search(
+            [('company_id', '=', company_id)], limit=1).lot_stock_id
 
     journal_id = fields.Many2one(
         domain="[('type', '=', 'sale'), ('company_id', '=', company_id)]",
@@ -21,6 +48,49 @@ class PosConfig(models.Model):
                "'|',('company_id','=',False),('company_id','=',company_id)]",
     )
 
+    @api.model
+    def create(self, vals):
+        # If we are creating the pos.config with a specific company, and
+        # we are not indicating an invoice journal or location, we
+        # propose a default that is consistent with the company provided.
+        company_id = vals.get('company_id', False)
+        invoice_journal_id = vals.get('invoice_journal_id', False)
+        stock_location_id = vals.get('stock_location_id', False)
+
+        if company_id and not invoice_journal_id:
+            invoice_journal = self.with_context(
+                company_id=company_id)._default_invoice_journal()
+            vals['invoice_journal_id'] = invoice_journal.id
+        if company_id and not stock_location_id:
+            stock_location = self.with_context(
+                company_id=company_id)._get_default_location()
+            vals['stock_location_id'] = stock_location.id
+        return super(PosConfig, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        for pos_config in self:
+            if vals.get('company_id') and not vals.get('sequence_id', False):
+                sequence_id = vals.get('sequence_id',
+                                       pos_config.sequence_id.id)
+                sequence = self.env[
+                    'ir.sequence'].browse(sequence_id)
+                if sequence and sequence.company_id.id != vals['company_id']:
+                    sequence.with_context(
+                        bypass_company_validation=True).sudo().write(
+                        {'company_id': vals['company_id']})
+            if vals.get('company_id') and not vals.get(
+                    'sequence_line_id', False):
+                sequence_id = vals.get('sequence_line_id',
+                                       pos_config.sequence_line_id.id)
+                sequence = self.env[
+                    'ir.sequence'].browse(sequence_id)
+                if sequence and sequence.company_id.id != vals['company_id']:
+                    sequence.with_context(
+                        bypass_company_validation=True).sudo().write(
+                        {'company_id': vals['company_id']})
+        return super(PosConfig, self).write(vals)
+
     @api.multi
     @api.depends('company_id')
     def name_get(self):
@@ -35,12 +105,14 @@ class PosConfig(models.Model):
                 [('journal_user', '=', True),
                  ('type', 'in', ['bank', 'cash']),
                  ('company_id', '=', self.company_id.id)])
-        if not self.journal_id.check_company(self.company_id):
-            self.journal_id = self.env['account.journal'].search([
-                ('company_id', '=', self.company_id.id),
-                ('type', '=', 'sale')
-            ], limit=1)
-            self.invoice_journal_id = self.journal_id
+        if not self.journal_id or not self.journal_id.check_company(
+                self.company_id):
+            self.journal_id = self.with_context(
+                company_id=self.company_id.id)._default_sale_journal()
+        if not self.invoice_journal_id or not \
+                self.invoice_journal_id.check_company(self.company_id):
+            self.invoice_journal_id = self.with_context(
+                company_id=self.company_id.id)._default_invoice_journal()
         if not self.tip_product_id.check_company(self.company_id):
             self.tip_product_id = False
         if not self.pricelist_id.check_company(self.company_id):
@@ -51,27 +123,6 @@ class PosConfig(models.Model):
             ).lot_stock_id
         if not self.default_fiscal_position_id.check_company(self.company_id):
             self.default_fiscal_position_id = False
-        # if not self.sequence_id.check_company(self.company_id):
-        #     self.sequence_id = False
-        # if not self.sequence_line_id.check_company(self.company_id):
-        #     self.sequence_line_id = False
-        # if not self.available_pricelist_ids.check_company(self.company_id):
-        #     self.available_pricelist_ids = self.env['product.pricelist'].\
-        #         search(
-        #             [('____id', '=', self.id),
-        #              ('company_id', '=', False),
-        #              ('company_id', '=', self.company_id.id)])
-        # if not self.journal_ids.check_company(self.company_id):
-        #     self.journal_ids = self.env['account.journal'].search(
-        #             [('____id', '=', self.id),
-        #              ('company_id', '=', False),
-        #              ('company_id', '=', self.company_id.id)])
-        # if not self.fiscal_position_ids.check_company(self.company_id):
-        #     self.fiscal_position_ids = self.env['account.fiscal.position'].\
-        #         search(
-        #             [('____id', '=', self.id),
-        #              ('company_id', '=', False),
-        #              ('company_id', '=', self.company_id.id)])
 
     @api.multi
     @api.constrains('company_id', 'invoice_journal_id')
@@ -80,7 +131,7 @@ class PosConfig(models.Model):
             if not rec.invoice_journal_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
-                      'Account Journal must be the same.'))
+                      'Invoice Journal must be the same.'))
 
     @api.multi
     @api.constrains('company_id', 'journal_id')
