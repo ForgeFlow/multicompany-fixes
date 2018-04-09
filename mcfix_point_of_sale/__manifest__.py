@@ -13,7 +13,9 @@
     'data': [
         'views/pos_config_view.xml',
         'views/pos_order_view.xml',
+        'views/pos_session_view.xml',
         'wizard/pos_details.xml',
+        'security/point_of_sale_security.xml',
     ],
     'demo': [
         'data/point_of_sale_demo.xml',
