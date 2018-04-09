@@ -2,14 +2,15 @@
 # Copyright 2018 Eficent Business and IT Consulting Services, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
 
     company_id = fields.Many2one('res.company', string='Company',
-                                 related='config_id.company_id', store=True)
+                                 related='config_id.company_id', store=True,
+                                 readonly=True)
 
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
@@ -46,3 +47,14 @@ class PosSession(models.Model):
             pos_config.sudo().write({'journal_ids': [(6, 0, journals.ids)]})
 
         return super(PosSession, self).create(values)
+
+    @api.multi
+    @api.constrains('config_id')
+    def _check_company_id_config_id(self):
+        for rec in self.sudo():
+            for config in rec.config_id:
+                if not config.check_company(rec.company_id):
+                    raise ValidationError(
+                        _('The Company in the POS Session and in '
+                          'POS Config (%s) must be the same.'
+                          ) % config.name_get()[0][1])

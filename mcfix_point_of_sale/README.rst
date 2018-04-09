@@ -23,16 +23,13 @@ the multi-company functionality is consistent.
 * You cannot change the company of a POS Session once it has created a bank
   statement.
 
-
-
-
 * You cannot change the company of an invoice if it originated from a
   POS order that belongs to another company.
 
 * You cannot change the company of a picking if it originated from a POS order
   that belongs to another company.
 
-*
+
 
 
 

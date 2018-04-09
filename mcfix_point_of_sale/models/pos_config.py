@@ -10,11 +10,11 @@ class PosConfig(models.Model):
 
     def _default_sale_journal(self):
         super(PosConfig, self)._default_sale_journal()
-        company = self.env.context.get('company_id') or \
+        company_id = self.env.context.get('company_id') or \
             self.env.user.company_id.id
         journal = self.env.ref('point_of_sale.pos_sale_journal',
                                raise_if_not_found=False)
-        if journal and journal.sudo().company_id == company:
+        if journal and journal.sudo().company_id.id == company_id:
             return journal
         return self._default_invoice_journal()
 
