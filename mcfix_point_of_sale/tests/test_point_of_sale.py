@@ -26,17 +26,12 @@ class TestPointOfSale(TestAccountChartTemplate):
         self.pos_model = self.env['pos.order']
         self.journal_model = self.env['account.journal']
 
-        self.fruits_vegetables = self.env.ref(
-            'point_of_sale.fruits_vegetables')
-        self.carotte = self.env.ref('point_of_sale.carotte')
-        self.courgette = self.env.ref('point_of_sale.courgette')
-        self.onions = self.env.ref('point_of_sale.Onions')
-
         manager_pos_test_group = self.create_full_access(
             ['pos.order', 'pos.order.line', 'product.pricelist',
              'product.pricelist.item', 'account.journal', 'account.move',
              'account.move.line', 'account.reconcile.model',
              'account.payment', 'account.asset.category'])
+        self.env.user.company_id = self.company
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
@@ -85,17 +80,22 @@ class TestPointOfSale(TestAccountChartTemplate):
                 'account.data_account_type_revenue').id
         })
 
-        self.carotte.with_context(
-            force_company=self.company_id).property_account_income_id = \
-            self.income_account
+        self.fruits_vegetables = self.env.ref(
+            'point_of_sale.fruits_vegetables')
+        self.carotte = self.env.ref('point_of_sale.carotte')
+        self.courgette = self.env.ref('point_of_sale.courgette')
+        self.onions = self.env.ref('point_of_sale.Onions')
 
-        self.onions.with_context(
-            force_company=self.company_id).property_account_income_id = \
-            self.income_account
-
-        self.courgette.with_context(
-            force_company=self.company_id).property_account_income_id = \
-            self.income_account
+        self.carotte.categ_id.with_context(
+            force_company=self.company.id
+        ).property_account_income_categ_id = self.env[
+            'account.account'].create({
+                'company_id': self.company.id,
+                'code': 'INCOME',
+                'name': 'Income',
+                'user_type_id': self.env.ref(
+                    'account.data_account_type_revenue').id
+            })
 
     def create_full_access(self, list_of_models):
         manager_pos_test_group = self.env['res.groups'].sudo().create({
@@ -156,14 +156,14 @@ class TestPointOfSale(TestAccountChartTemplate):
             'user_id': self.user.id,
             'config_id': self.pos_config.id,
         })
-        self.pos_1 = self.pos_model.sudo(self.user).create({
+        pos_1 = self.pos_model.sudo(self.user).create({
             'name': 'Pos - Test',
             'pricelist_id': self.pricelist.id,
             'company_id': self.company.id,
             'session_id': pos_session.id,
         })
         with self.assertRaises(ValidationError):
-            self.pos_1.company_id = self.company_2
+            pos_1.company_id = self.company_2
 
     def test_create_from_ui(self):
         """
@@ -270,7 +270,7 @@ class TestPointOfSale(TestAccountChartTemplate):
             'to_invoice': False}
 
         untax, atax = compute_tax(self.onions, 1.28)
-        onions_order = {
+        self.onions_order = {
             'data': {'amount_paid': untax + atax,
                      'amount_return': 0,
                      'amount_tax': atax,
@@ -334,7 +334,7 @@ class TestPointOfSale(TestAccountChartTemplate):
 
         # I keep selling after the session is closed
         with mute_logger('odoo.addons.point_of_sale.models.pos_order'):
-            self.pos_model.create_from_ui([zucchini_order, onions_order])
+            self.pos_model.create_from_ui([zucchini_order, self.onions_order])
         rescue_session = self.env['pos.session'].search([
             ('config_id', '=', self.pos_config.id),
             ('state', '=', 'opened'),
