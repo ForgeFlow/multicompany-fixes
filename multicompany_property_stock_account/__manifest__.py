@@ -13,9 +13,9 @@
     'depends': ['multicompany_property_account',
                 'multicompany_property_stock'],
     'data': [
-        'views/product.xml',
-        'views/product_category.xml',
-        'views/res_company_view.xml'
+        'views/product_views.xml',
+        'views/product_category_views.xml',
+        'views/res_company_views.xml'
     ],
     'installable': True,
     'application': False,
