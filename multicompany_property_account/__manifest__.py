@@ -13,9 +13,9 @@
     'depends': ['account', 'multicompany_property_product',
                 'payment'],
     'data': [
-        'views/partner.xml',
-        'views/product.xml',
-        'views/product_category.xml',
+        'views/partner_views.xml',
+        'views/product_views.xml',
+        'views/product_category_views.xml',
         'views/res_company_views.xml',
     ],
     'installable': True,
