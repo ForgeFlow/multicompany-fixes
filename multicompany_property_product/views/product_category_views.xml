@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="product.product_category_form_view"/>
         <field name="arch" type="xml">
             <group name="first" position="after">
-               <group>
+               <group name="properties" string="Multi company">
                    <field name="property_ids" nolabel="1"/>
                </group>
             </group>
