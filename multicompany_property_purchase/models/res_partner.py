@@ -5,12 +5,6 @@
 from odoo import fields, models, api
 
 
-class Partner(models.Model):
-    _inherit = 'res.partner'
-
-    property_purchase_currency_id = fields.Many2one(readonly=True)
-
-
 class PartnerProperties(models.TransientModel):
     _inherit = 'res.partner.property'
 
