@@ -5,13 +5,6 @@
 from odoo import models, fields, api
 
 
-class Partner(models.Model):
-    _inherit = 'res.partner'
-
-    property_stock_customer = fields.Many2one(readonly=True)
-    property_stock_supplier = fields.Many2one(readonly=True)
-
-
 class PartnerProperty(models.TransientModel):
     _inherit = 'res.partner.property'
 

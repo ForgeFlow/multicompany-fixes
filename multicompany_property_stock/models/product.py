@@ -5,13 +5,6 @@
 from odoo import models, fields, api
 
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
-
-    property_stock_production = fields.Many2one(readonly=True)
-    property_stock_inventory = fields.Many2one(readonly=True)
-
-
 class ProductProperty(models.TransientModel):
     _inherit = 'product.property'
 
