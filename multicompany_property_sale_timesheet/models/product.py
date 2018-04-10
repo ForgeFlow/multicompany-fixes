@@ -5,12 +5,6 @@
 from odoo import models, fields, api
 
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
-
-    project_id = fields.Many2one(readonly=True)
-
-
 class ProductProperty(models.TransientModel):
     _inherit = 'product.property'
 
@@ -20,10 +14,8 @@ class ProductProperty(models.TransientModel):
         readonly=False,
         help='Create a task under this project on sale '
              'order validation. This setting must be set for each company.')
-
-    type = fields.Selection(related='product_template_id.type')
-    service_type = fields.Selection(
-        related='product_template_id.service_type')
+    service_tracking = fields.Selection(
+        related='product_template_id.service_tracking')
 
     @api.multi
     def get_property_fields(self, object, properties):

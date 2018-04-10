@@ -5,17 +5,6 @@
 from odoo import models, fields, api
 
 
-class ProductCategory(models.Model):
-    _inherit = 'product.category'
-
-    property_valuation = fields.Selection(readonly=True)
-    property_cost_method = fields.Selection(readonly=True)
-    property_stock_journal = fields.Many2one(readonly=True)
-    property_stock_account_input_categ_id = fields.Many2one(readonly=True)
-    property_stock_account_output_categ_id = fields.Many2one(readonly=True)
-    property_stock_valuation_account_id = fields.Many2one(readonly=True)
-
-
 class ProductCategoryProperty(models.TransientModel):
     _inherit = 'product.category.property'
 

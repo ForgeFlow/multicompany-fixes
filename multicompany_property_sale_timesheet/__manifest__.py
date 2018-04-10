@@ -12,7 +12,7 @@
     'website': 'http://www.eficent.com',
     'depends': ['sale_timesheet', 'multicompany_property_account'],
     'data': [
-        'views/product.xml',
+        'views/product_views.xml',
     ],
     'installable': True,
     'application': False,
