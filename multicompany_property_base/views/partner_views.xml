@@ -15,7 +15,7 @@
         </field>
     </record>
 
-    <record id="view_partner_property_tree" model="ir.ui.view">
+    <record id="view_partner_property_multicompany_tree" model="ir.ui.view">
         <field name="name">res.partner.property.tree</field>
         <field name="model">res.partner.property</field>
         <field name="arch" type="xml">
@@ -26,8 +26,7 @@
         </field>
     </record>
 
-
-    <record id="view_partner_property_form" model="ir.ui.view">
+    <record id="view_partner_property_multicompany_form" model="ir.ui.view">
         <field name="name">res.partner.property.form</field>
         <field name="model">res.partner.property</field>
         <field name="arch" type="xml">
