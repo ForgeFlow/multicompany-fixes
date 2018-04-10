@@ -12,9 +12,9 @@
     'website': 'http://www.eficent.com',
     'depends': ['purchase', 'multicompany_property_stock_account'],
     'data': [
-        'views/partner.xml',
-        'views/product.xml',
-        'views/product_category.xml'
+        'views/partner_views.xml',
+        'views/product_views.xml',
+        'views/product_category_views.xml'
     ],
     'installable': True,
     'application': False,
