@@ -13,7 +13,7 @@
     'website': 'https://github.com/OCA/multi-company',
     'depends': ['base'],
     'data': [
-        'views/partner.xml',
+        'views/partner_views.xml',
         'views/res_company_views.xml'
     ],
     'installable': True,
