@@ -9,7 +9,7 @@ class PosConfig(models.Model):
     _inherit = 'pos.config'
 
     def _default_sale_journal(self):
-        super(PosConfig, self)._default_sale_journal()
+        super()._default_sale_journal()
         company_id = self.env.context.get('company_id') or \
             self.env.user.company_id.id
         journal = self.env.ref('point_of_sale.pos_sale_journal',
@@ -19,18 +19,28 @@ class PosConfig(models.Model):
         return self._default_invoice_journal()
 
     def _default_invoice_journal(self):
-        super(PosConfig, self)._default_invoice_journal()
+        super()._default_invoice_journal()
         company_id = self.env.context.get('company_id') or \
             self.env.user.company_id.id
         return self.env['account.journal'].search(
             [('type', '=', 'sale'), ('company_id', '=', company_id)], limit=1)
 
     def _get_default_location(self):
-        super(PosConfig, self)._get_default_location()
+        super()._get_default_location()
         company_id = self.env.context.get('company_id') or \
             self.env.user.company_id.id
         return self.env['stock.warehouse'].search(
             [('company_id', '=', company_id)], limit=1).lot_stock_id
+
+    def _default_pricelist(self):
+        super()._default_pricelist()
+        company_id = self.env.context.get('company_id') or \
+            self.env.user.company_id.id
+        company = self.env['res.company'].browse(company_id)
+        return self.env['product.pricelist'].search(
+            [('currency_id', '=', company.currency_id.id),
+             ('company_id', '=', company.id)],
+            limit=1)
 
     journal_id = fields.Many2one(
         domain="[('type', '=', 'sale'), ('company_id', '=', company_id)]",
