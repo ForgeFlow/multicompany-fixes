@@ -25,6 +25,14 @@
                             <field name="default_sale_tax_id"/>
                             <field name="default_purchase_tax_id"/>
                             <field name="transfer_account_id"/>
+                            <field name="partner_account_payable_id"
+                                   attrs="{'required': [('chart_template_id', '!=', False)]}"/>
+                            <field name="partner_account_receivable_id"
+                                   attrs="{'required': [('chart_template_id', '!=', False)]}"/>
+                            <field name="categ_account_income_id"
+                                   attrs="{'required': [('chart_template_id', '!=', False)]}"/>
+                            <field name="categ_account_expense_id"
+                                   attrs="{'required': [('chart_template_id', '!=', False)]}"/>
                         </group>
                         <group>
                             <field name="fiscalyear_last_day"/>
