@@ -165,6 +165,38 @@ class TestPointOfSale(TestAccountChartTemplate):
         with self.assertRaises(ValidationError):
             pos_1.company_id = self.company_2
 
+    def test_pos_session_create(self):
+        company_3 = self.env['res.company'].create({
+            'name': 'C3',
+        })
+        self.env['account.journal'].create(
+            {'name': 'Cash Journal - c3',
+             'code': 'CJ3',
+             'type': 'cash',
+             'company_id': company_3.id,
+             'journal_user': True
+             }
+        )
+        sale_journal = self.env['account.journal'].create(
+            {'name': 'Sale Journal - c3',
+             'code': 'SJ3',
+             'type': 'sale',
+             'company_id': company_3.id,
+             }
+        )
+        pos_config = self.env['pos.config'].create({
+            'name': 'Config Test',
+            'company_id': company_3.id,
+            'journal_id': sale_journal.id,
+        })
+
+        # I click on create a new session button
+        pos_config.open_session_cb()
+        self.assertEquals(len(pos_config.journal_ids) > 0, True)
+        self.assertEquals(pos_config.journal_ids[0].journal_user, True)
+        with self.assertRaises(ValidationError):
+            pos_config.company_id = self.company_2
+
     def test_create_from_ui(self):
         """
         Simulation of sales coming from the interface,
