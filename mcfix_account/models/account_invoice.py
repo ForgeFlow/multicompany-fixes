@@ -184,10 +184,11 @@ class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
     @api.onchange('product_id')
-    def onchange_product_id(self):
-        return self.with_context(
-            force_company=self.invoice_id.company_id.id
-        )._onchange_product_id()
+    def _onchange_product_id(self):
+        self.company_id = self.invoice_id.company_id
+        res = super()._onchange_product_id()
+        self.change_company_id()
+        return res
 
     @api.onchange('account_id')
     def onchange_account_id(self):
@@ -213,7 +214,7 @@ class AccountInvoiceLine(models.Model):
             self.account_id = account.id
         if not self.account_analytic_id.check_company(self.company_id):
             self.account_analytic_id = self.get_default_account_analytic()
-        self._set_taxes()
+        self.with_context(company_id=company_id)._set_taxes()
 
     def get_default_account_analytic(self):
         return False
