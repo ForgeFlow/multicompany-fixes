@@ -56,6 +56,7 @@ class ResCompany(models.Model):
                "('company_id', '=', active_id)]",
         compute='_compute_partner_account_payable',
         inverse='_inverse_partner_account_payable',
+        string="Default Account Payable in Partner",
     )
     partner_account_receivable_id = fields.Many2one(
         'account.account',
@@ -64,6 +65,7 @@ class ResCompany(models.Model):
                "('company_id', '=', active_id)]",
         compute='_compute_partner_account_receivable',
         inverse='_inverse_partner_account_receivable',
+        string="Default Account Receivable in Partner",
     )
     categ_account_expense_id = fields.Many2one(
         'account.account',
@@ -72,6 +74,7 @@ class ResCompany(models.Model):
                "('company_id', '=', active_id)]",
         compute='_compute_categ_account_expense',
         inverse='_inverse_categ_account_expense',
+        string="Default Expense Account in Product Category",
     )
     categ_account_income_id = fields.Many2one(
         'account.account',
@@ -80,6 +83,7 @@ class ResCompany(models.Model):
                "('company_id', '=', active_id)]",
         compute='_compute_categ_account_income',
         inverse='_inverse_categ_account_income',
+        string="Default Income Account in Product Category",
     )
 
     def get_property_value(self, model, field):

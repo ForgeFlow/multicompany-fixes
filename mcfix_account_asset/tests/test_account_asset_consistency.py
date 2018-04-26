@@ -96,7 +96,5 @@ class TestAccountAssetConsistency(TransactionCase):
         with self.assertRaises(ValidationError):
             asset_categ.write({'account_depreciation_id': xfa_account_id.id})
         with self.assertRaises(ValidationError):
-            asset_categ.write({'journal_id': self.journal_2.id})
-        with self.assertRaises(ValidationError):
             asset_categ.write({'account_depreciation_expense_id':
                                expense_account_id.id})
