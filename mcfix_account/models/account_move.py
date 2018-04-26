@@ -6,7 +6,9 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     company_id = fields.Many2one(
-        readonly=False, states={'posted': [('readonly', True)]}, related=False)
+        readonly=False,
+        states={'posted': [('readonly', True)]},
+    )
 
     @api.multi
     @api.depends('company_id')
@@ -208,7 +210,7 @@ class AccountMoveLine(models.Model):
         # Fetch other data
         for row in rows:
             account = self.env['account.account'].browse(row['account_id'])
-            row['currency_id'] = account.currency_id.id or account.\
+            row['currency_id'] = account.currency_id.id or account. \
                 company_id.currency_id.id
             partner_id = is_partner and row['partner_id'] or None
             row['reconciliation_proposition'] = \

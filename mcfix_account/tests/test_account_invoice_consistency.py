@@ -30,6 +30,10 @@ class TestAccountInvoiceConsistency(TestAccountChartTemplate):
         self.main_partner.with_context(
             force_company=self.company_2.id).property_account_position_id = \
             self.fiscal_position_2
+        self.partner_2 = self.env['res.partner'].create({
+            'name': 'Partner 2',
+            'company_id': self.company_2.id,
+        })
 
         self.payment_term_1 = self._create_payment_terms(self.company)
         self.payment_term_2 = self._create_payment_terms(self.company_2)
@@ -98,3 +102,6 @@ class TestAccountInvoiceConsistency(TestAccountChartTemplate):
         with self.assertRaises(ValidationError):
             self.account_invoice.\
                 write({'journal_id': self.journal_c2.id})
+        with self.assertRaises(ValidationError):
+            self.account_invoice.\
+                write({'partner_id': self.partner_2.id})

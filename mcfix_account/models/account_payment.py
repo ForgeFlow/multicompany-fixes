@@ -9,15 +9,15 @@ class AccountPayment(models.Model):
         super(AccountPayment, self)._compute_destination_account_id()
         for rec in self:
             if (
-                self.partner_id and not rec.invoice_ids and
-                self.payment_type != 'transfer'
+                rec.partner_id and not rec.invoice_ids and
+                rec.payment_type != 'transfer'
             ):
-                if self.partner_type == 'customer':
-                    self.destination_account_id = self.partner_id.with_context(
+                if rec.partner_type == 'customer':
+                    rec.destination_account_id = rec.partner_id.with_context(
                         force_company=rec.company_id.id
                     ).property_account_receivable_id.id
                 else:
-                    self.destination_account_id = self.partner_id.with_context(
+                    rec.destination_account_id = rec.partner_id.with_context(
                         force_company=rec.company_id.id
                     ).property_account_payable_id.id
 

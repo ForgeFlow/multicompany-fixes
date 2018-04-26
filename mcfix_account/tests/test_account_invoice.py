@@ -26,6 +26,7 @@ class TestAccountInvoice(TestAccountChartTemplate):
         self.journal_model = self.env['account.journal']
         self.invoice_model = self.env['account.invoice']
         self.invoice_line_model = self.env['account.invoice.line']
+        self.tax_model = self.env['account.tax']
         self.account_template_model = self.env['account.account.template']
         self.chart_template_model = self.env['account.chart.template']
         manager_account_test_group = self.create_full_access(
@@ -80,6 +81,64 @@ class TestAccountInvoice(TestAccountChartTemplate):
             'journal_id': self.cash_journal.id,
             'account_id': self.account.id,
         })
+        self.tax_c1_cust = self.tax_model.create({
+            'name': 'Tax c1 customer - Test',
+            'amount': 10.0,
+            'type_tax_use': 'sale',
+            'company_id': self.company.id,
+        })
+        self.tax_c1_supp = self.tax_model.create({
+            'name': 'Tax c1  - Test',
+            'amount': 10.0,
+            'type_tax_use': 'purchase',
+            'company_id': self.company.id,
+        })
+        self.tax_c2_cust = self.tax_model.create({
+            'name': 'Tax c2 customer  - Test',
+            'amount': 20.0,
+            'type_tax_use': 'sale',
+            'company_id': self.company_2.id,
+        })
+        self.tax_c2_supp = self.tax_model.create({
+            'name': 'Tax c2 supplier  - Test',
+            'amount': 20.0,
+            'type_tax_use': 'purchase',
+            'company_id': self.company_2.id,
+        })
+
+        self.product_1 = self.env['product.product'].create({
+            'name': 'Service product',
+            'default_code': 'service_prod_1',
+            'type': 'service',
+            'categ_id': self.env.ref('product.product_category_all').id,
+            'sale_ok': True,
+            'purchase_ok': False,
+            'list_price': 10,
+            'company_id': False,
+            'taxes_id': False,
+            'supplier_taxes_id': False,
+        })
+        self.product_1.taxes_id |= self.tax_c1_cust
+        self.product_1.taxes_id |= self.tax_c2_cust
+        self.product_1.supplier_taxes_id |= self.tax_c1_supp
+        self.product_1.supplier_taxes_id |= self.tax_c2_supp
+
+        self.product_2 = self.env['product.product'].create({
+            'name': 'Service product 2',
+            'default_code': 'service_prod_2',
+            'type': 'service',
+            'categ_id': self.env.ref('product.product_category_all').id,
+            'sale_ok': True,
+            'purchase_ok': False,
+            'list_price': 10,
+            'company_id': False,
+            'taxes_id': False,
+            'supplier_taxes_id': False,
+        })
+        self.product_2.taxes_id |= self.tax_c1_cust
+        self.product_2.taxes_id |= self.tax_c2_cust
+        self.product_2.supplier_taxes_id |= self.tax_c1_supp
+        self.product_2.supplier_taxes_id |= self.tax_c2_supp
 
     def create_full_access(self, list_of_models):
         manager_account_test_group = self.env['res.groups'].sudo().create({
@@ -100,20 +159,46 @@ class TestAccountInvoice(TestAccountChartTemplate):
                 access.group_id = manager_account_test_group
         return manager_account_test_group
 
-    def test_invoice_onchange(self):
-        self.invoice2 = self.invoice_model.sudo(self.user).new({
+    def test_invoice_onchange_01(self):
+        invoice2 = self.invoice_model.sudo(self.user).new({
             'partner_id': self.partner.id,
             'company_id': self.company_2.id,
             'journal_id': self.cash_journal.id,
             'account_id': self.account.id,
         })
-        self.invoice2._onchange_partner_id()
-        self.invoice2._onchange_company_id()
-        self.assertFalse(self.invoice2.partner_id)
-        self.assertNotEqual(self.invoice2.journal_id, self.cash_journal)
-        self.assertNotEqual(self.invoice2.account_id, self.account)
+        invoice2._onchange_partner_id()
+        invoice2._onchange_company_id()
+        self.assertFalse(invoice2.partner_id)
+        self.assertNotEqual(invoice2.journal_id, self.cash_journal)
+        self.assertNotEqual(invoice2.account_id, self.account)
 
-    def test_invoice_line(self):
+    def test_invoice_onchange_02(self):
+        invoice = self.invoice_model.sudo(self.user).new({
+            'partner_id': self.partner.id,
+            'company_id': self.company.id,
+            'journal_id': self.cash_journal.id,
+            'account_id': self.account.id,
+        })
+        invoice_line = self.invoice_line_model.sudo(self.user).new({
+            'product_id': self.product_1.id,
+            'company_id': self.company.id,
+            'account_id': self.account.id,
+            'price_unit': 1.0,
+        })
+        partner = self.env['res.partner'].sudo(self.user).create({
+            'name': 'Partner Test',
+            'company_id': self.company_2.id,
+            'is_company': True,
+        })
+        invoice.invoice_line_ids += invoice_line
+        invoice_line.invoice_id = invoice
+        invoice.company_id = self.company_2
+        invoice.partner_id = partner
+        invoice._onchange_company_id()
+        self.assertEqual(invoice_line.invoice_line_tax_ids.company_id,
+                         self.company_2)
+
+    def test_invoice_line_1(self):
         self.invoice_line = self.invoice_line_model.sudo(self.user).create({
             'name': 'Line test',
             'company_id': self.company.id,
@@ -126,6 +211,27 @@ class TestAccountInvoice(TestAccountChartTemplate):
         self.invoice.company_id = self.company
         with self.assertRaises(ValidationError):
             self.invoice_line.company_id = self.company_2
+
+    def test_invoice_line_2(self):
+        invoice_line = self.invoice_line_model.sudo(self.user).new({
+            'product_id': self.product_1.id,
+            'company_id': self.company.id,
+            'account_id': self.account.id,
+            'price_unit': 1.0,
+        })
+        invoice = self.invoice_model.sudo(self.user).new({
+            'partner_id': self.partner.id,
+            'company_id': self.company.id,
+            'journal_id': self.cash_journal.id,
+            'account_id': self.account.id,
+            'type': 'out_invoice',
+        })
+        invoice_line.invoice_id = invoice
+        invoice.company_id = self.company_2
+        invoice_line.product_id = self.product_2
+        invoice_line._onchange_product_id()
+        self.assertEqual(invoice_line.invoice_line_tax_ids.company_id,
+                         self.company_2)
 
     def test_register_payments(self):
         self.invoice.state = 'open'
