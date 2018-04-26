@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 {
-    'name': 'Multi Company Account',
+    'name': 'Multi Company Property Account',
     'version': '11.0.1.0.0',
     'summary': 'Account Company Properties',
     'author': 'Creu Blanca, Eficent, Odoo Community Association (OCA)',
