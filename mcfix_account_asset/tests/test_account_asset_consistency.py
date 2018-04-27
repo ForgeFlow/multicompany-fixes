@@ -28,9 +28,6 @@ class TestAccountAssetConsistency(TransactionCase):
         self.assets = self._create_asset('Hardware', 3, 12000.0, 2000.0,
                                          'Laptops', self.company, self.journal,
                                          self.accounts)
-        self.assets_2 = self._create_asset('Furniture', 1, 50000.0, 5000.0,
-                                           'Chairs', self.company_2,
-                                           self.journal_2, self.accounts_2)
 
     def _create_account(self, company):
 
@@ -84,7 +81,6 @@ class TestAccountAssetConsistency(TransactionCase):
             'method_number': 5,
             'name': asset_name,
             'value': value,
-            'company_id': company.id,
             'category_id': asset_category.id,
             })
         return asset_category, asset_asset
@@ -95,11 +91,6 @@ class TestAccountAssetConsistency(TransactionCase):
         xfa_account_id, expense_account_id = [account for account in
                                               self.accounts_2]
         asset_categ, asset_asset = [asset for asset in self.assets]
-        asset_categ_2, asset_asset_2 = [asset for asset in self.assets_2]
-        with self.assertRaises(ValidationError):
-            asset_asset.write({'category_id': asset_categ_2.id})
-        with self.assertRaises(ValidationError):
-            asset_asset_2.write({'category_id': asset_categ.id})
         with self.assertRaises(ValidationError):
             asset_categ.write({'account_asset_id': xfa_account_id.id})
         with self.assertRaises(ValidationError):
