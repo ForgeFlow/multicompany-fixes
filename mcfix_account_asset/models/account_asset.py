@@ -94,6 +94,22 @@ class AccountAssetAsset(models.Model):
     _inherit = 'account.asset.asset'
 
     @api.multi
+    def _compute_entries(self, date, group_entries=False):
+        return super(AccountAssetAsset, self.with_context(
+            default_company_id=self.company_id.id))._compute_entries(
+            date=date, group_entries=group_entries)
+
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        if not self.category_id.check_company(self.company_id):
+            self._cache.update(self._convert_to_cache(
+                {'category_id': False}, update=True))
+        if not self.invoice_id.check_company(self.company_id):
+            self.invoice_id = False
+        if not self.partner_id.check_company(self.company_id):
+            self.partner_id = False
+
+    @api.multi
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
@@ -111,6 +127,15 @@ class AccountAssetAsset(models.Model):
                     _('The Company in the Account Asset Asset and in '
                       'Account Invoice must be the same.'))
 
+    @api.multi
+    @api.constrains('company_id', 'category_id')
+    def _check_company_id_category_id(self):
+        for rec in self.sudo():
+            if not rec.category_id.check_company(rec.company_id):
+                raise ValidationError(
+                    _('The Company in the Account Asset Asset and in '
+                      'Account Asset Category must be the same.'))
+
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
@@ -121,3 +146,16 @@ class AccountAssetAsset(models.Model):
             ('asset.asset.report', [('asset_id', '=', self.id)]),
         ]
         return res
+
+
+class AccountAssetDepreciationLine(models.Model):
+    _inherit = 'account.asset.depreciation.line'
+
+    @api.multi
+    def create_move(self, post_move=True):
+        moves = []
+        for line in self:
+            moves += super(AccountAssetDepreciationLine, line.with_context(
+                default_company_id=line.asset_id.company_id.id
+            )).create_move(post_move=post_move)
+        return moves

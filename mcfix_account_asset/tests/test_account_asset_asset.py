@@ -97,6 +97,13 @@ class TestAssetAsset(TransactionCase):
                 access.group_id = manager_account_test_group
         return manager_account_test_group
 
+    def test_onchanges(self):
+        self.asset_1._cache.update(
+            self.asset_1._convert_to_cache(
+                {'company_id': self.company_2.id}, update=True))
+        self.asset_1._onchange_company_id()
+        self.assertFalse(self.asset_1.category_id)
+
     def test_constrains(self):
         with self.assertRaises(ValidationError):
             self.account.company_id = self.company_2
