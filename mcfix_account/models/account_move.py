@@ -10,19 +10,25 @@ class AccountMove(models.Model):
         states={'posted': [('readonly', True)]},
     )
 
+    @api.model
+    def create(self, vals):
+        vals['company_id'] = self.env['account.journal'].browse(
+            vals['journal_id']).company_id.id
+        return super().create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('journal_id', False):
+            vals['company_id'] = self.env['account.journal'].browse(
+                vals['journal_id']).company_id.id
+        return super().write(vals)
+
     @api.multi
     @api.depends('company_id')
     def name_get(self):
         names = super(AccountMove, self).name_get()
         res = self.add_company_suffix(names)
         return res
-
-    @api.model
-    def create(self, vals):
-        if self._context.get('company_id'):
-            vals['company_id'] = self._context.get('company_id')
-        move = super(AccountMove, self).create(vals)
-        return move
 
     @api.multi
     @api.onchange('company_id')
@@ -39,7 +45,7 @@ class AccountMove(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec.journal_id.company_id):
                 raise ValidationError(
                     _('The Company in the Account Move and in '
                       'Res Partner must be the same.'))
@@ -48,7 +54,9 @@ class AccountMove(models.Model):
     @api.constrains('company_id', 'tax_cash_basis_rec_id')
     def _check_company_id_tax_cash_basis_rec_id(self):
         for rec in self.sudo():
-            if not rec.tax_cash_basis_rec_id.check_company(rec.company_id):
+            if not rec.tax_cash_basis_rec_id.check_company(
+                rec.journal_id.company_id
+            ):
                 raise ValidationError(
                     _('The Company in the Account Move and in '
                       'Account Partial Reconcile must be the same.'))
@@ -57,19 +65,12 @@ class AccountMove(models.Model):
     @api.constrains('company_id')
     def _check_company_id_dummy_account_id(self):
         for rec in self.sudo():
-            if not rec.dummy_account_id.check_company(rec.company_id):
+            if not rec.dummy_account_id.check_company(
+                rec.journal_id.company_id
+            ):
                 raise ValidationError(
                     _('The Company in the Account Move and in '
                       'Account Account must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'journal_id')
-    def _check_company_id_journal_id(self):
-        for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move and in '
-                      'Account Journal must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
@@ -300,7 +301,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'move_id')
     def _check_company_id_move_id(self):
         for rec in self.sudo():
-            if not rec.move_id.check_company(rec.company_id):
+            if not rec.move_id.journal_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Move must be the same.'))

@@ -79,9 +79,6 @@ class TestAccountMove(TransactionCase):
         return manager_account_test_group
 
     def test_account_move(self):
-        with self.assertRaises(ValidationError):
-            self.move.company_id = self.company_2
-        self.move.company_id = self.company
         partner = self.env['res.partner'].sudo(self.user).create({
             'name': 'Partner Test',
             'company_id': self.company_2.id,
