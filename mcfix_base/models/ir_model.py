@@ -73,6 +73,8 @@ class Base(models.AbstractModel):
                 for fld in fields:
                     if not fld.check_company(rec.company_id):
                         raise ValidationError(_(
-                            'You cannot change the company, as this %s is '
-                            'assigned to %s (%s).'
-                        ) % (rec._name, fld._name, fld.name_get()[0][1]))
+                            'You cannot change the company, as this %s (%s) '
+                            'is assigned to %s (%s).'
+                        ) % (
+                            rec._name, rec.display_name,
+                            fld._name, fld.name_get()[0][1]))

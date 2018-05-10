@@ -22,10 +22,10 @@ class TestStockInventory(TransactionCase):
         manager_stock_test_group = self.create_full_access(
             ['stock.inventory', 'stock.location'])
         self.company = self.env['res.company'].create({
-            'name': 'Test company',
+            'name': '1 Company',
         })
         self.company_2 = self.env['res.company'].create({
-            'name': 'Test company 2',
+            'name': '2 Company',
             'parent_id': self.company.id,
         })
         self.env.user.company_ids += self.company
