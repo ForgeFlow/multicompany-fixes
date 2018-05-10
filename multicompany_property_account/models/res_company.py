@@ -101,13 +101,24 @@ class ResCompany(models.Model):
             ('name', '=', field_name),
             ('model', '=', model)
         ], limit=1)
-        val = value.id if isinstance(value, models.BaseModel) else value
-        self.env['ir.property'].sudo().search([
+        if value and isinstance(value, models.BaseModel):
+            val = value.id
+        else:
+            val = value
+        prop = self.env['ir.property'].sudo().search([
             ('name', '=', field_name),
             ('fields_id', '=', field.id),
             ('company_id', '=', self.id),
             ('res_id', '=', False)
-        ]).write({'value': val})
+        ])
+        if not prop:
+            prop = self.env['ir.property'].sudo().create({
+                'name': field_name,
+                'fields_id': field.id,
+                'company_id': self.id,
+                'res_id': False,
+            })
+        prop.write({'value': val})
 
     @api.model
     def _compute_partner_account_payable(self):
