@@ -215,7 +215,6 @@ class Warehouse(models.Model):
         res = res + [
             ('procurement.rule', [('propagate_warehouse_id', '=', self.id)]),
             ('procurement.rule', [('warehouse_id', '=', self.id)]),
-            ('product.template', [('warehouse_id', '=', self.id)]),
             ('stock.location.path', [('warehouse_id', '=', self.id)]),
             ('stock.location.route', [('warehouse_ids', 'in', self.ids)]),
             ('stock.move', [('warehouse_id', '=', self.id)]),

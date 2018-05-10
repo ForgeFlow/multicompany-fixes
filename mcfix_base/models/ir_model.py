@@ -65,11 +65,12 @@ class Base(models.AbstractModel):
                 if not rec.company_id:
                     continue
                 fields = rec._check_company_id_fields()
-                for model, domain in rec._check_company_id_search():
-                    fields.append(self.sudo().env[model].search(domain + [
-                        ('company_id', '!=', rec.company_id.id),
-                        ('company_id', '!=', 'False'),
-                    ], limit=1))
+                if rec.id:
+                    for model, domain in rec._check_company_id_search():
+                        fields.append(self.sudo().env[model].search(domain + [
+                            ('company_id', '!=', rec.company_id.id),
+                            ('company_id', '!=', False),
+                        ], limit=1))
                 for fld in fields:
                     if not fld.check_company(rec.company_id):
                         raise ValidationError(_(
@@ -77,4 +78,4 @@ class Base(models.AbstractModel):
                             'is assigned to %s (%s).'
                         ) % (
                             rec._name, rec.display_name,
-                            fld._name, fld.name_get()[0][1]))
+                            fld._name, fld.display_name))

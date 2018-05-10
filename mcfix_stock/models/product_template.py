@@ -47,7 +47,8 @@ class ProductTemplate(models.Model):
 
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
-        res += [self.route_ids, self.route_from_categ_ids, ]
+        res += [self.route_ids, self.route_from_categ_ids,
+                self.location_id, self.warehouse_id]
         return res
 
     def _check_company_id_search(self):
