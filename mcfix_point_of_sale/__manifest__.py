@@ -11,6 +11,7 @@
     'license': 'LGPL-3',
     'depends': ['point_of_sale', 'mcfix_stock_account', 'mcfix_account'],
     'data': [
+        'data/point_of_sale_data.xml',
         'views/pos_config_view.xml',
         'views/pos_order_view.xml',
         'views/pos_session_view.xml',
