@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    <data noupdate="1">
         <!--  Child Company 1-->
         <record id="stock.res_partner_company_1" model="res.partner">
             <field name="company_id"/>
@@ -8,6 +8,34 @@
 
         <record id="stock.res_partner_address_41" model="res.partner">
             <field name="company_id"/>
+        </record>
+
+        <record id="stock.product_icecream" model="product.product">
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="stock.test_quant_product" model="product.product">
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="stock.stock_location_3" model="stock.location">
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="stock.stock_location_4" model="stock.location">
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="stock.stock_location_5" model="stock.location">
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="stock.stock_location_7" model="stock.location">
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="stock.stock_location_8" model="stock.location">
+            <field name="company_id" eval="False"/>
         </record>
 
     </data>
