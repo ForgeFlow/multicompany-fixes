@@ -93,7 +93,6 @@ class Location(models.Model):
         res = res + [
             ('procurement.rule', [('location_id', '=', self.id)]),
             ('procurement.rule', [('location_src_id', '=', self.id)]),
-            ('product.template', [('location_id', '=', self.id)]),
             ('stock.inventory', [('location_id', '=', self.id)]),
             ('stock.inventory.line', [('location_id', '=', self.id)]),
             ('stock.location.path', [('location_from_id', '=', self.id)]),

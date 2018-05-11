@@ -21,11 +21,15 @@ class TestStockInventory(TransactionCase):
         self.location_model = self.env['stock.location']
         manager_stock_test_group = self.create_full_access(
             ['stock.inventory', 'stock.location'])
-        self.company = self.env['res.company'].create({
-            'name': 'Test company',
+        self.company = self.env['res.company'].with_context(
+            bypass_company_validation=True
+        ).create({
+            'name': '1 Company',
         })
-        self.company_2 = self.env['res.company'].create({
-            'name': 'Test company 2',
+        self.company_2 = self.env['res.company'].with_context(
+            bypass_company_validation=True
+        ).create({
+            'name': '2 Company',
             'parent_id': self.company.id,
         })
         self.env.user.company_ids += self.company
