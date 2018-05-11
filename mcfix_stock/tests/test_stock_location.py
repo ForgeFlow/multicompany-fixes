@@ -20,10 +20,14 @@ class TestStockLocation(TransactionCase):
         self.location_model = self.env['stock.location']
         manager_stock_test_group = self.create_full_access(
             ['stock.move', 'stock.location'])
-        self.company = self.env['res.company'].create({
+        self.company = self.env['res.company'].with_context(
+            bypass_company_validation=True
+        ).create({
             'name': 'Test company',
         })
-        self.company_2 = self.env['res.company'].create({
+        self.company_2 = self.env['res.company'].with_context(
+            bypass_company_validation=True
+        ).create({
             'name': 'Test company 2',
             'parent_id': self.company.id,
         })
@@ -31,7 +35,8 @@ class TestStockLocation(TransactionCase):
         self.env.user.company_ids += self.company_2
 
         self.user = self.env['res.users'].sudo(self.env.user).with_context(
-            no_reset_password=True).create(
+            no_reset_password=True
+        ).create(
             {'name': 'Test User',
              'login': 'test_user',
              'email': 'test@oca.com',

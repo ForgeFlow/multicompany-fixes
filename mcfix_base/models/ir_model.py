@@ -68,11 +68,13 @@ class Base(models.AbstractModel):
                 for model, domain in rec._check_company_id_search():
                     fields.append(self.sudo().env[model].search(domain + [
                         ('company_id', '!=', rec.company_id.id),
-                        ('company_id', '!=', 'False'),
+                        ('company_id', '!=', False),
                     ], limit=1))
                 for fld in fields:
                     if not fld.check_company(rec.company_id):
                         raise ValidationError(_(
-                            'You cannot change the company, as this %s is '
-                            'assigned to %s (%s).'
-                        ) % (rec._name, fld._name, fld.name_get()[0][1]))
+                            'You cannot change the company, as this %s (%s) '
+                            'is assigned to %s (%s).'
+                        ) % (
+                            rec._name, rec.display_name,
+                            fld._name, fld.display_name))
