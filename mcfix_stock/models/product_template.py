@@ -5,7 +5,6 @@ from odoo.exceptions import ValidationError
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-
     @api.multi
     @api.constrains('company_id')
     def _check_company_id_route_from_categ_ids(self):
