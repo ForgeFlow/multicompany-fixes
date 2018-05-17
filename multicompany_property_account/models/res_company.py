@@ -121,7 +121,10 @@ class ResCompany(models.Model):
                 'company_id': self.id,
                 'res_id': False,
             })
-        prop.write({'value': val})
+        if isinstance(value, models.BaseModel) and not val:
+            prop.sudo().unlink()
+        else:
+            prop.sudo().write({'value': val})
 
     @api.model
     def _compute_partner_account_payable(self):
