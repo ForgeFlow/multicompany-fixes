@@ -101,8 +101,11 @@ class ResCompany(models.Model):
             ('name', '=', field_name),
             ('model', '=', model)
         ], limit=1)
-        if value and isinstance(value, models.BaseModel):
-            val = value.id
+        if isinstance(value, models.BaseModel):
+            if value:
+                val = value.id
+            else:
+                val = False
         else:
             val = value
         prop = self.env['ir.property'].sudo().search([
