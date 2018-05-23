@@ -91,6 +91,7 @@ class TestAccountChartTemplate(TransactionCase):
         })
         self.company_2 = self.env['res.company'].create({
             'name': 'Test company 2',
+            'parent_id': self.company.id,
         })
         # Create charts
         templates = self._get_templates()
