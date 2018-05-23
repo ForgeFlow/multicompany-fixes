@@ -45,7 +45,8 @@ class TestPointOfSale(TestAccountChartTemplate):
                                    multi_company_group.id,
                                    manager_pos_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id),
+                             (4, self.company_2.id)],
              })
 
         self.pricelist = self.env['product.pricelist'].sudo(self.user).create({
@@ -60,18 +61,18 @@ class TestPointOfSale(TestAccountChartTemplate):
             'type': 'sale',
             'company_id': self.company.id,
         })
-
-        self.pos_config = self.env['pos.config'].create({
-            'name': 'Config Test',
-            'company_id': self.company.id,
-            'journal_id': self.sale_journal.id,
-            'journal_ids': [(0, 0, {'name': 'Cash Journal - Test',
-                                    'code': 'TSC',
-                                    'type': 'cash',
-                                    'company_id': self.company.id,
-                                    'journal_user': True})],
-        })
-
+        vals = self.env['pos.config'].with_context(
+            company_id=self.company.id).default_get(
+            ['journal_id', 'stock_location_id',
+             'invoice_journal_id', 'pricelist_id'])
+        vals['name'] = 'Config Test'
+        vals['company_id'] = self.company.id
+        vals['journal_ids'] = [(0, 0, {'name': 'Cash Journal - Test',
+                                       'code': 'TSC',
+                                       'type': 'cash',
+                                       'company_id': self.company.id,
+                                       'journal_user': True})]
+        self.pos_config = self.env['pos.config'].create(vals)
         self.income_account = self.env['account.account'].create({
             'company_id': self.company.id,
             'code': 'INC1',
@@ -124,27 +125,32 @@ class TestPointOfSale(TestAccountChartTemplate):
         return dict_company
 
     def test_pos_config_create(self):
-        pos_config = self.env['pos.config'].sudo(self.user).create({
-            'name': 'Config Test',
-            'company_id': self.company.id,
-        })
+        vals = self.env['pos.config'].with_context(
+            company_id=self.company.id).default_get(
+            ['journal_id', 'stock_location_id',
+             'invoice_journal_id', 'pricelist_id'])
+        vals['name'] = 'Config Test'
+        vals['company_id'] = self.company.id
+        pos_config = self.env['pos.config'].sudo(self.user).create(vals)
         self.assertEquals(pos_config.sequence_id.company_id,
                           pos_config.company_id)
         self.assertEquals(pos_config.sequence_line_id.company_id,
                           pos_config.company_id)
 
     def test_pos_config_onchange(self):
-        pos_config = self.env['pos.config'].sudo(self.user).new({
-            'name': 'Config Test',
-            'company_id': self.company.id,
-            'journal_id': self.sale_journal.id,
-            'journal_ids': [(0, 0, {'name': 'Cash Journal - Test',
-                                    'code': 'TSC',
-                                    'type': 'cash',
-                                    'company_id': self.company.id,
-                                    'journal_user': True})],
-        })
-
+        vals = self.env['pos.config'].with_context(
+            company_id=self.company.id).default_get(
+            ['journal_id', 'stock_location_id',
+             'invoice_journal_id', 'pricelist_id'])
+        vals['name'] = 'Config Test'
+        vals['company_id'] = self.company.id
+        vals['journal_id'] = self.sale_journal.id
+        vals['journal_ids'] = [(0, 0, {'name': 'Cash Journal - Test',
+                                       'code': 'TSC',
+                                       'type': 'cash',
+                                       'company_id': self.company.id,
+                                       'journal_user': True})]
+        pos_config = self.env['pos.config'].sudo(self.user).new(vals)
         pos_config.company_id = self.company_2
         pos_config._onchange_company_id()
         self.assertNotEquals(pos_config.journal_id, self.sale_journal)
@@ -184,12 +190,14 @@ class TestPointOfSale(TestAccountChartTemplate):
              'company_id': company_3.id,
              }
         )
-        pos_config = self.env['pos.config'].create({
-            'name': 'Config Test',
-            'company_id': company_3.id,
-            'journal_id': sale_journal.id,
-        })
-
+        vals = self.env['pos.config'].with_context(
+            company_id=company_3.id).default_get(
+            ['journal_id', 'stock_location_id',
+             'invoice_journal_id', 'pricelist_id'])
+        vals['name'] = 'Config Test'
+        vals['journal_id'] = sale_journal.id
+        vals['company_id'] = company_3.id
+        pos_config = self.env['pos.config'].create(vals)
         # I click on create a new session button
         pos_config.open_session_cb()
         self.assertEquals(len(pos_config.journal_ids) > 0, True)
