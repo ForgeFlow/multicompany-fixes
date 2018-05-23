@@ -39,11 +39,15 @@ class PosConfig(models.Model):
         company = self.env['res.company'].browse(company_id)
         return self.env['product.pricelist'].search(
             [('currency_id', '=', company.currency_id.id),
-             ('company_id', '=', company.id)],
-            limit=1)
+             '|', ('company_id', '=', company.id),
+             ('company_id', '=', False)], limit=1)
 
+    pricelist_id = fields.Many2one(
+        default=_default_pricelist
+    )
     journal_id = fields.Many2one(
         domain="[('type', '=', 'sale'), ('company_id', '=', company_id)]",
+        default=_default_sale_journal,
     )
     journal_ids = fields.Many2many(
         domain="[('journal_user', '=', True ), "
@@ -52,10 +56,12 @@ class PosConfig(models.Model):
     )
     invoice_journal_id = fields.Many2one(
         domain="[('type', '=', 'sale'), ('company_id', '=', company_id)]",
+        default=_default_invoice_journal,
     )
     stock_location_id = fields.Many2one(
         domain="[('usage', '=', 'internal'),"
                "'|',('company_id','=',False),('company_id','=',company_id)]",
+        default=_get_default_location
     )
 
     @api.model
@@ -125,12 +131,14 @@ class PosConfig(models.Model):
                 company_id=self.company_id.id)._default_invoice_journal()
         if not self.tip_product_id.check_company(self.company_id):
             self.tip_product_id = False
-        if not self.pricelist_id.check_company(self.company_id):
-            self.pricelist_id = self.tip_product_id.pricelist_id
-        if not self.stock_location_id.check_company(self.company_id):
-            self.stock_location_id = self.env['stock.warehouse'].search(
-                [('company_id', '=', self.company_id.id)], limit=1
-            ).lot_stock_id
+        if not self.pricelist_id or not self.pricelist_id.check_company(
+                self.company_id):
+            self.pricelist_id = self.with_context(
+                company_id=self.company_id.id)._default_pricelist()
+        if not self.stock_location_id or not \
+                self.stock_location_id.check_company(self.company_id):
+            self.stock_location_id = self.with_context(
+                company_id=self.company_id.id)._get_default_location()
         if not self.default_fiscal_position_id.check_company(self.company_id):
             self.default_fiscal_position_id = False
 
