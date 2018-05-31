@@ -93,12 +93,6 @@ class AccountAssetCategory(models.Model):
 class AccountAssetAsset(models.Model):
     _inherit = 'account.asset.asset'
 
-    @api.multi
-    def _compute_entries(self, date, group_entries=False):
-        return super(AccountAssetAsset, self.with_context(
-            default_company_id=self.company_id.id))._compute_entries(
-            date=date, group_entries=group_entries)
-
     @api.onchange('company_id')
     def _onchange_company_id(self):
         if not self.category_id.check_company(self.company_id):
@@ -158,4 +152,14 @@ class AccountAssetDepreciationLine(models.Model):
             moves += super(AccountAssetDepreciationLine, line.with_context(
                 default_company_id=line.asset_id.company_id.id
             )).create_move(post_move=post_move)
+        return moves
+
+    @api.multi
+    def create_grouped_move(self, post_move=True):
+        moves = []
+        for company in self.mapped('asset_id.company_id'):
+            lines = self.filtered(lambda l: l.asset_id.company_id == company)
+            moves += super(AccountAssetDepreciationLine, lines.with_context(
+                default_company_id=company.id
+            )).create_grouped_move(post_move=post_move)
         return moves
