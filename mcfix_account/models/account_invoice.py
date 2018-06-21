@@ -26,7 +26,7 @@ class AccountInvoice(models.Model):
             self.partner_id.with_context(force_company=company_id)
         if self.type in ('in_invoice', 'out_refund'):
             bank_ids = p.commercial_partner_id.bank_ids.filtered(
-                lambda b: b.company_id.id == company_id)
+                lambda b: b.company_id.id == company_id or not b.company_id)
             bank_id = bank_ids[0].id if bank_ids else False
             self.partner_bank_id = bank_id
             domain = {'partner_bank_id': [('id', 'in', bank_ids.ids)]}
