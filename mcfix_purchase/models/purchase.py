@@ -206,11 +206,11 @@ class PurchaseOrderLine(models.Model):
         res += [self.invoice_lines, self.move_ids, self.move_dest_ids, ]
         return res
 
-    @api.multi
     @api.onchange('product_id')
     def onchange_product_id(self):
         self.company_id = self.order_id.company_id
         result = super(
             PurchaseOrderLine,
             self.with_context(not_display_company=True)).onchange_product_id()
+        self._compute_tax_id()
         return result
