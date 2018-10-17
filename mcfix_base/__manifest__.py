@@ -15,7 +15,7 @@
     'demo': [
         'demo/res_partner_demo.xml',
     ],
-    'sequence': 30,
+    'sequence': 150,
     'installable': True,
     'application': False,
     'auto_install': False,
