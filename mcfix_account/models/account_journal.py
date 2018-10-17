@@ -8,8 +8,6 @@ class AccountJournal(models.Model):
     company_partner_id = fields.Many2one(
         'res.partner', related='company_id.partner_id',
         string='Account Holder', readonly=True)
-    bank_account_id = fields.Many2one(
-        domain="[('partner_id','=', company_partner_id)]")
 
     @api.multi
     def get_journal_dashboard_datas(self):
