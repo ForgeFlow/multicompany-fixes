@@ -19,6 +19,9 @@
             <field name="company_id" position="after">
                 <field name="company_partner_id" invisible="1"/>
             </field>
+            <field name="bank_account_id" position="attributes">
+                <attribute name="domain">[('partner_id','=', company_partner_id)]</attribute>
+            </field>
             <field name="default_debit_account_id" position="attributes">
                 <attribute name="domain">[('company_id', '=', company_id)]</attribute>
             </field>
