@@ -78,6 +78,13 @@ class TestAccountTaxTemplate(TransactionCase):
             'code': 'Code_test',
             'user_type_id': self.user_type.id,
         })
+        self.env['ir.model.data'].create({
+            'name': account_template.name,
+            'module': 'account',
+            'model': 'account.account.template',
+            'res_id': account_template.id,
+            'noupdate': 0,
+        })
         self.chart_2 = self.env['account.chart.template'].create({
             'name': 'Test Chart',
             'currency_id': self.env.ref('base.EUR').id,
