@@ -107,7 +107,22 @@ class AccountBankStatementLine(models.Model):
     def get_statement_line_for_reconciliation_widget(self):
         data = super(AccountBankStatementLine, self). \
             get_statement_line_for_reconciliation_widget()
+        if self.amount_currency and self.currency_id:
+            amount = self.amount_currency
+        else:
+            amount = self.amount
         data['company_id'] = self.company_id.id
+        if self.partner_id:
+            if amount > 0:
+                data['open_balance_account_id'] = \
+                    self.partner_id.with_context(
+                        force_company=self.company_id.id
+                    ).property_account_receivable_id.id
+            else:
+                data['open_balance_account_id'] = \
+                    self.partner_id.with_context(
+                        force_company=self.company_id.id
+                    ).property_account_payable_id.id
         return data
 
     def _prepare_reconciliation_move(self, move_ref):

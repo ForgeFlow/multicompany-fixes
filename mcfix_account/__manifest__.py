@@ -22,6 +22,7 @@
         'views/reports.xml',
         'wizard/account_reports_views.xml',
         'wizard/wizard_tax_adjustments_views.xml',
+        'templates/assets.xml',
     ],
     'sequence': 30,
     'installable': True,

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2016 Onestein
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).-->
+<odoo>
+    <template id="assets_backend" name="mcfix_account assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/mcfix_account/static/src/js/reconciliation/reconciliation_model.js"/>
+        </xpath>
+    </template>
+
+</odoo>
