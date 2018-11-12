@@ -24,7 +24,10 @@
                         <group>
                             <field name="default_sale_tax_id"/>
                             <field name="default_purchase_tax_id"/>
-                            <field name="transfer_account_id"/>
+                            <field name="transfer_account_id"
+                                   domain="[('company_id', '=', active_id)]"
+                                   context="{'default_company_id': active_id}"
+                            />
                             <field name="partner_account_payable_id"
                                    attrs="{'required': [('chart_template_id', '!=', False)]}"/>
                             <field name="partner_account_receivable_id"
