@@ -23,6 +23,7 @@ class PosOrder(models.Model):
     # consistent with the default session.
     company_id = fields.Many2one(default=_default_company)
 
+    @api.model
     def create(self, vals):
         company_id = vals.get('company_id', False)
         session_id = vals.get('session_id', False)
