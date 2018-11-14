@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 class SupplierInfo(models.Model):
     _inherit = "product.supplierinfo"
 
-    @api.multi
+    @api.model
     def create(self, vals):
         if 'company_id' not in vals:
             if 'name' in vals:
