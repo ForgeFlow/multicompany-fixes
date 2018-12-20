@@ -9,6 +9,7 @@
     'depends': ['sale', 'mcfix_sales_team', 'mcfix_account'],
     'data': [
         'views/sale_views.xml',
+        "report/sale_report_templates.xml",
     ],
     'sequence': 30,
     'installable': True,
