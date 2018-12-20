@@ -20,6 +20,7 @@
         'views/partner_view.xml',
         'views/product_view.xml',
         'views/reports.xml',
+        'views/report_invoice.xml',
         'wizard/account_reports_views.xml',
         'wizard/wizard_tax_adjustments_views.xml',
         'templates/assets.xml',
