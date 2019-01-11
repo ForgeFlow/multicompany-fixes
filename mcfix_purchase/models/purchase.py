@@ -15,7 +15,9 @@ class PurchaseOrder(models.Model):
     @api.onchange('picking_type_id')
     def _onchange_picking_type_id(self):
         super(PurchaseOrder, self)._onchange_picking_type_id()
-        if self.picking_type_id:
+        if self.picking_type_id and not self.env.context.get(
+            'no_change_company'
+        ):
             self.company_id = self.picking_type_id.warehouse_id.company_id.id
 
     @api.onchange('partner_id', 'company_id')
