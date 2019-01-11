@@ -98,6 +98,7 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
 
         # Create records for both companies
         self.partner_1 = self._create_partners(self.company)
+
         self.partner_2 = self._create_partners(self.company_2)
 
         self.crm_team_model = self.env['crm.team']
@@ -106,7 +107,12 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
 
         self.pricelist_1 = self._create_pricelist(self.company)
         self.pricelist_2 = self._create_pricelist(self.company_2)
-
+        self.partner_1.with_context(
+            force_company=self.company.id).property_product_pricelist = \
+            self.pricelist_1
+        self.partner_2.with_context(
+            force_company=self.company.id).property_product_pricelist = \
+            self.pricelist_2
         self.tax_1 = self._create_tax(self.company)
         self.tax_2 = self._create_tax(self.company_2)
 
