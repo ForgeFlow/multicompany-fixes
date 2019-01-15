@@ -15,25 +15,25 @@
 
     <template id="external_layout_background" inherit_id="web.external_layout_background">
         <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context({'not_display_company': True})" />
+            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
         </xpath>
     </template>
 
     <template id="external_layout_boxed" inherit_id="web.external_layout_boxed">
         <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context({'not_display_company': True})" />
+            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
         </xpath>
     </template>
 
     <template id="external_layout_clean" inherit_id="web.external_layout_clean">
         <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context({'not_display_company': True})" />
+            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
         </xpath>
     </template>
 
     <template id="external_layout_standard" inherit_id="web.external_layout_standard">
         <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context({'not_display_company': True})" />
+            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
         </xpath>
     </template>
 
