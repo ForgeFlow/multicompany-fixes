@@ -26,7 +26,15 @@ class SaleOrder(models.Model):
             self.pricelist_id = False
         if not self.payment_term_id.check_company(self.company_id):
             self.payment_term_id = False
+        self.onchange_partner_shipping_id()
         self.order_line.change_company_id()
+
+    @api.multi
+    @api.onchange('partner_shipping_id', 'partner_id')
+    def onchange_partner_shipping_id(self):
+        return super(SaleOrder, self.with_context(
+            force_company=self.company_id.id
+        )).onchange_partner_shipping_id()
 
     @api.multi
     @api.onchange('partner_id')
@@ -167,7 +175,7 @@ class SaleOrderLine(models.Model):
                 lambda r: r.company_id == line.order_id.company_id)
         return result
 
-    @api.model
+    @api.multi
     def change_company_id(self):
         for line in self:
             line._compute_tax_id()
