@@ -196,7 +196,6 @@ class AccountInvoiceLine(models.Model):
             force_company=self.invoice_id.company_id.id
         )._onchange_account_id()
 
-    @api.model
     def change_company_id(self):
         part = self.invoice_id.partner_id
         invoice_type = self.invoice_id.type
