@@ -18,8 +18,8 @@ class TestResPartner(TransactionCase):
 
     def setUp(self):
         super(TestResPartner, self).setUp()
-        employees_group = self.env.ref('base.group_user')
-        partner_manager_group = self.env.ref('base.group_partner_manager')
+        self.employees_group = self.env.ref('base.group_user')
+        self.partner_manager_group = self.env.ref('base.group_partner_manager')
         self.company = self.env['res.company'].create({
             'name': 'Test company'
         })
@@ -37,8 +37,8 @@ class TestResPartner(TransactionCase):
             {'name': 'Test User',
              'login': 'test_user',
              'email': 'test@oca.com',
-             'groups_id': [(6, 0, [employees_group.id,
-                                   partner_manager_group.id])],
+             'groups_id': [(6, 0, [self.employees_group.id,
+                                   self.partner_manager_group.id])],
              'company_id': self.company.id,
              'company_ids': [(4, self.company.id)],
              })
@@ -70,3 +70,18 @@ class TestResPartner(TransactionCase):
         partner_3.parent_id = partner_2
         partner_2.parent_id = False
         self.assertEqual(partner_3.commercial_partner_id, partner_2)
+
+    def test_user_partner_company(self):
+        user = self.env['res.users'].sudo(self.env.user).with_context(
+            no_reset_password=True).create(
+            {'name': 'Test User',
+             'login': 'test_user_2',
+             'email': 'test@oca.com',
+             'groups_id': [(6, 0, [self.employees_group.id,
+                                   self.partner_manager_group.id])],
+             'company_id': self.company.id,
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
+             })
+        self.assertFalse(user.partner_id.company_id)
+        user.company_id = self.company_2
+        self.assertFalse(user.partner_id.company_id)
