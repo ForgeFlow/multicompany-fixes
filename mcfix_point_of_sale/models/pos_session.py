@@ -12,13 +12,6 @@ class PosSession(models.Model):
                                  related='config_id.company_id', store=True,
                                  readonly=True)
 
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res += [
-            ('account.bank.statement', [('pos_session_id', '=', self.id)]),
-        ]
-        return res
-
     @api.model
     def create(self, values):
         # Here we have to redefine the logic to obtain pos_config.journal_ids
