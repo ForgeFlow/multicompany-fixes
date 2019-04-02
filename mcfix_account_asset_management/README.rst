@@ -2,9 +2,9 @@
    :target: https://www.gnu.org/licenses/lgpl
    :alt: License: LGPL-3
 
-===================
-Mcfix Account Asset
-===================
+============================
+Mcfix Account Check Printing
+============================
 
 This module is part of a set of modules that are intended to make sure that
 the multi-company functionality is consistent.
