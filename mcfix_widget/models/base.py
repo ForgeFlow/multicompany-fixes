@@ -28,8 +28,8 @@ class Base(models.AbstractModel):
                         add_company = False
                         break
             if add_company:
-                args += self.get_mcfix_domain(self.env.context.get(
-                    'mcfix_widget_company'))
+                args = self.get_mcfix_domain(self.env.context.get(
+                    'mcfix_widget_company')) + args
         return args
 
     @api.model
