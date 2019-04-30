@@ -16,7 +16,9 @@ class Base(models.AbstractModel):
 
     @api.model
     def _multicompany_args(self, args):
-        if self.env.context.get(
+        if not self.env.context.get(
+            'ignore_mcfix_widget', False
+        ) and self.env.context.get(
             'mcfix_widget_company', False
         ) and 'company_id' in self._fields and self._fields[
             'company_id'
