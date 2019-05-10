@@ -6,8 +6,8 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     company_id = fields.Many2one(
-        readonly=False,
-        states={'posted': [('readonly', True)]},
+        readonly=True,
+        states={'draft': [('readonly', False)]},
     )
 
     @api.model
