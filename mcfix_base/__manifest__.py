@@ -3,12 +3,12 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 {
     'name': 'Multi Company Fix Base',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'summary': 'Base fixes',
     'author': 'Eficent, Odoo Community Association (OCA)',
     'website': 'https://github.com/OCA/multi-company',
     'license': 'LGPL-3',
-    'depends': ['base', 'mcfix_base_model_create_hook'],
+    'depends': ['base'],
     'data': [
         'security/base_security.xml',
     ],

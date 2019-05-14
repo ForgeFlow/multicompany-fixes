@@ -25,15 +25,16 @@ class Partner(models.Model):
             super(Partner, other)._compute_display_name()
             rec.display_name = other.display_name
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals):
         """We need this to ensure that when the partner is created,
         associated to a company, we want to override the default company and
         take instead what the forced company if provided. Otherwise the
         partner of a company was being created inconsistent with the company
         that the partner belongs to."""
-        if 'company_id' in self.env.context and 'company_id' not in vals:
-            vals['company_id'] = self.env.context['company_id']
+        for val in vals:
+            if 'company_id' in self.env.context and 'company_id' not in val:
+                val['company_id'] = self.env.context['company_id']
         return super(Partner, self).create(vals)
 
     @api.multi
