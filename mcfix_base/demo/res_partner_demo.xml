@@ -36,19 +36,10 @@
     <record id="base.res_partner_address_7" model="res.partner">
         <field name="company_id"/>
     </record>
-    <record id="base.res_partner_address_12" model="res.partner">
-        <field name="company_id"/>
-    </record>
     <record id="base.res_partner_address_31" model="res.partner">
         <field name="company_id"/>
     </record>
     <record id="base.res_partner_address_27" model="res.partner">
-        <field name="company_id"/>
-    </record>
-    <record id="base.res_partner_address_26" model="res.partner">
-        <field name="company_id"/>
-    </record>
-    <record id="base.res_partner_address_35" model="res.partner">
         <field name="company_id"/>
     </record>
 

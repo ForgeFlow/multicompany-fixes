@@ -7,13 +7,14 @@ from odoo import api, models
 class Users(models.Model):
     _inherit = "res.users"
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals):
         # We reset the company of the partner to blank
-        user = super(Users, self).create(vals)
-        if user.partner_id.company_id:
-            user.partner_id.write({'company_id': False})
-        return user
+        users = super(Users, self).create(vals)
+        for user in users:
+            if user.partner_id.company_id:
+                user.partner_id.write({'company_id': False})
+        return users
 
     @api.multi
     def write(self, values):
