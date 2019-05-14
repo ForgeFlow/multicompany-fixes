@@ -38,8 +38,8 @@ class TestSupplierinfo(TransactionCase):
              'company_id': self.company.id,
              'company_ids': [(4, self.company.id)],
              })
-        self.uom_unit = self.env.ref('product.product_uom_unit')
-        self.uom_dunit = self.env['product.uom'].create({
+        self.uom_unit = self.env.ref('uom.product_uom_unit')
+        self.uom_dunit = self.env['uom.uom'].create({
             'name': 'DeciUnit',
             'category_id': self.uom_unit.category_id.id,
             'factor_inv': 0.1,
@@ -67,7 +67,7 @@ class TestSupplierinfo(TransactionCase):
         return manager_product_test_group
 
     def test_constrains(self):
-        """Check contrains methods"""
+        """Check constrains methods"""
 
         template_1 = self.env['product.template'].sudo().create({
             'name': 'Test Product',
@@ -83,10 +83,7 @@ class TestSupplierinfo(TransactionCase):
         supplier_1 = self.env['product.supplierinfo'].sudo(self.user).create({
             'name': partner_1.id,
             'product_tmpl_id': template_1.id,
-            'company_id': self.company.id,
         })
-        with self.assertRaises(ValidationError):
-            template_1.company_id = self.company_2
         with self.assertRaises(ValidationError):
             partner_1.company_id = self.company_2
         template_1.company_id = self.company

@@ -5,14 +5,15 @@ from odoo.exceptions import ValidationError
 class SupplierInfo(models.Model):
     _inherit = "product.supplierinfo"
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals):
-        if 'company_id' not in vals:
-            if 'name' in vals:
-                partner = self.env['res.partner'].browse([vals['name']])
-                vals['company_id'] = partner.company_id.id
-            else:
-                vals['company_id'] = False
+        for val in vals:
+            if 'company_id' not in val:
+                if 'name' in val:
+                    partner = self.env['res.partner'].browse([val['name']])
+                    val['company_id'] = partner.company_id.id
+                else:
+                    val['company_id'] = False
         return super(SupplierInfo, self).create(vals)
 
     @api.multi
