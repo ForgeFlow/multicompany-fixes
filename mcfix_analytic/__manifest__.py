@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 {
     'name': 'Multi Company Fix Analytic',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'summary': 'Analytic fixes',
     'author': 'Eficent, Odoo Community Association (OCA)',
     'website': 'https://github.com/OCA/multi-company',
