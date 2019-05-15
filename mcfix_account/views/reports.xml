@@ -1,51 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="report_generalledger" inherit_id="account.report_generalledger">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="res_company" t-value="company_id"/>
-        </xpath>
-    </template>
-
-    <template id="report_partnerledger" inherit_id="account.report_partnerledger">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="res_company" t-value="company_id"/>
-        </xpath>
-    </template>
-
     <template id="report_journal" inherit_id="account.report_journal">
         <xpath expr="//div[1]" position="before">
             <t t-set="res_company" t-value="company_id"/>
         </xpath>
     </template>
 
-    <template id="report_overdue_document" inherit_id="account.report_overdue_document">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="res_company" t-value="company_id"/>
-        </xpath>
-    </template>
-
-    <template id="report_trialbalance" inherit_id="account.report_trialbalance">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="res_company" t-value="company_id"/>
-        </xpath>
-    </template>
-
-    <template id="report_financial" inherit_id="account.report_financial">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="res_company" t-value="company_id"/>
-        </xpath>
-    </template>
-
-    <template id="report_agedpartnerbalance" inherit_id="account.report_agedpartnerbalance">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="res_company" t-value="company_id"/>
-        </xpath>
-    </template>
-
-    <template id="report_tax" inherit_id="account.report_tax">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="res_company" t-value="company_id"/>
-        </xpath>
-    </template>
 </odoo>

@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Multi Company Fix Account',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'summary': 'Account fixes',
     'author': 'Eficent, Odoo Community Association (OCA)',
     'website': 'http://www.eficent.com',
@@ -29,5 +29,4 @@
     'installable': True,
     'application': False,
     'auto_install': True,
-    'post_init_hook': 'post_init_hook',
 }

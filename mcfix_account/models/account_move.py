@@ -10,11 +10,12 @@ class AccountMove(models.Model):
         states={'draft': [('readonly', False)]},
     )
 
-    @api.model
-    def create(self, vals):
-        vals['company_id'] = self.env['account.journal'].browse(
-            vals['journal_id']).company_id.id
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, mvals):
+        for vals in mvals:
+            vals['company_id'] = self.env['account.journal'].browse(
+                vals['journal_id']).company_id.id
+        return super().create(mvals)
 
     @api.multi
     def write(self, vals):

@@ -42,8 +42,8 @@ class TestProduct(TransactionCase):
              'company_id': self.company.id,
              'company_ids': [(4, self.company.id)],
              })
-        self.uom_unit = self.env.ref('product.product_uom_unit')
-        self.uom_dunit = self.env['product.uom'].create({
+        self.uom_unit = self.env.ref('uom.product_uom_unit')
+        self.uom_dunit = self.env['uom.uom'].create({
             'name': 'DeciUnit',
             'category_id': self.uom_unit.category_id.id,
             'factor_inv': 0.1,

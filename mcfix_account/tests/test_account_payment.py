@@ -86,10 +86,6 @@ class TestAccountPayment(TransactionCase):
 
     def test_constrains(self):
         with self.assertRaises(ValidationError):
-            self.payment.company_id = self.company_2
-        self.payment.company_id = self.company
-
-        with self.assertRaises(ValidationError):
             self.payment.partner_id.company_id = self.company_2
 
         partner_2 = self.env['res.partner'].sudo(self.user).create({

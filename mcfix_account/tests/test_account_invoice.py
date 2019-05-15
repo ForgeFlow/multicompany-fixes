@@ -54,9 +54,6 @@ class TestAccountInvoice(TestAccountChartTemplate):
 
         self.user_type = self.env.ref('account.data_account_type_liquidity')
 
-        self.chart.company_id = self.company
-        self.chart_2.company_id = self.company_2
-
         self.partner = self.env['res.partner'].sudo(self.user).create({
             'name': 'Partner Test',
             'company_id': self.company.id,
@@ -115,13 +112,10 @@ class TestAccountInvoice(TestAccountChartTemplate):
             'purchase_ok': False,
             'list_price': 10,
             'company_id': False,
-            'taxes_id': False,
-            'supplier_taxes_id': False,
+            'taxes_id': [(6, 0, (self.tax_c1_cust | self.tax_c2_cust).ids)],
+            'supplier_taxes_id': [(6, 0, (
+                self.tax_c1_supp | self.tax_c2_supp).ids)],
         })
-        self.product_1.taxes_id |= self.tax_c1_cust
-        self.product_1.taxes_id |= self.tax_c2_cust
-        self.product_1.supplier_taxes_id |= self.tax_c1_supp
-        self.product_1.supplier_taxes_id |= self.tax_c2_supp
 
         self.product_2 = self.env['product.product'].create({
             'name': 'Service product 2',
@@ -176,6 +170,7 @@ class TestAccountInvoice(TestAccountChartTemplate):
         invoice = self.invoice_model.sudo(self.user).new({
             'partner_id': self.partner.id,
             'company_id': self.company.id,
+            'type': 'out_invoice',
             'journal_id': self.cash_journal.id,
             'account_id': self.account.id,
         })
@@ -195,8 +190,10 @@ class TestAccountInvoice(TestAccountChartTemplate):
         invoice.company_id = self.company_2
         invoice.partner_id = partner
         invoice._onchange_company_id()
-        self.assertEqual(invoice_line.invoice_line_tax_ids.company_id,
-                         self.company_2)
+        self.assertEqual(
+            invoice_line.mapped('invoice_line_tax_ids.company_id'),
+            self.company_2
+        )
 
     def test_invoice_line_1(self):
         self.invoice_line = self.invoice_line_model.sudo(self.user).create({
@@ -243,7 +240,6 @@ class TestAccountInvoice(TestAccountChartTemplate):
                 'amount': 0.0,
                 'partner_id': self.partner.id,
                 'journal_id': self.cash_journal.id,
-                'company_id': self.company.id,
             })
         self.rec_payment.company_id = self.company_2
         self.rec_payment.company_id = self.company

@@ -58,7 +58,7 @@ class AccountAccount(models.Model):
             ('account.reconcile.model', [('account_id', '=', self.id)]),
             ('account.reconcile.model', [('second_account_id', '=', self.id)]),
             ('account.tax', [('account_id', '=', self.id)]),
-            ('account.tax', [('cash_basis_account', '=', self.id)]),
+            ('account.tax', [('cash_basis_account_id', '=', self.id)]),
             ('account.tax', [('refund_account_id', '=', self.id)]),
         ]
         return res

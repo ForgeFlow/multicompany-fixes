@@ -42,10 +42,13 @@ class TestAccountJournal(TransactionCase):
              'company_ids': [(4, self.company.id)],
              })
 
-        self.partner_bank = self.env['res.partner.bank'].sudo(self.user).\
-            create({'acc_number': '12345',
-                    'company_id': self.company.id,
-                    })
+        self.partner_bank = self.env['res.partner.bank'].sudo(
+            self.user
+        ).create({
+            'acc_number': '12345',
+            'company_id': self.company.id,
+            'partner_id': self.company.partner_id.id,
+        })
 
     def create_full_access(self, list_of_models):
         manager_account_test_group = self.env['res.groups'].sudo().create({
@@ -72,6 +75,7 @@ class TestAccountJournal(TransactionCase):
             'code': 'test_bank_2',
             'type': 'bank',
             'company_id': self.company_2.id,
+            'partner_id': self.company.partner_id.id,
             'bank_account_id': self.partner_bank.id,
         })
         bank_journal._onchange_company_id()
