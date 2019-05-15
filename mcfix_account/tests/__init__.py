@@ -9,5 +9,4 @@ from . import test_account_move
 from . import test_account_payment
 from . import test_account_reconcile
 from . import test_account_tax
-from . import test_account_tax_template
 from . import test_product

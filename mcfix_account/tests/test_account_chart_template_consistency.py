@@ -45,39 +45,11 @@ class TestAccountChartTemplate(TransactionCase):
         return res
 
     def _chart_of_accounts_create(self, company, chart, templates):
-        _logger.debug('Creating chart of account')
-
-        templates[0].chart_template_id = chart
-        templates[1].chart_template_id = chart
-        templates[2].chart_template_id = chart
-
-        if templates[3].company_id:
-            templates[3].company_id = False
-        if templates[4].company_id:
-            templates[4].company_id = False
-
-        chart.tax_template_ids |= templates[3]
-        chart.tax_template_ids |= templates[4]
-
         self.env.user.write({
             'company_ids': [(4, company.id)],
             'company_id': company.id,
         })
-        self.with_context(
-            company_id=company.id, force_company=company.id)
-        wizard = self.env['wizard.multi.charts.accounts'].create({
-            'company_id': company.id,
-            'chart_template_id': chart.id,
-            'code_digits': 6,
-            'currency_id': self.env.ref('base.EUR').id,
-            'transfer_account_id': chart.transfer_account_id.id,
-            'sale_tax_id': chart.tax_template_ids.filtered(
-                lambda t: t.type_tax_use == 'sale').id,
-            'purchase_tax_id': chart.tax_template_ids.filtered(
-                lambda t: t.type_tax_use == 'purchase').id,
-        })
-        wizard.onchange_chart_template_id()
-        wizard.execute()
+        chart.load_for_current_company(15.0, 15.0)
         return True
 
     def setUp(self):
@@ -96,25 +68,11 @@ class TestAccountChartTemplate(TransactionCase):
         # Create charts
         templates = self._get_templates()
 
-        self.chart = self.env['account.chart.template'].create({
-            'name': 'Test Chart',
-            'currency_id': self.env.ref('base.EUR').id,
-            'transfer_account_id': templates[0].id,
-            'property_account_receivable_id': templates[1].id,
-            'property_account_payable_id': templates[2].id,
-        })
+        self.chart = self.env['account.chart.template'].search([], limit=1)
 
         self._chart_of_accounts_create(self.company, self.chart, templates)
 
-        self.chart_2 = self.env['account.chart.template'].create({
-            'name': 'Test Chart 2',
-            'currency_id': self.env.ref('base.EUR').id,
-            'transfer_account_id': templates[0].id,
-            'property_account_receivable_id': templates[1].id,
-            'property_account_payable_id': templates[2].id,
-        })
-
-        self._chart_of_accounts_create(self.company_2, self.chart_2, templates)
+        self._chart_of_accounts_create(self.company_2, self.chart, templates)
 
         self.main_partner = self._create_partner()
 
@@ -124,9 +82,3 @@ class TestAccountChartTemplate(TransactionCase):
             'country_id': self.env.ref('base.us').id,
             'company_id': False,
         })
-
-    def test_tax_template(self):
-        """Check that the tax templates have no company"""
-        tax_templates = self.env['account.tax.template'].search(
-            [('company_id', '!=', False)])
-        self.assertEqual(len(tax_templates), 0)

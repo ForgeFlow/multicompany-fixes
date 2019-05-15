@@ -51,14 +51,14 @@ class AccountTax(models.Model):
             self.account_id = False
         if not self.refund_account_id.check_company(self.company_id):
             self.refund_account_id = False
-        if not self.cash_basis_account.check_company(self.company_id):
-            self.cash_basis_account = False
+        if not self.cash_basis_account_id.check_company(self.company_id):
+            self.cash_basis_account_id = False
 
     @api.multi
-    @api.constrains('company_id', 'cash_basis_account')
+    @api.constrains('company_id', 'cash_basis_account_id')
     def _check_company_id_cash_basis_account(self):
         for rec in self.sudo():
-            if not rec.cash_basis_account.check_company(
+            if not rec.cash_basis_account_id.check_company(
                     rec.company_id):
                 raise ValidationError(
                     _('The Company in the Account Tax and in '

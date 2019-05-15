@@ -213,7 +213,7 @@ class AccountInvoiceLine(models.Model):
             self.account_id = account.id
         if not self.account_analytic_id.check_company(self.company_id):
             self.account_analytic_id = self.get_default_account_analytic()
-        self.with_context(company_id=company_id)._set_taxes()
+        self._set_taxes()
         return True
 
     def get_default_account_analytic(self):
@@ -284,6 +284,11 @@ class AccountInvoiceLine(models.Model):
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
+
+    def _set_taxes(self):
+        if self.invoice_id.company_id:
+            self.company_id = self.invoice_id.company_id
+        return super()._set_taxes()
 
 
 class AccountInvoiceTax(models.Model):

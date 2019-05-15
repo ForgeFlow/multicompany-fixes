@@ -55,16 +55,17 @@ class AccountPayment(models.Model):
 
         return {'domain': {'journal_id': journal_domain}}
 
-    @api.model
-    def create(self, vals):
-        if 'company_id' not in vals:
-            journal_id = vals.get('journal_id')
-            journal = self.env['account.journal'].browse(journal_id)
-            vals['company_id'] = journal.company_id.id
-        return super(AccountPayment, self).create(vals)
+    @api.model_create_multi
+    def create(self, mvals):
+        for vals in mvals:
+            if 'company_id' not in vals:
+                journal_id = vals.get('journal_id')
+                journal = self.env['account.journal'].browse(journal_id)
+                vals['company_id'] = journal.company_id.id
+        return super(AccountPayment, self).create(mvals)
 
     @api.multi
-    @api.constrains('company_id', 'destination_journal_id')
+    @api.constrains('journal_id', 'destination_journal_id')
     def _check_company_id_destination_journal_id(self):
         for rec in self.sudo():
             if not rec.destination_journal_id.check_company(rec.company_id):
@@ -73,7 +74,7 @@ class AccountPayment(models.Model):
                       'Account Journal must be the same.'))
 
     @api.multi
-    @api.constrains('company_id', 'partner_id')
+    @api.constrains('journal_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
             if not rec.partner_id.check_company(rec.company_id):
@@ -82,7 +83,7 @@ class AccountPayment(models.Model):
                       'Res Partner must be the same.'))
 
     @api.multi
-    @api.constrains('company_id')
+    @api.constrains('journal_id')
     def _check_company_id_destination_account_id(self):
         for rec in self.sudo():
             if not rec.destination_account_id.check_company(rec.company_id):
@@ -91,7 +92,7 @@ class AccountPayment(models.Model):
                       'Account Account must be the same.'))
 
     @api.multi
-    @api.constrains('company_id', 'invoice_ids')
+    @api.constrains('journal_id', 'invoice_ids')
     def _check_company_id_invoice_ids(self):
         for rec in self.sudo():
             for line in rec.invoice_ids:
@@ -102,7 +103,7 @@ class AccountPayment(models.Model):
                           '.') % line.name_get()[0][1])
 
     @api.multi
-    @api.constrains('company_id', 'writeoff_account_id')
+    @api.constrains('journal_id', 'writeoff_account_id')
     def _check_company_id_writeoff_account_id(self):
         for rec in self.sudo():
             if not rec.writeoff_account_id.check_company(rec.company_id):
@@ -111,7 +112,7 @@ class AccountPayment(models.Model):
                       'Account Account must be the same.'))
 
     @api.multi
-    @api.constrains('company_id', 'journal_id')
+    @api.constrains('journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
             if not rec.journal_id.check_company(rec.company_id):
@@ -119,7 +120,7 @@ class AccountPayment(models.Model):
                     _('The Company in the Account Payment and in '
                       'Account Journal must be the same.'))
 
-    @api.constrains('company_id')
+    @api.constrains('journal_id')
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
@@ -134,36 +135,3 @@ class AccountPayment(models.Model):
             ('account.invoice', [('payment_ids', 'in', self.ids)]),
         ]
         return res
-
-
-class AccountRegisterPayments(models.TransientModel):
-    _inherit = "account.register.payments"
-
-    @api.multi
-    @api.constrains('partner_id')
-    def _check_company_id_partner_id(self):
-        for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Register Payments and in '
-                      'Res Partner must be the same.'))
-
-    @api.multi
-    @api.constrains('journal_id')
-    def _check_company_id_journal_id(self):
-        for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Register Payments and in '
-                      'Account Journal must be the same.'))
-
-    @api.multi
-    @api.constrains('invoice_ids')
-    def _check_company_id_invoice_ids(self):
-        for rec in self.sudo():
-            for line in rec.invoice_ids:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Account Register Payments '
-                          'and in Account Invoice (%s) must be '
-                          'the same.') % line.name_get()[0][1])

@@ -10,10 +10,10 @@ class ResConfigSettings(models.TransientModel):
         super(ResConfigSettings, self)._onchange_company_id()
         if not self.chart_template_id.check_company(self.company_id):
             self.chart_template_id = self.company_id.chart_template_id
-        if not self.default_sale_tax_id.check_company(self.company_id):
-            self.default_sale_tax_id = False
-        if not self.default_purchase_tax_id.check_company(self.company_id):
-            self.default_purchase_tax_id = False
+        if not self.sale_tax_id.check_company(self.company_id):
+            self.sale_tax_id = False
+        if not self.purchase_tax_id.check_company(self.company_id):
+            self.purchase_tax_id = False
 
     @api.multi
     @api.constrains('company_id', 'tax_cash_basis_journal_id')
