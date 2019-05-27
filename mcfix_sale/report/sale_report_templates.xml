@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//t[@t-set='doc']" position="after">
+            <t t-set="doc" t-value="doc.with_context(not_display_company=True)" />
+        </xpath>
+    </template>
+
+</odoo>
