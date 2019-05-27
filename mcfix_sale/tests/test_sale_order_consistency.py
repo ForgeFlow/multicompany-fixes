@@ -13,7 +13,7 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
 
         # Products
         self.product1 = self.env.ref('product.product_product_7')
-        uom_unit = self.env.ref('product.product_uom_unit')
+        uom_unit = self.env.ref('uom.product_uom_unit')
         dict_product = {
             'name': 'Product 2',
             'uom_id': uom_unit.id,
