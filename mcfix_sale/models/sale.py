@@ -164,18 +164,6 @@ class SaleOrderLine(models.Model):
         return res
 
     @api.multi
-    @api.onchange('product_id')
-    def product_id_change(self):
-        self.company_id = self.order_id.company_id
-        result = super(
-            SaleOrderLine,
-            self.with_context(not_display_company=True)).product_id_change()
-        for line in self:
-            line.tax_id = line.tax_id.filtered(
-                lambda r: r.company_id == line.order_id.company_id)
-        return result
-
-    @api.multi
     def change_company_id(self):
         for line in self:
             line._compute_tax_id()
