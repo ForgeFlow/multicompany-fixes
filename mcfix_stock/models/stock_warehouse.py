@@ -11,8 +11,6 @@ class Warehouse(models.Model):
             self.name = self.company_id.name
         if not self.partner_id.check_company(self.company_id):
             self.partner_id = self.company_id.partner_id
-        if not self.default_resupply_wh_id.check_company(self.company_id):
-            self.default_resupply_wh_id = False
         if not self.resupply_wh_ids.check_company(self.company_id):
             self.resupply_wh_ids = self.env['stock.warehouse'].search(
                 [('resupply_wh_ids', 'in', [self.id]),
@@ -85,17 +83,6 @@ class Warehouse(models.Model):
                         _('The Company in the Stock Warehouse and in '
                           'Stock Location Route (%s) must be the same.'
                           ) % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'default_resupply_wh_id')
-    def _check_company_id_default_resupply_wh_id(self):
-        for rec in self.sudo():
-            if not rec.default_resupply_wh_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Warehouse must be the same.'))
 
     @api.multi
     @api.constrains('company_id', 'wh_qc_stock_loc_id')
@@ -213,13 +200,11 @@ class Warehouse(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res = res + [
-            ('procurement.rule', [('propagate_warehouse_id', '=', self.id)]),
-            ('procurement.rule', [('warehouse_id', '=', self.id)]),
-            ('stock.location.path', [('warehouse_id', '=', self.id)]),
+            ('stock.rule', [('propagate_warehouse_id', '=', self.id)]),
+            ('stock.rule', [('warehouse_id', '=', self.id)]),
             ('stock.location.route', [('warehouse_ids', 'in', self.ids)]),
             ('stock.move', [('warehouse_id', '=', self.id)]),
             ('stock.picking.type', [('warehouse_id', '=', self.id)]),
-            ('stock.warehouse', [('default_resupply_wh_id', '=', self.id)]),
             ('stock.warehouse', [('resupply_wh_ids', 'in', self.ids)]),
             ('stock.warehouse.orderpoint', [('warehouse_id', '=', self.id)]),
         ]

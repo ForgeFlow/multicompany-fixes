@@ -91,12 +91,10 @@ class Location(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res = res + [
-            ('procurement.rule', [('location_id', '=', self.id)]),
-            ('procurement.rule', [('location_src_id', '=', self.id)]),
+            ('stock.rule', [('location_id', '=', self.id)]),
+            ('stock.rule', [('location_src_id', '=', self.id)]),
             ('stock.inventory', [('location_id', '=', self.id)]),
             ('stock.inventory.line', [('location_id', '=', self.id)]),
-            ('stock.location.path', [('location_from_id', '=', self.id)]),
-            ('stock.location.path', [('location_dest_id', '=', self.id)]),
             ('stock.move', [('location_id', '=', self.id)]),
             ('stock.move', [('location_dest_id', '=', self.id)]),
             ('stock.move.line', [('location_id', '=', self.id)]),
@@ -116,72 +114,6 @@ class Location(models.Model):
             ('stock.warehouse', [('view_location_id', '=', self.id)]),
             ('stock.warehouse', [('wh_pack_stock_loc_id', '=', self.id)]),
             ('stock.warehouse.orderpoint', [('location_id', '=', self.id)]),
-        ]
-        return res
-
-
-class PushedFlow(models.Model):
-    _inherit = "stock.location.path"
-
-    @api.onchange('company_id')
-    def _onchange_company_id(self):
-        if not self.route_id.check_company(self.company_id):
-            self.route_id.company_id = self.company_id
-        # if not self.warehouse_id.check_company(self.company_id):
-        #     self.warehouse_id = self.picking_type_id.warehouse_id
-        if not self.location_from_id.check_company(self.company_id):
-            self.location_from_id = False
-        if not self.location_dest_id.check_company(self.company_id):
-            self.location_dest_id = False
-
-    @api.multi
-    @api.constrains('company_id', 'route_id')
-    def _check_company_id_route_id(self):
-        for rec in self.sudo():
-            if not rec.route_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Location Path and in '
-                      'Stock Location Route must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'location_dest_id')
-    def _check_company_id_location_dest_id(self):
-        for rec in self.sudo():
-            if not rec.location_dest_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Location Path and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'warehouse_id')
-    def _check_company_id_warehouse_id(self):
-        for rec in self.sudo():
-            if not rec.warehouse_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Location Path and in '
-                      'Stock Warehouse must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'location_from_id')
-    def _check_company_id_location_from_id(self):
-        for rec in self.sudo():
-            if not rec.location_from_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Location Path and in '
-                      'Stock Location must be the same.'))
-
-    @api.constrains('company_id')
-    def _check_company_id_out_model(self):
-        self._check_company_id_base_model()
-
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res = res + [
-            ('stock.move', [('push_rule_id', '=', self.id)]),
         ]
         return res
 
@@ -269,7 +201,7 @@ class Route(models.Model):
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
         res += [
-            self.pull_ids, self.push_ids, self.move_ids, self.warehouse_ids,
+            self.move_ids, self.warehouse_ids,
         ]
         return res
 

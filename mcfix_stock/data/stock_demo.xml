@@ -10,14 +10,6 @@
             <field name="company_id"/>
         </record>
 
-        <record id="stock.product_icecream" model="product.product">
-            <field name="company_id" eval="False"/>
-        </record>
-
-        <record id="stock.test_quant_product" model="product.product">
-            <field name="company_id" eval="False"/>
-        </record>
-
         <record id="stock.stock_location_3" model="stock.location">
             <field name="company_id" eval="False"/>
         </record>

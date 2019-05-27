@@ -47,8 +47,8 @@ class TestStockMove(TransactionCase):
              'company_id': self.company.id,
              'company_ids': [(4, self.company.id)],
              })
-        self.uom_unit = self.env.ref('product.product_uom_unit')
-        self.uom_dunit = self.env['product.uom'].create({
+        self.uom_unit = self.env.ref('uom.product_uom_unit')
+        self.uom_dunit = self.env['uom.uom'].create({
             'name': 'DeciUnit',
             'category_id': self.uom_unit.category_id.id,
             'factor_inv': 0.1,
@@ -71,8 +71,6 @@ class TestStockMove(TransactionCase):
             'uom_id': self.uom_unit.id,
             'uom_po_id': self.uom_unit.id,
             'company_id': self.company.id,
-            'supplier_taxes_id': False,
-            'taxes_id': False,
         })
         self.move_1 = self.env['stock.move'].sudo(self.user).create({
             'name': 'test move',

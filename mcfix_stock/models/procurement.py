@@ -3,7 +3,7 @@ from odoo.exceptions import ValidationError
 
 
 class ProcurementRule(models.Model):
-    _inherit = 'procurement.rule'
+    _inherit = 'stock.rule'
 
     @api.onchange('company_id')
     def _onchange_company_id(self):

@@ -7,7 +7,7 @@ class Partner(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res = res + [
-            ('procurement.rule', [('partner_address_id', '=', self.id)]),
+            ('stock.rule', [('partner_address_id', '=', self.id)]),
             ('stock.inventory', [('partner_id', '=', self.id)]),
             ('stock.inventory.line', [('partner_id', '=', self.id)]),
             ('stock.location', [('partner_id', '=', self.id)]),

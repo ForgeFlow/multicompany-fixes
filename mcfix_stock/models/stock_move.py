@@ -60,8 +60,6 @@ class StockMove(models.Model):
                 self.inventory_id = False
             if not self.rule_id.check_company(self.company_id):
                 self.rule_id = False
-            if not self.push_rule_id.check_company(self.company_id):
-                self.push_rule_id = False
             if not self.move_orig_ids.check_company(self.company_id):
                 self.move_orig_ids = self.env['stock.move'].search(
                     [('move_dest_ids', 'in', [self.id]),
@@ -168,15 +166,6 @@ class StockMove(models.Model):
                         _('The Company in the Stock Move and in '
                           'Stock Location Route (%s) must be the same.'
                           ) % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'push_rule_id')
-    def _check_company_id_push_rule_id(self):
-        for rec in self.sudo():
-            if not rec.push_rule_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Move and in '
-                      'Stock Location Path must be the same.'))
 
     @api.multi
     @api.constrains('company_id', 'origin_returned_move_id')
