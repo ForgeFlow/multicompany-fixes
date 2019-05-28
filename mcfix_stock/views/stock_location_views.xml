@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Routes-->
+    <record id="stock_location_route_tree" model="ir.ui.view">
+        <field name="name">stock.location.route.tree</field>
+        <field name="model">stock.location.route</field>
+        <field name="inherit_id" ref="stock.stock_location_route_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="company_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

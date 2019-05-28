@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_scrap_form_view" model="ir.ui.view">
+        <field name="name">stock.scrap.form</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/group/group/field[@name='product_id']" position="before">
+                <field name="company_id" invisible="1"/>
+            </xpath>
+            <xpath expr="/form/sheet/group/group/field[@name='product_id']" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', company_id), ('company_id', '=', False)]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_scrap_tree_view" model="ir.ui.view">
+        <field name="name">stock.scrap.tree</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="/tree" position="inside">
+                <field name="picking_id" invisible="1"/>
+            </xpath>
+            <xpath expr="/tree" position="inside">
+                <field name="company_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_scrap_form_view2" model="ir.ui.view">
+        <field name="name">stock.scrap.form2</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_form_view2"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/group/group/field[@name='product_id']" position="before">
+                <field name="company_id" invisible="1"/>
+            </xpath>
+            <xpath expr="/form/group/group/field[@name='product_id']" position="attributes">
+                <attribute name="domain">['|', ('company_id', '=', company_id), ('company_id', '=', False)]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
