@@ -81,11 +81,9 @@ class TestPointOfSale(TestAccountChartTemplate):
                 'account.data_account_type_revenue').id
         })
 
-        self.fruits_vegetables = self.env.ref(
-            'point_of_sale.fruits_vegetables')
-        self.carotte = self.env.ref('point_of_sale.carotte')
-        self.courgette = self.env.ref('point_of_sale.courgette')
-        self.onions = self.env.ref('point_of_sale.Onions')
+        self.carotte = self.create_product('point_of_sale.carotte')
+        self.courgette = self.create_product('point_of_sale.courgette')
+        self.onions = self.create_product('point_of_sale.Onions')
 
         self.carotte.categ_id.with_context(
             force_company=self.company.id
@@ -97,6 +95,12 @@ class TestPointOfSale(TestAccountChartTemplate):
                 'user_type_id': self.env.ref(
                     'account.data_account_type_revenue').id
             })
+
+    def create_product(self, name):
+        return self.env['product.product'].create({
+            'name': name,
+            'type': 'consu',
+        })
 
     def create_full_access(self, list_of_models):
         manager_pos_test_group = self.env['res.groups'].sudo().create({
@@ -167,6 +171,10 @@ class TestPointOfSale(TestAccountChartTemplate):
             'pricelist_id': self.pricelist.id,
             'company_id': self.company.id,
             'session_id': pos_session.id,
+            'amount_tax': 0,
+            'amount_total': 0,
+            'amount_paid': 0,
+            'amount_return': 0,
         })
         with self.assertRaises(ValidationError):
             pos_1.company_id = self.company_2
@@ -243,6 +251,8 @@ class TestPointOfSale(TestAccountChartTemplate):
                        'id': 42,
                        'pack_lot_ids': [],
                        'price_unit': 0.9,
+                       'price_subtotal': 0.9,
+                        'price_subtotal_incl': untax + atax,
                        'product_id': self.carotte.id,
                        'qty': 1,
                        'tax_ids': [(6, 0, self.carotte.taxes_id.ids)]}
@@ -284,6 +294,8 @@ class TestPointOfSale(TestAccountChartTemplate):
                        'id': 3,
                        'pack_lot_ids': [],
                        'price_unit': 1.2,
+                       'price_subtotal': 1.2,
+                        'price_subtotal_incl': untax + atax,
                        'product_id': self.courgette.id,
                        'qty': 1,
                        'tax_ids': [(6, 0, self.courgette.taxes_id.ids)]}]],
@@ -325,6 +337,8 @@ class TestPointOfSale(TestAccountChartTemplate):
                            'id': 3,
                            'pack_lot_ids': [],
                            'price_unit': 1.28,
+                           'price_subtotal': 1.28,
+                           'price_subtotal_incl': untax + atax,
                            'product_id': self.onions.id,
                            'qty': 1,
                            'tax_ids': [[6, False,

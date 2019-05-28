@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 {
     'name': 'Multi Company Fix Point of Sale',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'summary': 'Point of Sale fixes',
     'author': 'Eficent, Odoo Community Association (OCA)',
     'website': 'https://github.com/OCA/multi-company',
@@ -17,9 +17,6 @@
         'views/pos_session_view.xml',
         'wizard/pos_details.xml',
         'security/point_of_sale_security.xml',
-    ],
-    'demo': [
-        'data/point_of_sale_demo.xml',
     ],
     'sequence': 30,
     'installable': True,
