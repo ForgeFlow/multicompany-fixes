@@ -5,9 +5,9 @@
         <field name="model">res.company</field>
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
-            <field name="report_header" position="after">
-                <field name="external_report_layout"/>
-            </field>
+            <xpath expr="//div[hasclass('o_address_format')]" position="after">
+                <field name="external_report_layout_id"/>
+            </xpath>
         </field>
     </record>
 </odoo>

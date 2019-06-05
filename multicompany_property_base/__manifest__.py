@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 {
     'name': 'Multi Company Property Base',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'summary': 'Base Company Properties',
     'author': 'Creu Blanca, '
               'Eficent, '

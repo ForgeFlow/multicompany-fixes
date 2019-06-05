@@ -8,6 +8,7 @@ from odoo.exceptions import MissingError
 
 class ModelProperty(models.AbstractModel):
     _name = 'model.property'
+    _description = 'model property'
 
     company_id = fields.Many2one(
         comodel_name='res.company',
