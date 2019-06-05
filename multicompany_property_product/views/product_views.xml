@@ -9,7 +9,7 @@
                    position="attributes">
                 <attribute name="readonly">1</attribute>
             </xpath>
-            <page name="notes" position="before">
+            <page name="inventory" position="after">
                 <page string="Multi company" name="multicompany">
                     <field name="property_ids" nolabel="1"/>
                 </page>
