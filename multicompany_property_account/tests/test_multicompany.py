@@ -9,26 +9,14 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
     def create_company(self, name):
         company = super().create_company(name)
         chart_template_id = self.env['account.chart.template'].search(
-            [('visible', '=', True)], limit=1
+            [], limit=1
         )
         if not company.chart_template_id:
-            wizard = self.env['wizard.multi.charts.accounts'].new({
+            self.env.user.write({
+                'company_ids': [(4, company.id)],
                 'company_id': company.id,
-                'chart_template_id': chart_template_id.id,
-                'transfer_account_id':
-                    chart_template_id.transfer_account_id.id,
-                'code_digits': 6,
-                'sale_tax_rate': 15.0,
-                'purchase_tax_rate': 15.0,
-                'complete_tax_set': chart_template_id.complete_tax_set,
-                'currency_id': company.currency_id.id,
-                'bank_account_code_prefix':
-                    chart_template_id.bank_account_code_prefix,
-                'cash_account_code_prefix':
-                    chart_template_id.cash_account_code_prefix,
             })
-            wizard.onchange_chart_template_id()
-            wizard.execute()
+            chart_template_id.load_for_current_company(15.0, 15.0)
         return company
 
     def test_partner(self):

@@ -10,18 +10,12 @@
             <notebook position="inside">
                 <page name="accounting" string="Accounting"
                       groups="account.group_account_manager">
-                    <group>
-                        <field name="chart_template_id" readonly="1"/>
-                        <button
-                                type="action"
-                                name="%(account.action_wizard_multi_chart)d"
-                                attrs="{'invisible': [('chart_template_id', '!=', False)]}"
-                                context="{'company_id': active_id}"
-                                string="Set accounting"
-                        />
-                    </group>
+                    <!-- TODO WIZARD MULTICHART-->
+                    <!-- TODO WIZARD MULTICHART-->
+
                     <group attrs="{'invisible': [('chart_template_id', '=', False)]}">
                         <group>
+                            <field name="chart_template_id" readonly="1"/>
                             <field name="default_sale_tax_id"/>
                             <field name="default_purchase_tax_id"/>
                             <field name="transfer_account_id"
