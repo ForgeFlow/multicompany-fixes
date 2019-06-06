@@ -1,8 +1,8 @@
 from odoo import models
 
 
-class ProcurementRule(models.Model):
-    _inherit = 'procurement.rule'
+class StockRule(models.Model):
+    _inherit = 'stock.rule'
 
     def _check_company_id_search(self):
         res = super()._check_company_id_search()

@@ -32,7 +32,7 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         })
 
         # Products
-        self.uom_unit = self.env.ref('product.product_uom_unit')
+        self.uom_unit = self.env.ref('uom.product_uom_unit')
         self.product_model = self.env['product.product']
 
         self.product1 = self.product_model.create({

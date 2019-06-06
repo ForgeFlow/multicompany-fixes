@@ -2,7 +2,7 @@ from . import account_invoice
 from . import account_payment_term
 from . import account_tax
 from . import analytic_account
-from . import procurement
+from . import stock_rule
 from . import product_product
 from . import product_template
 from . import purchase

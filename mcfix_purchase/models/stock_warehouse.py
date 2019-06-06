@@ -18,7 +18,7 @@ class Warehouse(models.Model):
             if not rec.buy_pull_id.check_company(rec.company_id):
                 raise ValidationError(
                     _('The Company in the Stock Warehouse and in '
-                      'Procurement Rule must be the same.'))
+                      'Stock Rule must be the same.'))
 
 
 class Orderpoint(models.Model):
