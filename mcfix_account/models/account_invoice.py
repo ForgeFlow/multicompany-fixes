@@ -222,8 +222,10 @@ class AccountInvoiceLine(models.Model):
     @api.v8
     def get_invoice_line_account(self, type, product, fpos, company):
         return super(AccountInvoiceLine, self.with_context(
-            force_company=company.id)).get_invoice_line_account(
-            type, product, fpos, company)
+            force_company=company.id
+        )).get_invoice_line_account(
+            type, product.with_context(force_company=company.id),
+            fpos.with_context(force_company=company.id), company)
 
     @api.multi
     @api.constrains('company_id', 'partner_id')
