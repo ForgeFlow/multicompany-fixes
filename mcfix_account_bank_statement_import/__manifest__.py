@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Multi Company Fix Account Bank Statement Import',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'summary': 'Account Bank Statement Import fixes',
     'author': 'Eficent, Odoo Community Association (OCA)',
     'website': 'http://www.eficent.com',
