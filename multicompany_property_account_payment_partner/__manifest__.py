@@ -4,7 +4,7 @@
 
 {
     'name': 'Multi Company Account Payment Partner',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'summary': 'Account Payment Company Properties',
     'author': 'Creu Blanca, Eficent, Odoo Community Association (OCA)',
     'sequence': 30,
