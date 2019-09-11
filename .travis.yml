@@ -9,6 +9,8 @@ python:
   - "3.5"
 
 addons:
+  postgresql: "9.6" # minimal postgresql version for the base_import_security_group module
+  # more info: https://github.com/OCA/maintainer-quality-tools/issues/432
   apt:
     sources:
       - pov-wkhtmltopdf
@@ -19,10 +21,6 @@ addons:
       - python-serial
       - python-yaml
       - wkhtmltopdf
-
-before_install:
-  - "export DISPLAY=:911.0"
-  - "sh -e /etc/init.d/xvfb start"
 
 env:
   global:
