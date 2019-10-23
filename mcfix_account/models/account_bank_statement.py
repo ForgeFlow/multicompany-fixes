@@ -6,6 +6,10 @@ class AccountBankStatement(models.Model):
     _inherit = "account.bank.statement"
 
     @api.multi
+    def get_company_ids(self):
+        return self.mapped('company_id').ids
+
+    @api.multi
     def reconciliation_widget_preprocess(self):
         # This is the same code as the original method except for the fact
         # that here will fetch bank statement data for the child companies
