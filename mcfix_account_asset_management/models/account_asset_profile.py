@@ -61,7 +61,7 @@ class AccountAssetProfile(models.Model):
     @api.constrains('company_id', 'account_min_value_id')
     def _check_company_id_account_min_value_id(self):
         for rec in self.sudo():
-            if not rec.profile_id.check_company(
+            if not rec.account_min_value_id.check_company(
                 rec.company_id
             ):
                 raise ValidationError(
@@ -71,7 +71,7 @@ class AccountAssetProfile(models.Model):
     @api.constrains('company_id', 'account_residual_value_id')
     def _check_company_id_account_residual_value_id(self):
         for rec in self.sudo():
-            if not rec.profile_id.check_company(
+            if not rec.account_residual_value_id.check_company(
                     rec.company_id
             ):
                 raise ValidationError(
@@ -81,7 +81,7 @@ class AccountAssetProfile(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.profile_id.check_company(
+            if not rec.journal_id.check_company(
                     rec.company_id
             ):
                 raise ValidationError(
