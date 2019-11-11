@@ -33,6 +33,9 @@
             <xpath expr="/form/sheet/notebook/page/field/form/sheet/group/group/field[@name='taxes_id']" position="attributes">
                 <attribute name="domain">[('type_tax_use','=','purchase'), ('company_id', '=', parent.company_id)]</attribute>
             </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='company_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
         </field>
     </record>
 
