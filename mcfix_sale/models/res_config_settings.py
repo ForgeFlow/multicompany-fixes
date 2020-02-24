@@ -7,5 +7,5 @@ class ResConfigSettings(models.TransientModel):
     @api.onchange('company_id')
     def _onchange_company_id(self):
         super(ResConfigSettings, self)._onchange_company_id()
-        if not self.default_deposit_product_id.check_company(self.company_id):
-            self.default_deposit_product_id = False
+        if not self.deposit_default_product_id.check_company(self.company_id):
+            self.deposit_default_product_id = False
