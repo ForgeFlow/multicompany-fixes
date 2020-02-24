@@ -183,8 +183,14 @@ class AccountInvoice(models.Model):
             self.refund_invoice_ids,
             self.invoice_line_ids,
             self.tax_line_ids,
-            self.move_id,
             self.payment_ids,
+        ]
+        return res
+
+    def _check_company_id_search(self):
+        res = super()._check_company_id_search()
+        res += [
+            ('account.move.line', [('invoice_id', '=', self.id)]),
         ]
         return res
 
