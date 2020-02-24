@@ -20,26 +20,6 @@ class AccountAsset(models.Model):
                     _('The Company in the Account Asset and in '
                       'Account Asset Profile must be the same.'))
 
-    @api.constrains('company_id', 'parent_id')
-    def _check_company_id_parent_id(self):
-        for rec in self.sudo():
-            if not rec.parent_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Account Asset and in '
-                      'Account Asset parent must be the same.'))
-
-    @api.constrains('company_id', 'child_ids')
-    def _check_company_id_child_ids(self):
-        for rec in self.sudo():
-            if not rec.child_ids.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Account Asset and in '
-                      'Account Asset childs must be the same.'))
-
     @api.constrains('company_id', 'account_move_line_ids')
     def _check_company_id_account_move_line_ids(self):
         for rec in self.sudo():
