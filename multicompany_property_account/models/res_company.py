@@ -10,7 +10,7 @@ class ResCompany(models.Model):
 
     default_sale_tax_id = fields.Many2one(
         'account.tax',
-        string="Default Sale Tax",
+        string="Default sale tax",
         compute='_compute_tax',
         inverse='_inverse_tax',
         domain="[('type_tax_use', 'in', ('sale', 'all')), "
@@ -19,7 +19,7 @@ class ResCompany(models.Model):
     )
     default_purchase_tax_id = fields.Many2one(
         'account.tax',
-        string="Default Purchase Tax",
+        string="Default purchase tax",
         compute='_compute_tax',
         inverse='_inverse_tax',
         domain="[('type_tax_use', 'in', ('purchase', 'all')), "
