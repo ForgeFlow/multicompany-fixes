@@ -36,17 +36,20 @@ class Base(models.AbstractModel):
         res = self.add_company_suffix(names)
         return res
 
-    def check_company(self, company_id):
+    def _check_company(self, company_id):
         """This method will be used in constrains methods
         to ensure consistency between linked many2one models company-wise.
         Typically when the method returns false a Validation Error
         will be raised."""
         if not company_id:
-            return True
+            return self.browse()
         if 'company_id' not in self._fields:
-            return True
-        return not bool(self.filtered(
-            lambda r: r.company_id and r.company_id != company_id))
+            return self.browse()
+        return self.filtered(
+            lambda r: r.company_id and r.company_id != company_id)
+
+    def check_company(self, company_id):
+        return not bool(self._check_company(company_id))
 
     def _check_company_id_fields(self):
         return []
@@ -71,10 +74,12 @@ class Base(models.AbstractModel):
                         ('company_id', '!=', False),
                     ], limit=1))
                 for fld in fields:
-                    if not fld.check_company(rec.company_id):
+                    issues = fld._check_company(rec.company_id)
+                    if issues:
                         raise ValidationError(_(
                             'You cannot change the company, as this %s (%s) '
                             'is assigned to %s (%s).'
                         ) % (
                             rec._name, rec.display_name,
-                            fld._name, fld.display_name))
+                            fld._name, ', '.join(issues.mapped('display_name'))
+                        ))
