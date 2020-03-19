@@ -4,7 +4,7 @@
     <record id="purchase_order_form" model="ir.ui.view">
         <field name="name">purchase.order.form</field>
         <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="inherit_id" ref="purchase_stock.purchase_order_form_inherit"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='picking_type_id']" position="attributes">
                 <attribute name="domain">[('code','=','incoming'), '|', ('company_id','=',company_id), ('company_id','=',False)]</attribute>
