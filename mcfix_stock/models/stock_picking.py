@@ -68,7 +68,7 @@ class Picking(models.Model):
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if not rec.location_id.check_company(rec.company_id):
+            if not rec.location_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Stock Location must be the same.'))
@@ -77,7 +77,7 @@ class Picking(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Res Partner must be the same.'))
@@ -97,7 +97,7 @@ class Picking(models.Model):
     @api.constrains('company_id', 'owner_id')
     def _check_company_id_owner_id(self):
         for rec in self.sudo():
-            if not rec.owner_id.check_company(rec.company_id):
+            if not rec.owner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Res Partner must be the same.'))
@@ -106,7 +106,7 @@ class Picking(models.Model):
     @api.constrains('company_id', 'backorder_id')
     def _check_company_id_backorder_id(self):
         for rec in self.sudo():
-            if not rec.backorder_id.check_company(rec.company_id):
+            if not rec.backorder_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Picking and in '
                       'Stock Picking must be the same.'))

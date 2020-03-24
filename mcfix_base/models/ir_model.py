@@ -36,7 +36,27 @@ class Base(models.AbstractModel):
         res = self.add_company_suffix(names)
         return res
 
-    def _check_company(self, company_id):
+    def _get_companies(self):
+        if 'company_id' in self._fields:
+            return self.company_id
+        return self.env['res.company']
+
+    def _check_company(self, element):
+        if 'company_id' not in self._fields:
+            return self.browse()
+        company_id = element._get_companies()
+        if not company_id:
+            return self.browse()
+        result = self.browse()
+        for record in self:
+            record_companies = record._get_companies()
+            if not record_companies:
+                continue
+            if not any(c in company_id for c in record_companies):
+                result |= record
+        return result
+
+    def _old_check_company(self, company_id):
         """This method will be used in constrains methods
         to ensure consistency between linked many2one models company-wise.
         Typically when the method returns false a Validation Error

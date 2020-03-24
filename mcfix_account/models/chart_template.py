@@ -54,7 +54,7 @@ class AccountChartTemplate(models.Model):
     @api.constrains('company_id', 'parent_id')
     def _check_company_id_parent_id(self):
         for rec in self.sudo():
-            if not rec.parent_id.check_company(rec.company_id):
+            if not rec.parent_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Chart Template and in '
                       'Account Chart Template must be the same.'))
@@ -92,7 +92,7 @@ class WizardMultiChartsAccounts(models.TransientModel):
     @api.constrains('company_id', 'sale_tax_id')
     def _check_company_id_sale_tax_id(self):
         for rec in self.sudo():
-            if not rec.sale_tax_id.check_company(rec.company_id):
+            if not rec.sale_tax_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Wizard Multi Charts Accounts and in '
                       'Account Tax Template must be the same.'))
@@ -101,7 +101,7 @@ class WizardMultiChartsAccounts(models.TransientModel):
     @api.constrains('company_id', 'purchase_tax_id')
     def _check_company_id_purchase_tax_id(self):
         for rec in self.sudo():
-            if not rec.purchase_tax_id.check_company(rec.company_id):
+            if not rec.purchase_tax_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Wizard Multi Charts Accounts and in '
                       'Account Tax Template must be the same.'))
@@ -110,7 +110,7 @@ class WizardMultiChartsAccounts(models.TransientModel):
     @api.constrains('company_id', 'chart_template_id')
     def _check_company_id_chart_template_id(self):
         for rec in self.sudo():
-            if not rec.chart_template_id.check_company(rec.company_id):
+            if not rec.chart_template_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Wizard Multi Charts Accounts and in '
                       'Account Chart Template must be the same.'))

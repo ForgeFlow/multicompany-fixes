@@ -67,7 +67,7 @@ class AccountPayment(models.Model):
     @api.constrains('company_id', 'destination_journal_id')
     def _check_company_id_destination_journal_id(self):
         for rec in self.sudo():
-            if not rec.destination_journal_id.check_company(rec.company_id):
+            if not rec.destination_journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Payment and in '
                       'Account Journal must be the same.'))
@@ -76,7 +76,7 @@ class AccountPayment(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Payment and in '
                       'Res Partner must be the same.'))
@@ -85,7 +85,7 @@ class AccountPayment(models.Model):
     @api.constrains('company_id')
     def _check_company_id_destination_account_id(self):
         for rec in self.sudo():
-            if not rec.destination_account_id.check_company(rec.company_id):
+            if not rec.destination_account_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Payment and in '
                       'Account Account must be the same.'))
@@ -95,7 +95,7 @@ class AccountPayment(models.Model):
     def _check_company_id_invoice_ids(self):
         for rec in self.sudo():
             for line in rec.invoice_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Account Payment and in '
                           'Account Invoice (%s) must be the same'
@@ -105,7 +105,7 @@ class AccountPayment(models.Model):
     @api.constrains('company_id', 'writeoff_account_id')
     def _check_company_id_writeoff_account_id(self):
         for rec in self.sudo():
-            if not rec.writeoff_account_id.check_company(rec.company_id):
+            if not rec.writeoff_account_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Payment and in '
                       'Account Account must be the same.'))
@@ -114,7 +114,7 @@ class AccountPayment(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Payment and in '
                       'Account Journal must be the same.'))
@@ -143,7 +143,7 @@ class AccountRegisterPayments(models.TransientModel):
     @api.constrains('partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Register Payments and in '
                       'Res Partner must be the same.'))
@@ -152,7 +152,7 @@ class AccountRegisterPayments(models.TransientModel):
     @api.constrains('journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Register Payments and in '
                       'Account Journal must be the same.'))
@@ -162,7 +162,7 @@ class AccountRegisterPayments(models.TransientModel):
     def _check_company_id_invoice_ids(self):
         for rec in self.sudo():
             for line in rec.invoice_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Account Register Payments '
                           'and in Account Invoice (%s) must be '

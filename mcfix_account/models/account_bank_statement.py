@@ -80,7 +80,7 @@ class AccountBankStatement(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Bank Statement and in '
                       'Account Journal must be the same.'))
@@ -141,7 +141,7 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Res Partner must be the same.'))
@@ -150,7 +150,7 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Account Journal must be the same.'))
@@ -159,7 +159,7 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'statement_id')
     def _check_company_id_statement_id(self):
         for rec in self.sudo():
-            if not rec.statement_id.check_company(rec.company_id):
+            if not rec.statement_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Account Bank Statement must be the same.'))
@@ -168,7 +168,7 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'bank_account_id')
     def _check_company_id_bank_account_id(self):
         for rec in self.sudo():
-            if not rec.bank_account_id.check_company(rec.company_id):
+            if not rec.bank_account_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Res Partner Bank must be the same.'))
@@ -177,7 +177,7 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'account_id')
     def _check_company_id_account_id(self):
         for rec in self.sudo():
-            if not rec.account_id.check_company(rec.company_id):
+            if not rec.account_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Account Account must be the same.'))

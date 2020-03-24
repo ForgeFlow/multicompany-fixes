@@ -33,7 +33,7 @@ class AccountInvoice(models.Model):
     @api.constrains('company_id', 'team_id')
     def _check_company_id_team_id(self):
         for rec in self.sudo():
-            if not rec.team_id.check_company(rec.company_id):
+            if not rec.team_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Invoice and in '
                       'Crm Team must be the same.'))
@@ -47,7 +47,7 @@ class AccountInvoiceLine(models.Model):
     def _check_company_id_sale_line_ids(self):
         for rec in self.sudo():
             for line in rec.sale_line_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Account Invoice Line and in '
                           'Sale Order Line (%s) must be the same.'

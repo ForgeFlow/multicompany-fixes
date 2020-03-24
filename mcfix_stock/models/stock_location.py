@@ -65,7 +65,7 @@ class Location(models.Model):
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if not rec.location_id.check_company(rec.company_id):
+            if not rec.location_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Location and in '
                       'Stock Location must be the same.'))
@@ -74,7 +74,7 @@ class Location(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Location and in '
                       'Res Partner must be the same.'))
@@ -138,7 +138,7 @@ class PushedFlow(models.Model):
     @api.constrains('company_id', 'route_id')
     def _check_company_id_route_id(self):
         for rec in self.sudo():
-            if not rec.route_id.check_company(rec.company_id):
+            if not rec.route_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Location Path and in '
                       'Stock Location Route must be the same.'))
@@ -158,7 +158,7 @@ class PushedFlow(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if not rec.warehouse_id.check_company(rec.company_id):
+            if not rec.warehouse_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Location Path and in '
                       'Stock Warehouse must be the same.'))
@@ -216,7 +216,7 @@ class Route(models.Model):
     def _check_company_id_move_ids(self):
         for rec in self.sudo():
             for line in rec.move_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Stock Location Route and in '
                           'Stock Move (%s) must be the same.'
@@ -226,7 +226,7 @@ class Route(models.Model):
     @api.constrains('company_id', 'supplier_wh_id')
     def _check_company_id_supplier_wh_id(self):
         for rec in self.sudo():
-            if not rec.supplier_wh_id.check_company(rec.company_id):
+            if not rec.supplier_wh_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Location Route and in '
                       'Stock Warehouse must be the same.'))
@@ -236,7 +236,7 @@ class Route(models.Model):
     def _check_company_id_product_ids(self):
         for rec in self.sudo():
             for line in rec.product_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Stock Location Route and in '
                           'Product Template (%s) must be the same.'
@@ -246,7 +246,7 @@ class Route(models.Model):
     @api.constrains('company_id', 'supplied_wh_id')
     def _check_company_id_supplied_wh_id(self):
         for rec in self.sudo():
-            if not rec.supplied_wh_id.check_company(rec.company_id):
+            if not rec.supplied_wh_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Stock Location Route and in '
                       'Stock Warehouse must be the same.'))
@@ -256,7 +256,7 @@ class Route(models.Model):
     def _check_company_id_warehouse_ids(self):
         for rec in self.sudo():
             for line in rec.warehouse_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Stock Location Route and in '
                           'Stock Warehouse (%s) must be the same.'

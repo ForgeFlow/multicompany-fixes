@@ -20,7 +20,7 @@ class AccountJournal(models.Model):
     @api.constrains('company_id', 'check_sequence_id')
     def _check_company_id_check_sequence_id(self):
         for rec in self.sudo():
-            if not rec.check_sequence_id.check_company(rec.company_id):
+            if not rec.check_sequence_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Journal and in '
                       'Ir Sequence must be the same.'))

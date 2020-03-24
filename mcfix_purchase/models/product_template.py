@@ -19,7 +19,7 @@ class ProductTemplate(models.Model):
     def _check_company_id_route_ids(self):
         for rec in self.sudo():
             for line in rec.route_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Product Template and in '
                           'Stock Location Route (%s) must be the same.'

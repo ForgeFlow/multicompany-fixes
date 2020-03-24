@@ -79,7 +79,7 @@ class AccountTax(models.Model):
     def _check_company_id_children_tax_ids(self):
         for rec in self.sudo():
             for line in rec.children_tax_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Account Tax and in '
                           'Account Tax (%s) must be the same'
@@ -89,7 +89,7 @@ class AccountTax(models.Model):
     @api.constrains('company_id', 'account_id')
     def _check_company_id_account_id(self):
         for rec in self.sudo():
-            if not rec.account_id.check_company(rec.company_id):
+            if not rec.account_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Tax and in '
                       'Account Account must be the same.'))
