@@ -15,7 +15,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'crm_team_id')
     def _check_company_id_crm_team_id(self):
         for rec in self.sudo():
-            if not rec.crm_team_id.check_company(rec.company_id):
+            if not rec.crm_team_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Crm Team must be the same.'))

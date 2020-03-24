@@ -29,7 +29,7 @@ class PricelistItem(models.Model):
     @api.constrains('company_id', 'product_id')
     def _check_company_id_product_id(self):
         for rec in self.sudo():
-            if not rec.product_id.check_company(rec.company_id):
+            if not rec.product_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Product Pricelist Item and in '
                       'Product Product must be the same.'))

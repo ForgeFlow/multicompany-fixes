@@ -12,7 +12,7 @@ class AccountBankStatementLine(models.Model):
     @api.constrains('company_id', 'pos_statement_id')
     def _check_company_id_pos_statement_id(self):
         for rec in self.sudo():
-            if not rec.pos_statement_id.check_company(rec.company_id):
+            if not rec.pos_statement_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Bank Statement Line and in '
                       'Pos Order must be the same.'))

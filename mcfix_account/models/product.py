@@ -20,7 +20,7 @@ class ProductTemplate(models.Model):
     def _check_company_id_supplier_taxes_id(self):
         for rec in self.sudo():
             for line in rec.supplier_taxes_id:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Product Template and in '
                           'Account Tax (%s) must be the same.'
@@ -31,7 +31,7 @@ class ProductTemplate(models.Model):
     def _check_company_id_taxes_id(self):
         for rec in self.sudo():
             for line in rec.taxes_id:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Product Template and in '
                           'Account Tax (%s) must be the same.'
@@ -46,7 +46,7 @@ class ProductProduct(models.Model):
     def _check_company_id_supplier_taxes_id(self):
         for rec in self.sudo():
             for line in rec.supplier_taxes_id:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Product Product and in '
                           'Account Tax (%s) must be the same.'
@@ -57,7 +57,7 @@ class ProductProduct(models.Model):
     def _check_company_id_taxes_id(self):
         for rec in self.sudo():
             for line in rec.taxes_id:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Product Product and in '
                           'Account Tax (%s) must be the same.'

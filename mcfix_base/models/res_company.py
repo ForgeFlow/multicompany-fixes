@@ -14,3 +14,6 @@ class Company(models.Model):
         company = super(Company, self.with_context(company_id=False)).create(
             vals)
         return company
+
+    def _get_companies(self):
+        return self

@@ -65,7 +65,7 @@ class AccountTaxTemplate(models.Model):
     def _check_company_id_children_tax_ids(self):
         for rec in self.sudo():
             for line in rec.children_tax_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Account Tax Template and in '
                           'Account Tax Template (%s) must be '

@@ -46,7 +46,7 @@ class PosSession(models.Model):
     def _check_company_id_config_id(self):
         for rec in self.sudo():
             for config in rec.config_id:
-                if not config.check_company(rec.company_id):
+                if not config.check_company(rec):
                     raise ValidationError(
                         _('The Company in the POS Session and in '
                           'POS Config (%s) must be the same.'

@@ -36,7 +36,7 @@ class AccountInvoice(models.Model):
     @api.constrains('company_id', 'purchase_id')
     def _check_company_id_purchase_id(self):
         for rec in self.sudo():
-            if not rec.purchase_id.check_company(rec.company_id):
+            if not rec.purchase_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Invoice and in '
                       'Purchase Order must be the same.'))
@@ -56,7 +56,7 @@ class AccountInvoiceLine(models.Model):
     @api.constrains('company_id', 'purchase_line_id')
     def _check_company_id_purchase_line_id(self):
         for rec in self.sudo():
-            if not rec.purchase_line_id.check_company(rec.company_id):
+            if not rec.purchase_line_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Invoice Line and in '
                       'Purchase Order Line must be the same.'))

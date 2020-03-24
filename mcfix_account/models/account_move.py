@@ -236,7 +236,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'tax_line_id')
     def _check_company_id_tax_line_id(self):
         for rec in self.sudo():
-            if not rec.tax_line_id.check_company(rec.company_id):
+            if not rec.tax_line_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Tax must be the same.'))
@@ -245,7 +245,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'product_id')
     def _check_company_id_product_id(self):
         for rec in self.sudo():
-            if not rec.product_id.check_company(rec.company_id):
+            if not rec.product_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Product Product must be the same.'))
@@ -254,7 +254,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'statement_line_id')
     def _check_company_id_statement_line_id(self):
         for rec in self.sudo():
-            if not rec.statement_line_id.check_company(rec.company_id):
+            if not rec.statement_line_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Bank Statement Line must be the same.'))
@@ -264,7 +264,7 @@ class AccountMoveLine(models.Model):
     def _check_company_id_tax_ids(self):
         for rec in self.sudo():
             for line in rec.tax_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Account Move Line and in '
                           'Account Tax (%s) must be the same'
@@ -274,7 +274,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'payment_id')
     def _check_company_id_payment_id(self):
         for rec in self.sudo():
-            if not rec.payment_id.check_company(rec.company_id):
+            if not rec.payment_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Payment must be the same.'))
@@ -283,7 +283,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'invoice_id')
     def _check_company_id_invoice_id(self):
         for rec in self.sudo():
-            if not rec.invoice_id.check_company(rec.company_id):
+            if not rec.invoice_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Invoice must be the same.'))
@@ -292,7 +292,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Res Partner must be the same.'))
@@ -301,7 +301,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'move_id')
     def _check_company_id_move_id(self):
         for rec in self.sudo():
-            if not rec.move_id.journal_id.check_company(rec.company_id):
+            if not rec.move_id.journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Move must be the same.'))
@@ -310,7 +310,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'account_id')
     def _check_company_id_account_id(self):
         for rec in self.sudo():
-            if not rec.account_id.check_company(rec.company_id):
+            if not rec.account_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Account must be the same.'))
@@ -319,7 +319,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'statement_id')
     def _check_company_id_statement_id(self):
         for rec in self.sudo():
-            if not rec.statement_id.check_company(rec.company_id):
+            if not rec.statement_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Bank Statement must be the same.'))
@@ -328,7 +328,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'analytic_account_id')
     def _check_company_id_analytic_account_id(self):
         for rec in self.sudo():
-            if not rec.analytic_account_id.check_company(rec.company_id):
+            if not rec.analytic_account_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Analytic Account must be the same.'))
@@ -337,7 +337,7 @@ class AccountMoveLine(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Account Move Line and in '
                       'Account Journal must be the same.'))
