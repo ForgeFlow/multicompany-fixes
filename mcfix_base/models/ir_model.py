@@ -44,23 +44,20 @@ class Base(models.AbstractModel):
     def _check_company(self, element):
         if 'company_id' not in self._fields:
             return self.browse()
-        company_id = element._get_companies()
-        if not company_id:
+        company_ids = element._get_companies()
+        if not company_ids:
             return self.browse()
         result = self.browse()
         for record in self:
             record_companies = record._get_companies()
             if not record_companies:
                 continue
-            if not any(c in company_id for c in record_companies):
+            if not any(c.id in company_ids.ids for c in record_companies):
                 result |= record
         return result
 
+    # Kept here for reference.
     def _old_check_company(self, company_id):
-        """This method will be used in constrains methods
-        to ensure consistency between linked many2one models company-wise.
-        Typically when the method returns false a Validation Error
-        will be raised."""
         if not company_id:
             return self.browse()
         if 'company_id' not in self._fields:
@@ -69,6 +66,10 @@ class Base(models.AbstractModel):
             lambda r: r.company_id and r.company_id != company_id)
 
     def check_company(self, company_id):
+        """This method will be used in constrains methods
+        to ensure consistency between linked many2one models company-wise.
+        Typically when the method returns false a Validation Error
+        will be raised."""
         return not bool(self._check_company(company_id))
 
     def _check_company_id_fields(self):
@@ -76,6 +77,9 @@ class Base(models.AbstractModel):
 
     def _check_company_id_search(self):
         return []
+
+    def _company_field_name(self):
+        return "company_id"
 
     def _check_company_id_base_model(self):
         """This method is to be used in constrains methods of
@@ -89,9 +93,11 @@ class Base(models.AbstractModel):
                     continue
                 fields = rec._check_company_id_fields()
                 for model, domain in rec._check_company_id_search():
+                    model_obj = self.sudo().env[model]
+                    c_field = model_obj._company_field_name()
                     fields.append(self.sudo().env[model].search(domain + [
-                        ('company_id', '!=', rec.company_id.id),
-                        ('company_id', '!=', False),
+                        (c_field, 'not in', rec._get_companies().ids),
+                        (c_field, '!=', False),
                     ], limit=1))
                 for fld in fields:
                     issues = fld._check_company(rec.company_id)
