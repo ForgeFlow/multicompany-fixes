@@ -9,7 +9,7 @@ class ReportSaleDetails(models.AbstractModel):
 
     @api.multi
     def _get_report_values(self, docids, data=None):
-        res = super(ReportSaleDetails, self).get_report_values(
+        res = super(ReportSaleDetails, self)._get_report_values(
             docids=docids, data=data)
         res['company_id'] = self.env['res.company'].browse(data['company_id'])
         return res
