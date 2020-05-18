@@ -1,10 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Multi Company Fix Mail',
-    'version': '12.0.1.0.0',
+    'version': '13.0.1.0.0',
     'summary': 'Mail fixes',
-    'author': 'Eficent, Odoo Community Association (OCA)',
-    'website': 'http://www.eficent.com',
+    'author': 'ForgeFlow, Odoo Community Association (OCA)',
+    'website': 'http://www.forgeflow.com',
     'license': 'LGPL-3',
     'depends': ['mail', 'mcfix_base_setup'],
     'sequence': 30,

@@ -1,9 +1,11 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+
+    taxes_id = fields.Many2many(check_company=True)
+    supplier_taxes_id = fields.Many2many(check_company=True)
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
@@ -14,51 +16,3 @@ class ProductTemplate(models.Model):
         if not self.supplier_taxes_id.check_company(self.company_id):
             self.supplier_taxes_id = self.supplier_taxes_id.filtered(
                 lambda t: t.company_id == self.company_id)
-
-    @api.multi
-    @api.constrains('company_id', 'supplier_taxes_id')
-    def _check_company_id_supplier_taxes_id(self):
-        for rec in self.sudo():
-            for line in rec.supplier_taxes_id:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Product Template and in '
-                          'Account Tax (%s) must be the same.'
-                          ) % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'taxes_id')
-    def _check_company_id_taxes_id(self):
-        for rec in self.sudo():
-            for line in rec.taxes_id:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Product Template and in '
-                          'Account Tax (%s) must be the same.'
-                          ) % line.name_get()[0][1])
-
-
-class ProductProduct(models.Model):
-    _inherit = 'product.product'
-
-    @api.multi
-    @api.constrains('company_id', 'supplier_taxes_id')
-    def _check_company_id_supplier_taxes_id(self):
-        for rec in self.sudo():
-            for line in rec.supplier_taxes_id:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Product Product and in '
-                          'Account Tax (%s) must be the same.'
-                          ) % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'taxes_id')
-    def _check_company_id_taxes_id(self):
-        for rec in self.sudo():
-            for line in rec.taxes_id:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Product Product and in '
-                          'Account Tax (%s) must be the same.'
-                          ) % line.name_get()[0][1])

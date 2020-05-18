@@ -1,4 +1,4 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
@@ -28,7 +28,7 @@ class TestAccountJournal(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -39,10 +39,10 @@ class TestAccountJournal(TransactionCase):
                                    multi_company_group.id,
                                    manager_account_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
 
-        self.partner_bank = self.env['res.partner.bank'].sudo(
+        self.partner_bank = self.env['res.partner.bank'].with_user(
             self.user
         ).create({
             'acc_number': '12345',
@@ -70,19 +70,18 @@ class TestAccountJournal(TransactionCase):
         return manager_account_test_group
 
     def test_onchanges(self):
-        bank_journal = self.journal_model.sudo(self.user).new({
+        bank_journal = self.journal_model.with_user(self.user).new({
             'name': 'Bank Journal 1 - Test',
             'code': 'test_bank_2',
             'type': 'bank',
             'company_id': self.company_2.id,
-            'partner_id': self.company.partner_id.id,
             'bank_account_id': self.partner_bank.id,
         })
         bank_journal._onchange_company_id()
         self.assertEqual(bank_journal.bank_account_id, self.partner_bank)
 
     def test_create(self):
-        bank_journal = self.journal_model.sudo(self.user).create({
+        bank_journal = self.journal_model.with_user(self.user).create({
             'name': 'Bank Journal 1 - Test',
             'code': 'test_bank_1',
             'type': 'bank',

@@ -1,11 +1,11 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import time
 import logging
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class TestSaleOrder(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -41,16 +41,16 @@ class TestSaleOrder(TransactionCase):
                                    multi_company_group.id,
                                    manager_sale_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
 
-        self.partner = self.env['res.partner'].sudo(self.user).create({
+        self.partner = self.env['res.partner'].with_user(self.user).create({
             'name': 'Partner Test',
             'company_id': self.company.id,
             'is_company': True,
         })
 
-        self.pricelist = self.env['product.pricelist'].sudo(self.user).create({
+        self.pricelist = self.env['product.pricelist'].with_user(self.user).create({
             'name': 'Pricelist Test',
             'currency_id': self.env.ref('base.EUR').id,
             'company_id': self.company.id,
@@ -83,7 +83,7 @@ class TestSaleOrder(TransactionCase):
         return dict_company
 
     def test_onchanges(self):
-        self.so_1 = self.so_model.sudo(self.user).new({
+        self.so_1 = self.so_model.with_user(self.user).new({
             'name': 'Sale - Test',
             'partner_id': self.partner.id,
             'pricelist_id': self.pricelist.id,
@@ -94,12 +94,12 @@ class TestSaleOrder(TransactionCase):
         self.assertFalse(self.so_1.partner_id)
 
     def test_constrains(self):
-        self.so_1 = self.so_model.sudo(self.user).create({
+        self.so_1 = self.so_model.with_user(self.user).create({
             'name': 'Sale - Test',
             'partner_id': self.partner.id,
             'pricelist_id': self.pricelist.id,
             'company_id': self.company.id,
             'date_order': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
         })
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.so_1.company_id = self.company_2

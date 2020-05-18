@@ -1,5 +1,4 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, models
 
 
 class SaleOrder(models.Model):
@@ -11,7 +10,7 @@ class SaleOrder(models.Model):
         # https://github.com/odoo/odoo/pull/24063 is merged.
         super(SaleOrder, self)._default_warehouse_id()
         company = self.env.context.get('company_id') or \
-            self.env.user.company_id.id
+            self.env.company.id
         warehouse_ids = self.env['stock.warehouse'].search(
             [('company_id', '=', company)], limit=1)
         return warehouse_ids
@@ -27,15 +26,6 @@ class SaleOrder(models.Model):
             company_id=self.company_id.id
         )._default_warehouse_id()
 
-    @api.multi
-    @api.constrains('company_id', 'warehouse_id')
-    def _check_company_id_warehouse_id(self):
-        for rec in self.sudo():
-            if not rec.warehouse_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Sale Order and in '
-                      'Stock Warehouse must be the same.'))
-
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
         res += [self.picking_ids, ]
@@ -44,15 +34,6 @@ class SaleOrder(models.Model):
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
-
-    @api.multi
-    @api.constrains('company_id', 'route_id')
-    def _check_company_id_route_id(self):
-        for rec in self.sudo():
-            if not rec.route_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Sale Order Line and in '
-                      'Stock Location Route must be the same.'))
 
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()

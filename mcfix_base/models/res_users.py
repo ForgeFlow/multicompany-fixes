@@ -1,5 +1,5 @@
 # Copyright 2019 Creu Blanca
-# Copyright 2019 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2019 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 from odoo import api, models
 
@@ -16,7 +16,6 @@ class Users(models.Model):
                 user.partner_id.write({'company_id': False})
         return users
 
-    @api.multi
     def write(self, values):
         # We reset the company of the partner to blank
         res = super(Users, self).write(values)

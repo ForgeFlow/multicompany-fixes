@@ -1,9 +1,9 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class TestPaymentAcquirer(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -42,12 +42,12 @@ class TestPaymentAcquirer(TransactionCase):
                                    account_manager_group.id,
                                    manager_account_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
 
         self.view_template = self.env['ir.ui.view'].\
             search([('name', '=', 'default_acquirer_button')])
-        self.bank_journal = self.journal_model.sudo(self.user).create({
+        self.bank_journal = self.journal_model.with_user(self.user).create({
             'name': 'Bank Journal 1 - Test',
             'code': 'test_bank_1',
             'type': 'bank',
@@ -92,7 +92,7 @@ class TestPaymentAcquirer(TransactionCase):
                 'company_id': self.company.id,
                 'view_template_id': self.view_template.id,
             })
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.payment_acquirer.company_id = self.company_2
 
     def test_constrains_journal(self):

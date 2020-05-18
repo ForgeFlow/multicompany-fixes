@@ -1,9 +1,9 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
-from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.tests.common import TransactionCase, Form
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class TestStockMove(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -45,7 +45,7 @@ class TestStockMove(TransactionCase):
                                    multi_company_group.id,
                                    manager_stock_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
         self.uom_unit = self.env.ref('uom.product_uom_unit')
         self.uom_dunit = self.env['uom.uom'].create({
@@ -56,12 +56,12 @@ class TestStockMove(TransactionCase):
             'uom_type': 'smaller',
             'rounding': 0.001})
 
-        location_1 = self.env['stock.location'].sudo(self.user).create({
+        location_1 = self.env['stock.location'].with_user(self.user).create({
             'name': 'test location Customer',
             'usage': 'customer',
             'company_id': self.company.id,
         })
-        location_2 = self.env['stock.location'].sudo(self.user).create({
+        location_2 = self.env['stock.location'].with_user(self.user).create({
             'name': 'test location Supplier',
             'usage': 'supplier',
             'company_id': False,
@@ -72,7 +72,7 @@ class TestStockMove(TransactionCase):
             'uom_po_id': self.uom_unit.id,
             'company_id': self.company.id,
         })
-        self.move_1 = self.env['stock.move'].sudo(self.user).create({
+        self.move_1 = self.env['stock.move'].with_user(self.user).create({
             'name': 'test move',
             'product_id': template_1.product_variant_id.id,
             'location_id': location_1.id,
@@ -102,16 +102,14 @@ class TestStockMove(TransactionCase):
         return manager_stock_test_group
 
     def test_onchanges(self):
-        self.move_1._cache.update(
-            self.move_1._convert_to_cache(
-                {'company_id': self.company_2.id}, update=True))
-        self.move_1._onchange_company_id()
-        self.assertFalse(self.move_1.location_id)
+        move_form = Form(self.move_1)
+        move_form.company_id = self.company_2
+        self.assertFalse(move_form.location_id)
 
     def test_constrains(self):
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.move_1.company_id = self.company_2
         self.move_1.company_id = self.company
         self.move_1.product_id.company_id = self.company_2
-        self.move_1.location_id.company_id = False
-        self.move_1.company_id = self.company_2
+        with self.assertRaises(UserError):
+            self.move_1.location_id.company_id = False

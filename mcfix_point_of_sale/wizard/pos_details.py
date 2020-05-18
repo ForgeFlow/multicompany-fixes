@@ -1,5 +1,5 @@
 # Copyright 2018 Creu Blanca
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 from odoo import api, fields, models
 
@@ -9,7 +9,7 @@ class PosDetails(models.TransientModel):
 
     company_id = fields.Many2one(
         'res.company', string='Company', required=True,
-        default=lambda s: s.env.user.company_id)
+        default=lambda s: s.env.company_id)
     pos_config_ids = fields.Many2many(
         required=True, default=lambda s: s.env['pos.config'].search(
             [('company_id', '=', s.company_id.id)]))
@@ -22,7 +22,6 @@ class PosDetails(models.TransientModel):
         else:
             self.pos_config_ids = self.env['pos.config'].search([])
 
-    @api.multi
     def generate_report(self):
         result = super(PosDetails, self).generate_report()
         result['data'].update({'company_id': self.company_id.id})

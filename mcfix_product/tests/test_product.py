@@ -1,4 +1,4 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
@@ -13,8 +13,7 @@ class TestProduct(TransactionCase):
         super(TestProduct, self).setUp()
         employees_group = self.env.ref('base.group_user')
         manager_product_test_group = self.create_full_access(
-            ['product.price.history', 'product.template', 'product.product',
-             'ir.property'])
+            ['product.template', 'product.product', 'ir.property'])
         self.company = self.env['res.company'].create({
             'name': 'Test company',
         })
@@ -25,7 +24,7 @@ class TestProduct(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -33,7 +32,7 @@ class TestProduct(TransactionCase):
              'groups_id': [(6, 0, [employees_group.id,
                                    manager_product_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
         self.uom_unit = self.env.ref('uom.product_uom_unit')
         self.uom_dunit = self.env['uom.uom'].create({
@@ -90,13 +89,13 @@ class TestProduct(TransactionCase):
         self.assertEqual(product_1.company_id, self.company)
 
     def test_product(self):
-        template_1 = self.env['product.template'].sudo(self.user).create({
+        template_1 = self.env['product.template'].with_user(self.user).create({
             'name': 'Test',
             'uom_id': self.uom_unit.id,
             'uom_po_id': self.uom_unit.id,
             'company_id': self.company.id,
         })
-        product_1 = self.env['product.product'].sudo(self.user).create(
+        product_1 = self.env['product.product'].with_user(self.user).create(
             {'name': 'Test 1',
              'type': 'consu',
              'uom_id': self.uom_dunit.id,
@@ -105,17 +104,3 @@ class TestProduct(TransactionCase):
              })
         product_1.product_tmpl_id = template_1
         self.assertEqual(product_1.company_id, self.company)
-
-    def test_product_price(self):
-        product_1 = self.env['product.product'].sudo(self.user).create(
-            {'name': 'Test 1',
-             'type': 'consu',
-             'uom_id': self.uom_dunit.id,
-             'uom_po_id': self.uom_dunit.id,
-             'company_id': self.company_2.id,
-             'standard_price': 23.0,
-             })
-        product_history = self.env['product.price.history'].search(
-            [('product_id', '=', product_1.id),
-             ('company_id', '=', self.company_2.id)], limit=1)
-        self.assertEqual(len(product_history), 1)

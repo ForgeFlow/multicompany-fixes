@@ -1,9 +1,9 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
-from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.tests.common import TransactionCase, Form
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class TestStockInventory(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -47,7 +47,7 @@ class TestStockInventory(TransactionCase):
                                    multi_company_group.id,
                                    manager_stock_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
         self.uom_unit = self.env.ref('uom.product_uom_unit')
         self.uom_dunit = self.env['uom.uom'].create({
@@ -58,12 +58,12 @@ class TestStockInventory(TransactionCase):
             'uom_type': 'smaller',
             'rounding': 0.001})
 
-        location_1 = self.env['stock.location'].sudo(self.user).create({
+        location_1 = self.env['stock.location'].with_user(self.user).create({
             'name': 'test location Customer',
             'usage': 'customer',
             'company_id': self.company.id,
         })
-        self.location_2 = self.env['stock.location'].sudo(self.user).create({
+        self.location_2 = self.env['stock.location'].with_user(self.user).create({
             'name': 'test location Supplier',
             'usage': 'supplier',
             'company_id': self.company_2.id,
@@ -74,19 +74,14 @@ class TestStockInventory(TransactionCase):
             'uom_po_id': self.uom_unit.id,
             'company_id': self.company.id,
         })
-        self.partner = self.env['res.partner'].sudo(self.user).create({
-            'name': 'Partner Test',
-            'company_id': self.company.id,
-            'is_company': True,
-        })
-        self.inventory_1 = self.env['stock.inventory'].sudo(self.user).create({
-            'name': 'test inventory',
-            'product_id': self.template_1.product_variant_id.id,
-            'partner_id': self.partner.id,
-            'location_id': location_1.id,
-            'company_id': self.company.id,
-            'filter': 'product_owner',
-        })
+        self.inventory_1 = self.env['stock.inventory'].with_user(
+            self.user).create({
+                'name': 'test inventory',
+                'product_ids': [(4, self.template_1.product_variant_id.id)],
+                'location_ids': [(4, location_1.id)],
+                'company_id': self.company.id,
+                'start_empty': False,
+            })
 
     def create_full_access(self, list_of_models):
         manager_stock_test_group = self.env['res.groups'].sudo().create({
@@ -108,33 +103,26 @@ class TestStockInventory(TransactionCase):
         return manager_stock_test_group
 
     def test_onchanges(self):
-        self.inventory_1._cache.update(
-            self.inventory_1._convert_to_cache(
-                {'company_id': self.company_2.id}, update=True))
-        self.inventory_1._onchange_company_id()
-        self.assertFalse(self.inventory_1.product_id)
+        inventory_form = Form(self.inventory_1)
+        inventory_form.company_id = self.company_2
+        self.assertFalse(inventory_form.product_ids)
 
     def test_constrains(self):
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.inventory_1.company_id = self.company_2
         self.inventory_1.company_id = self.company
-        with self.assertRaises(ValidationError):
-            self.partner.company_id = self.company_2
-        self.partner.company_id = self.company
-        with self.assertRaises(ValidationError):
-            self.inventory_1.location_id = self.location_2
+        with self.assertRaises(UserError):
+            self.inventory_1.location_ids = [(6, 0, self.location_2.ids)]
 
     def test_create_inventory(self):
         # When creating an inventory without indicating the company,
         # it should default to the company associated to the location.
         self.template_1.company_id = False
-        self.partner.company_id = False
-        inventory = self.env['stock.inventory'].sudo(
+        inventory = self.env['stock.inventory'].with_user(
             self.user).create({
                 'name': 'test inventory',
-                'product_id': self.template_1.product_variant_id.id,
-                'partner_id': self.partner.id,
-                'location_id': self.location_2.id,
-                'filter': 'product_owner',
+                'product_ids': [(4, self.template_1.product_variant_id.id)],
+                'location_ids': [(4, self.location_2.id)],
+                'start_empty': False,
             })
         self.assertEquals(inventory.company_id, self.company_2)

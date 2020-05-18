@@ -1,5 +1,5 @@
 # Copyright 2018 Creu Blanca
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 import logging
 from odoo import api, models, _
@@ -24,7 +24,6 @@ class Base(models.AbstractModel):
             res += [(rec.id, name)]
         return res
 
-    @api.multi
     @api.depends('company_id')
     def name_get(self):
         """When the user is assigned to the multi-company group,

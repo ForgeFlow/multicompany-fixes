@@ -1,9 +1,9 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class TestAccountPayment(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -41,21 +41,21 @@ class TestAccountPayment(TransactionCase):
                                    account_manager_group.id,
                                    manager_account_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
 
-        self.partner = self.env['res.partner'].sudo(self.user).create({
+        self.partner = self.env['res.partner'].with_user(self.user).create({
             'name': 'Partner Test',
             'company_id': self.company.id,
             'is_company': True,
         })
-        self.cash_journal = self.journal_model.sudo(self.user).create({
+        self.cash_journal = self.journal_model.with_user(self.user).create({
             'name': 'Cash Journal 1 - Test',
             'code': 'test_cash_1',
             'type': 'cash',
             'company_id': self.company.id,
         })
-        self.payment = self.payment_model.sudo(self.user).create({
+        self.payment = self.payment_model.with_user(self.user).create({
             'payment_type': 'inbound',
             'payment_method_id': self.env.ref(
                 'account.account_payment_method_manual_in').id,
@@ -88,10 +88,10 @@ class TestAccountPayment(TransactionCase):
         with self.assertRaises(ValidationError):
             self.payment.partner_id.company_id = self.company_2
 
-        partner_2 = self.env['res.partner'].sudo(self.user).create({
+        partner_2 = self.env['res.partner'].with_user(self.user).create({
             'name': 'Partner 2 Test',
             'company_id': self.company_2.id,
             'is_company': True,
         })
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.payment.partner_id = partner_2

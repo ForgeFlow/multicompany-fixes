@@ -1,9 +1,9 @@
-# © 2016 Eficent Business and IT Consulting Services S.L.
+# Copyright 2016 ForgeFlow S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo.addons.mcfix_account.tests.test_account_chart_template_consistency \
     import TestAccountChartTemplate
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 
 
 class TestSaleOrderConsistency(TestAccountChartTemplate):
@@ -149,7 +149,6 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
         partner = self.env['res.partner'].create({
             'name': 'Test partner',
             'company_id': company.id,
-            'customer': True,
         })
         return partner
 
@@ -200,8 +199,8 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
                 'order_line': [(0, 0, {'product_id': product.id,
                                        'tax_id': [(6, 0, [tax.id])],
                                        'name': 'Sale Order Line'})],
-                'warehouse_id': self.env['stock.warehouse'].search(
-                    [('company_id', '=', company.id)], limit=1).id
+                # 'warehouse_id': self.env['stock.warehouse'].search(
+                #     [('company_id', '=', company.id)], limit=1).id
             })
         else:
             sale = self.env['sale.order'].create({
@@ -221,7 +220,7 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
         self.user.write({'company_id': self.company.id,
                          'company_ids': [(4, self.company.id)],
                          })
-        so_ids = self.env['sale.order'].sudo(self.user).search([
+        so_ids = self.env['sale.order'].with_user(self.user).search([
             ('company_id', '=', self.company_2.id)
         ])
         self.assertEqual(so_ids, self.env['sale.order'],
@@ -233,21 +232,21 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
     def test_sale_order_company_consistency(self):
         # Assertion on the constraints to ensure the consistency
         # on company dependent fields
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.sale_order_2.\
                 write({'partner_id': self.partner_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.sale_order_2.\
                 write({'payment_term_id': self.payment_terms_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.sale_order_2.\
                 write({'team_id': self.team_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.sale_order_2.\
                 write({'fiscal_position_id': self.fiscal_position_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.sale_order_2.order_line.\
                 write({'tax_id': [(6, 0, [self.tax_2.id])]})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.sale_order_2.order_line.\
                 write({'product_id': self.product2.id})

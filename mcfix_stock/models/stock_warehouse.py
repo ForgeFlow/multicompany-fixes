@@ -1,9 +1,13 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
 
 
 class Warehouse(models.Model):
     _inherit = "stock.warehouse"
+
+    crossdock_route_id = fields.Many2one(check_company=True)
+    reception_route_id = fields.Many2one(check_company=True)
+    delivery_route_id = fields.Many2one(check_company=True)
+    resupply_wh_ids = fields.Many2many(check_company=True)
 
     @api.onchange('company_id')
     def _onchange_company_id(self):
@@ -51,143 +55,6 @@ class Warehouse(models.Model):
         #     self.delivery_route_id = self.default_resupply_wh_id.\
         #         delivery_route_id
 
-    @api.multi
-    @api.constrains('company_id', 'wh_input_stock_loc_id')
-    def _check_company_id_wh_input_stock_loc_id(self):
-        for rec in self.sudo():
-            if not rec.wh_input_stock_loc_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'crossdock_route_id')
-    def _check_company_id_crossdock_route_id(self):
-        for rec in self.sudo():
-            if not rec.crossdock_route_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location Route must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'route_ids')
-    def _check_company_id_route_ids(self):
-        for rec in self.sudo():
-            for line in rec.route_ids:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Stock Warehouse and in '
-                          'Stock Location Route (%s) must be the same.'
-                          ) % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'wh_qc_stock_loc_id')
-    def _check_company_id_wh_qc_stock_loc_id(self):
-        for rec in self.sudo():
-            if not rec.wh_qc_stock_loc_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'reception_route_id')
-    def _check_company_id_reception_route_id(self):
-        for rec in self.sudo():
-            if not rec.reception_route_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location Route must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'mto_pull_id')
-    def _check_company_id_mto_pull_id(self):
-        for rec in self.sudo():
-            if not rec.mto_pull_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Procurement Rule must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'view_location_id')
-    def _check_company_id_view_location_id(self):
-        for rec in self.sudo():
-            if not rec.view_location_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'wh_output_stock_loc_id')
-    def _check_company_id_wh_output_stock_loc_id(self):
-        for rec in self.sudo():
-            if not rec.wh_output_stock_loc_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'partner_id')
-    def _check_company_id_partner_id(self):
-        for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Res Partner must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'lot_stock_id')
-    def _check_company_id_lot_stock_id(self):
-        for rec in self.sudo():
-            if not rec.lot_stock_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'wh_pack_stock_loc_id')
-    def _check_company_id_wh_pack_stock_loc_id(self):
-        for rec in self.sudo():
-            if not rec.wh_pack_stock_loc_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'resupply_wh_ids')
-    def _check_company_id_resupply_wh_ids(self):
-        for rec in self.sudo():
-            for line in rec.resupply_wh_ids:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Stock Warehouse and in '
-                          'Stock Warehouse (%s) must be the same.'
-                          ) % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'delivery_route_id')
-    def _check_company_id_delivery_route_id(self):
-        for rec in self.sudo():
-            if not rec.delivery_route_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse and in '
-                      'Stock Location Route must be the same.'))
-
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
@@ -222,30 +89,3 @@ class Orderpoint(models.Model):
             self.warehouse_id = self.product_id.warehouse_id
         if not self.location_id.check_company(self.company_id):
             self.location_id = self.product_id.location_id
-
-    @api.multi
-    @api.constrains('company_id', 'location_id')
-    def _check_company_id_location_id(self):
-        for rec in self.sudo():
-            if not rec.location_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse Orderpoint and in '
-                      'Stock Location must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'warehouse_id')
-    def _check_company_id_warehouse_id(self):
-        for rec in self.sudo():
-            if not rec.warehouse_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse Orderpoint and in '
-                      'Stock Warehouse must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'product_id')
-    def _check_company_id_product_id(self):
-        for rec in self.sudo():
-            if not rec.product_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Stock Warehouse Orderpoint and in '
-                      'Product Product must be the same.'))

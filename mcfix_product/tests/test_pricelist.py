@@ -1,9 +1,9 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class TestPricelist(TransactionCase):
         multi_company_group = self.env.ref('base.group_multi_company')
         manager_product_test_group = self.create_full_access(
             ['product.pricelist', 'product.pricelist.item', 'product.template',
-             'product.product', 'product.price.history'])
+             'product.product'])
         self.company = self.env['res.company'].create({
             'name': 'Test company',
         })
@@ -27,8 +27,8 @@ class TestPricelist(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
-            no_reset_password=True).create(
+        self.user = self.env['res.users'].with_user(
+            self.env.user).with_context(no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
              'email': 'test@oca.com',
@@ -36,7 +36,7 @@ class TestPricelist(TransactionCase):
                                    multi_company_group.id,
                                    manager_product_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
         self.uom_unit = self.env.ref('uom.product_uom_unit')
         self.uom_dunit = self.env['uom.uom'].create({
@@ -75,16 +75,18 @@ class TestPricelist(TransactionCase):
             'uom_po_id': self.uom_unit.id,
             'company_id': False,
         })
-        pricelist_1 = self.env['product.pricelist'].sudo(self.user).create({
-            'name': 'Test Pricelist',
-            'company_id': self.company.id,
-        })
-        pricelist_item_1 = self.env['product.pricelist.item'].sudo(self.user).\
-            create({'name': 'Test Pricelist Item',
-                    'product_tmpl_id': template_1.id,
-                    'applied_on': '1_product',
-                    'pricelist_id': pricelist_1.id
-                    })
+        pricelist_1 = self.env['product.pricelist'].with_user(
+            self.user).create({
+                'name': 'Test Pricelist',
+                'company_id': self.company.id,
+            })
+        pricelist_item_1 = self.env['product.pricelist.item'].with_user(
+            self.user).create({
+                'name': 'Test Pricelist Item',
+                'product_tmpl_id': template_1.id,
+                'applied_on': '1_product',
+                'pricelist_id': pricelist_1.id
+                })
         product_1 = self.env['product.product'].sudo().create(
             {'name': 'Test Product',
              'type': 'consu',
@@ -95,10 +97,10 @@ class TestPricelist(TransactionCase):
         with self.assertRaises(ValidationError):
             template_1.company_id = self.company_2
         template_1.company_id = self.company
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             pricelist_item_1.company_id = self.company_2
         pricelist_item_1.sudo().company_id = self.company
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             pricelist_item_1.sudo().write({
                 'product_id': product_1.id,
                 'applied_on': '0_product_variant',

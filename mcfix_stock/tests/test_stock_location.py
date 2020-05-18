@@ -1,9 +1,9 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
-from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.tests.common import TransactionCase, Form
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ class TestStockLocation(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True
         ).create(
             {'name': 'Test User',
@@ -46,21 +46,21 @@ class TestStockLocation(TransactionCase):
                                    multi_company_group.id,
                                    manager_stock_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
 
-        self.location_1 = self.env['stock.location'].sudo(self.user).create({
+        self.location_1 = self.env['stock.location'].with_user(self.user).create({
             'name': 'test location 1',
             'company_id': self.company.id,
         })
-        self.location_2 = self.env['stock.location'].sudo(self.user).create({
+        self.location_2 = self.env['stock.location'].with_user(self.user).create({
             'name': 'test location 2',
             'location_id': self.location_1.id,
             'company_id': self.company.id,
         })
-        self.location_3 = self.env['stock.location'].sudo(self.user).create({
+        self.location_3 = self.env['stock.location'].with_user(self.user).create({
             'name': 'test location 3',
-            'company_id': self.company.id,
+            'company_id': self.company_2.id,
         })
 
     def create_full_access(self, list_of_models):
@@ -83,14 +83,22 @@ class TestStockLocation(TransactionCase):
         return manager_stock_test_group
 
     def test_onchanges(self):
-        self.location_1._cache.update(
-            self.location_1._convert_to_cache(
-                {'company_id': self.company_2.id}, update=True))
-        self.location_1._onchange_company_id()
+        with self.assertRaises(UserError):
+            with Form(self.location_1) as location_form:
+                location_form.company_id = self.company_2
         self.assertFalse(self.location_1.location_id)
 
     def test_constrains(self):
-        self.location_1.company_id = self.company_2
-        self.assertTrue(self.location_2.company_id, self.company_2)
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
+            self.location_1.company_id = self.company_2
+        with self.assertRaises(UserError):
             self.location_2.location_id = self.location_3
+
+    def test_company_sublocation(self):
+        with self.assertRaises(UserError):
+            self.location_4 = self.env['stock.location'].with_user(
+                self.user).create({
+                    'name': 'test location 4',
+                    'location_id': self.location_3.id,
+                    'company_id': False,
+                })

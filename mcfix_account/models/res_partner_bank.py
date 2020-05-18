@@ -14,6 +14,6 @@ class ResPartnerBank(models.Model):
         res += [
             ('account.bank.statement.line',
              [('bank_account_id', '=', self.id)]),
-            ('account.invoice', [('partner_bank_id', '=', self.id)]),
+            ('account.move', [('invoice_partner_bank_id', '=', self.id)]),
         ]
         return res

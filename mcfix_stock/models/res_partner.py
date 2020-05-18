@@ -8,9 +8,7 @@ class Partner(models.Model):
         res = super()._check_company_id_search()
         res = res + [
             ('stock.rule', [('partner_address_id', '=', self.id)]),
-            ('stock.inventory', [('partner_id', '=', self.id)]),
             ('stock.inventory.line', [('partner_id', '=', self.id)]),
-            ('stock.location', [('partner_id', '=', self.id)]),
             ('stock.move', [('restrict_partner_id', '=', self.id)]),
             ('stock.move', [('partner_id', '=', self.id)]),
             ('stock.move.line', [('owner_id', '=', self.id)]),

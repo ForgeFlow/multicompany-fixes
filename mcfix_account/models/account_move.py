@@ -1,37 +1,57 @@
-from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
 
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
+    _check_company_auto = True
 
+    journal_id = fields.Many2one(
+        check_company=True, domain="[('id', 'in', suitable_journal_ids)]")
+    suitable_journal_ids = fields.Many2many(
+        comodel_name='account.journal',
+        compute='_compute_suitable_journal_ids')
+    partner_id = fields.Many2one(check_company=True)
+    reversed_entry_id = fields.Many2one(
+        check_company=True)
+    fiscal_position_id = fields.Many2one(check_company=True)
+    invoice_payment_term_id = fields.Many2one(
+        check_company=True)
+    invoice_partner_bank_id = fields.Many2one(check_company=True)
+    invoice_vendor_bill_id = fields.Many2one(check_company=True)
     company_id = fields.Many2one(
         readonly=True,
         states={'draft': [('readonly', False)]},
     )
+    tax_cash_basis_rec_id = fields.Many2one(check_company=True)
+
+    @api.depends('company_id', 'invoice_filter_type_domain')
+    def _compute_suitable_journal_ids(self):
+        for m in self:
+            domain = [('company_id', '=', m.company_id.id), (
+                'type', '=?', m.invoice_filter_type_domain)]
+            m.suitable_journal_ids = self.env['account.journal'].search(domain)
 
     @api.model_create_multi
     def create(self, mvals):
         for vals in mvals:
-            vals['company_id'] = self.env['account.journal'].browse(
-                vals['journal_id']).company_id.id
+            if vals.get('journal_id', False) and \
+                    not vals.get('company_id', False):
+                vals['company_id'] = self.env['account.journal'].browse(
+                    vals['journal_id']).company_id.id
         return super().create(mvals)
 
-    @api.multi
     def write(self, vals):
         if vals.get('journal_id', False):
             vals['company_id'] = self.env['account.journal'].browse(
                 vals['journal_id']).company_id.id
         return super().write(vals)
 
-    @api.multi
     @api.depends('company_id')
     def name_get(self):
         names = super(AccountMove, self).name_get()
         res = self.add_company_suffix(names)
         return res
 
-    @api.multi
     @api.onchange('company_id')
     def _onchange_company_id(self):
         default = self.env.context['default_journal_type']
@@ -42,37 +62,6 @@ class AccountMove(models.Model):
             ], limit=1).id
             record.line_ids = False
 
-    @api.multi
-    @api.constrains('company_id', 'partner_id')
-    def _check_company_id_partner_id(self):
-        for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.journal_id.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move and in '
-                      'Res Partner must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'tax_cash_basis_rec_id')
-    def _check_company_id_tax_cash_basis_rec_id(self):
-        for rec in self.sudo():
-            if not rec.tax_cash_basis_rec_id.check_company(
-                rec.journal_id.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Account Move and in '
-                      'Account Partial Reconcile must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id')
-    def _check_company_id_dummy_account_id(self):
-        for rec in self.sudo():
-            if not rec.dummy_account_id.check_company(
-                rec.journal_id.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Account Move and in '
-                      'Account Account must be the same.'))
-
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
@@ -82,266 +71,30 @@ class AccountMove(models.Model):
         res += [self.line_ids, ]
         return res
 
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res += [
-            ('account.invoice', [('move_id', '=', self.id)]),
-        ]
-        return res
-
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
+    _check_company_auto = True
 
-    @api.multi
+    move_id = fields.Many2one(check_company=True)
+    account_id = fields.Many2one(
+        domain="[('deprecated', '=', False), ('company_id', '=', company_id)]",
+        check_company=True)
+    reconcile_model_id = fields.Many2one(check_company=True)
+    payment_id = fields.Many2one(check_company=True)
+    statement_line_id = fields.Many2one(check_company=True)
+    tax_ids = fields.Many2many(check_company=True)
+    tax_repartition_line_id = fields.Many2one(check_company=True)
+    analytic_account_id = fields.Many2one(check_company=True)
+    analytic_tag_ids = fields.Many2many(check_company=True)
+    partner_id = fields.Many2one(check_company=True)
+    product_id = fields.Many2one(check_company=True)
+
     @api.depends('company_id')
     def name_get(self):
         names = super(AccountMoveLine, self).name_get()
         res = self.add_company_suffix(names)
         return res
-
-    def auto_reconcile_lines(self):
-        return super(AccountMoveLine, self.with_context(
-            check_move_validity=False)).auto_reconcile_lines()
-
-    @api.model
-    def _add_company_name_to_rows(self, rows):
-        for row in rows:
-            if 'account_code' in row:
-                row['account_code'] = '%s (%s)' % (
-                    row['account_code'], self.env['account.account'].browse(
-                        row['account_id']).company_id.name)
-        return True
-
-    @api.model
-    def get_data_for_manual_reconciliation(self, res_type, res_ids=None,
-                                           account_type=None):
-        # Code is the same as original method, but we use it to compute for
-        # the child_companies
-        prev_rows = super(
-            AccountMoveLine, self).get_data_for_manual_reconciliation(
-            res_type, res_ids, account_type)
-        self._add_company_name_to_rows(prev_rows)
-        child_companies = self.env.user.company_id.child_ids
-        if not child_companies:
-            return prev_rows
-
-        if res_ids is not None and len(res_ids) == 0:
-            return []
-        res_ids = res_ids and tuple(res_ids)
-
-        assert res_type in ('partner', 'account')
-        assert account_type in ('payable', 'receivable', None)
-        is_partner = res_type == 'partner'
-        res_alias = is_partner and 'p' or 'a'
-        child_company_ids = child_companies and tuple(child_companies.ids)
-        # pylint: disable=E8103
-        query = ("""
-            SELECT {0} account_id, account_name, account_code, max_date,
-                   to_char(last_time_entries_checked, 'YYYY-MM-DD')
-                   AS last_time_entries_checked
-            FROM (
-                    SELECT {1}
-                        {res_alias}.last_time_entries_checked
-                        AS last_time_entries_checked,
-                        a.id AS account_id,
-                        a.name AS account_name,
-                        a.code AS account_code,
-                        MAX(l.write_date) AS max_date
-                    FROM
-                        account_move_line l
-                        RIGHT JOIN account_account a
-                        ON (a.id = l.account_id)
-                        RIGHT JOIN account_account_type at
-                        ON (at.id = a.user_type_id)
-                        {2}
-                    WHERE
-                        a.reconcile IS TRUE
-                        AND l.full_reconcile_id is NULL
-                        {3}
-                        {4}
-                        {5}
-                        AND l.company_id in {6}
-                        AND EXISTS (
-                            SELECT NULL
-                            FROM account_move_line l
-                            WHERE l.account_id = a.id
-                            {7}
-                            AND l.amount_residual > 0
-                        )
-                        AND EXISTS (
-                            SELECT NULL
-                            FROM account_move_line l
-                            WHERE l.account_id = a.id
-                            {7}
-                            AND l.amount_residual < 0
-                        )
-                    GROUP BY {8} a.id, a.name, a.code,
-                    {res_alias}.last_time_entries_checked
-                    ORDER BY {res_alias}.last_time_entries_checked
-                ) as s
-            WHERE (last_time_entries_checked IS NULL
-            OR max_date > last_time_entries_checked)
-        """.format(
-            is_partner and 'partner_id, partner_name,' or ' ',
-            is_partner and 'p.id AS partner_id, p.name '
-                           'AS partner_name,' or ' ',
-            is_partner and 'RIGHT JOIN res_partner p '
-                           'ON (l.partner_id = p.id)' or ' ',
-            is_partner and ' ' or "AND at.type <> 'payable' "
-                                  "AND at.type <> 'receivable'",
-            account_type and "AND at.type = %(account_type)s" or '',
-            res_ids and 'AND ' + res_alias + '.id in %(res_ids)s' or '',
-            child_company_ids and '%(child_company_ids)s' or '',
-            is_partner and 'AND l.partner_id = p.id' or ' ',
-            is_partner and 'l.partner_id, p.id,' or ' ',
-            res_alias=res_alias
-        ))
-        self.env.cr.execute(query, locals())
-
-        # Apply ir_rules by filtering out
-        rows = self.env.cr.dictfetchall()
-        ids = [x['account_id'] for x in rows]
-        allowed_ids = set(self.env['account.account'].browse(ids).ids)
-        rows = [row for row in rows if row['account_id'] in allowed_ids]
-        if is_partner:
-            ids = [x['partner_id'] for x in rows]
-            allowed_ids = set(self.env['res.partner'].browse(ids).ids)
-            rows = [row for row in rows if row['partner_id'] in allowed_ids]
-
-        # Fetch other data
-        for row in rows:
-            account = self.env['account.account'].browse(row['account_id'])
-            row['currency_id'] = account.currency_id.id or account. \
-                company_id.currency_id.id
-            partner_id = is_partner and row['partner_id'] or None
-            row['reconciliation_proposition'] = \
-                self.get_reconciliation_proposition(account.id, partner_id)
-        self._add_company_name_to_rows(rows)
-        total_rows = rows + prev_rows
-        return total_rows
-
-    @api.multi
-    def prepare_move_lines_for_reconciliation_widget(
-            self, target_currency=False, target_date=False):
-        ret = super(AccountMoveLine, self). \
-            prepare_move_lines_for_reconciliation_widget(
-            target_currency=target_currency, target_date=target_date)
-        for ret_line in ret:
-            for line in self:
-                if ret_line['id'] == line.id:
-                    ret_line['company_id'] = line.company_id.id
-        return ret
-
-    @api.multi
-    @api.constrains('company_id', 'tax_line_id')
-    def _check_company_id_tax_line_id(self):
-        for rec in self.sudo():
-            if not rec.tax_line_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Tax must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'product_id')
-    def _check_company_id_product_id(self):
-        for rec in self.sudo():
-            if not rec.product_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Product Product must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'statement_line_id')
-    def _check_company_id_statement_line_id(self):
-        for rec in self.sudo():
-            if not rec.statement_line_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Bank Statement Line must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'tax_ids')
-    def _check_company_id_tax_ids(self):
-        for rec in self.sudo():
-            for line in rec.tax_ids:
-                if not line.check_company(rec.company_id):
-                    raise ValidationError(
-                        _('The Company in the Account Move Line and in '
-                          'Account Tax (%s) must be the same'
-                          '.') % line.name_get()[0][1])
-
-    @api.multi
-    @api.constrains('company_id', 'payment_id')
-    def _check_company_id_payment_id(self):
-        for rec in self.sudo():
-            if not rec.payment_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Payment must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'invoice_id')
-    def _check_company_id_invoice_id(self):
-        for rec in self.sudo():
-            if not rec.invoice_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Invoice must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'partner_id')
-    def _check_company_id_partner_id(self):
-        for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Res Partner must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'move_id')
-    def _check_company_id_move_id(self):
-        for rec in self.sudo():
-            if not rec.move_id.journal_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Move must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'account_id')
-    def _check_company_id_account_id(self):
-        for rec in self.sudo():
-            if not rec.account_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Account must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'statement_id')
-    def _check_company_id_statement_id(self):
-        for rec in self.sudo():
-            if not rec.statement_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Bank Statement must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'analytic_account_id')
-    def _check_company_id_analytic_account_id(self):
-        for rec in self.sudo():
-            if not rec.analytic_account_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Analytic Account must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'journal_id')
-    def _check_company_id_journal_id(self):
-        for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Move Line and in '
-                      'Account Journal must be the same.'))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
@@ -353,12 +106,5 @@ class AccountMoveLine(models.Model):
             self.analytic_line_ids,
             self.matched_debit_ids,
             self.matched_credit_ids,
-        ]
-        return res
-
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res += [
-            ('account.invoice', [('payment_move_line_ids', 'in', self.ids)]),
         ]
         return res

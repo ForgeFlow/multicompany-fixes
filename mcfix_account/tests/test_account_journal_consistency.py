@@ -1,4 +1,4 @@
-# © 2016-17 Eficent Business and IT Consulting Services S.L.
+# Copyright 2016-17 ForgeFlow S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from ..tests.test_account_chart_template_consistency import \
@@ -63,33 +63,33 @@ class TestAccountJournalConsistency(TestAccountChartTemplate):
         # Assertion on the constraints to ensure the consistency
         # for company dependent fields
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.cash_journal.\
                 write({'profit_account_id': self.account_2.id})
         self.cash_journal.profit_account_id = False
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.cash_journal.\
                 write({'loss_account_id': self.account_2.id})
         self.cash_journal.loss_account_id = False
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.cash_journal.\
                 write({'default_debit_account_id': self.account_2.id})
         self.cash_journal.default_debit_account_id = False
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.cash_journal.\
                 write({'default_credit_account_id': self.account_2.id})
         self.cash_journal.default_credit_account_id = False
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.cash_journal.account_control_ids += self.account_2
         self.cash_journal.account_control_ids = False
 
         self.cash_journal.account_control_ids += self.account_1
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.cash_journal.write(
                 {'company_id': self.company_2.id})
 

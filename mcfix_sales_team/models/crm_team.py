@@ -3,6 +3,7 @@ from odoo import api, models
 
 class CrmTeam(models.Model):
     _inherit = "crm.team"
+    _check_company_auto = True
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):

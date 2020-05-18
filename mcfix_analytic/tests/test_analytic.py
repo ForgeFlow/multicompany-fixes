@@ -1,5 +1,5 @@
 # Copyright 2018 Creu Blanca
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 
 import logging
@@ -28,7 +28,7 @@ class TestAnalytic(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -40,7 +40,7 @@ class TestAnalytic(TransactionCase):
              'company_ids': [(4, self.company.id)],
              })
 
-        self.partner_1 = self.env['res.partner'].sudo(self.user).create({
+        self.partner_1 = self.env['res.partner'].with_user(self.user).create({
             'name': 'Partner Test',
             'company_id': self.company.id,
             'is_company': True,
@@ -66,7 +66,7 @@ class TestAnalytic(TransactionCase):
         return manager_account_test_group
 
     def test_analytic_account(self):
-        analytic_1 = self.env['account.analytic.account'].sudo(self.user).new({
+        analytic_1 = self.env['account.analytic.account'].with_user(self.user).new({
             'name': 'Test Analytic',
             'partner_id': self.partner_1.id,
             'company_id': self.company_2.id,

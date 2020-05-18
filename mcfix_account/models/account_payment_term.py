@@ -11,6 +11,6 @@ class AccountPaymentTerm(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res += [
-            ('account.invoice', [('payment_term_id', '=', self.id)]),
+            ('account.move', [('invoice_payment_term_id', '=', self.id)]),
         ]
         return res

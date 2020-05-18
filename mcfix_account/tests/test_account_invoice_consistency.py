@@ -1,8 +1,8 @@
-# © 2016-17 Eficent Business and IT Consulting Services S.L.
+# Copyright 2016-17 ForgeFlow S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 from ..tests.test_account_chart_template_consistency import \
     TestAccountChartTemplate
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 
 
 class TestAccountInvoiceConsistency(TestAccountChartTemplate):
@@ -81,27 +81,28 @@ class TestAccountInvoiceConsistency(TestAccountChartTemplate):
         return terms
 
     def _create_account_invoice(self, company):
-        invoice = self.env['account.invoice'].create({
+        invoice = self.env['account.move'].create({
             'partner_id': self.main_partner.id,
             'company_id': company.id,
             'fiscal_position_id': self.fiscal_position_1.id,
-            'payment_term_id': self.payment_term_1.id,
-            'journal_id': self.journal_c1.id
+            'invoice_payment_term_id': self.payment_term_1.id,
+            'journal_id': self.journal_c1.id,
+            'type': 'out_invoice',
         })
         return invoice
 
     def test_invoice_company_consistency(self):
         # Assertion on the constraints to ensure the consistency
         # for company dependent fields
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.account_invoice.\
                 write({'fiscal_position_id': self.fiscal_position_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.account_invoice.\
-                write({'payment_term_id': self.payment_term_2.id})
-        with self.assertRaises(ValidationError):
+                write({'invoice_payment_term_id': self.payment_term_2.id})
+        with self.assertRaises(UserError):
             self.account_invoice.\
                 write({'journal_id': self.journal_c2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.account_invoice.\
                 write({'partner_id': self.partner_2.id})

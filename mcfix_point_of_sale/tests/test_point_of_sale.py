@@ -1,8 +1,8 @@
 # Copyright 2018 Creu Blanca
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl).
 import logging
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 from odoo import fields
 from odoo.tools import mute_logger
 from odoo.addons.mcfix_account.tests.test_account_chart_template_consistency \
@@ -35,7 +35,7 @@ class TestPointOfSale(TestAccountChartTemplate):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -45,17 +45,16 @@ class TestPointOfSale(TestAccountChartTemplate):
                                    multi_company_group.id,
                                    manager_pos_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id),
-                             (4, self.company_2.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
 
-        self.pricelist = self.env['product.pricelist'].sudo(self.user).create({
+        self.pricelist = self.env['product.pricelist'].with_user(self.user).create({
             'name': 'Pricelist Test',
             'currency_id': self.env.ref('base.EUR').id,
             'company_id': self.company.id,
         })
 
-        self.sale_journal = self.journal_model.sudo(self.user).create({
+        self.sale_journal = self.journal_model.with_user(self.user).create({
             'name': 'Sale Journal 1 - Test',
             'code': 'test_sale_1',
             'type': 'sale',
@@ -67,11 +66,6 @@ class TestPointOfSale(TestAccountChartTemplate):
              'invoice_journal_id', 'pricelist_id'])
         vals['name'] = 'Config Test'
         vals['company_id'] = self.company.id
-        vals['journal_ids'] = [(0, 0, {'name': 'Cash Journal - Test',
-                                       'code': 'TSC',
-                                       'type': 'cash',
-                                       'company_id': self.company.id,
-                                       'journal_user': True})]
         self.pos_config = self.env['pos.config'].create(vals)
         self.income_account = self.env['account.account'].create({
             'company_id': self.company.id,
@@ -81,11 +75,11 @@ class TestPointOfSale(TestAccountChartTemplate):
                 'account.data_account_type_revenue').id
         })
 
-        self.carotte = self.create_product('point_of_sale.carotte')
-        self.courgette = self.create_product('point_of_sale.courgette')
-        self.onions = self.create_product('point_of_sale.Onions')
+        self.led_lamp = self.env.ref('point_of_sale.led_lamp')
+        self.whiteboard_pen = self.env.ref('point_of_sale.whiteboard_pen')
+        self.newspaper_rack = self.env.ref('point_of_sale.newspaper_rack')
 
-        self.carotte.categ_id.with_context(
+        self.newspaper_rack.categ_id.with_context(
             force_company=self.company.id
         ).property_account_income_categ_id = self.env[
             'account.account'].create({
@@ -95,6 +89,17 @@ class TestPointOfSale(TestAccountChartTemplate):
                 'user_type_id': self.env.ref(
                     'account.data_account_type_revenue').id
             })
+
+        self.cash_payment_method = self.pos_config.payment_method_ids.filtered(
+            lambda pm: pm.name == 'Cash')
+        self.bank_payment_method = self.pos_config.payment_method_ids.filtered(
+            lambda pm: pm.name == 'Bank')
+        self.credit_payment_method = self.env['pos.payment.method'].create({
+            'name': 'Credit',
+            'receivable_account_id':
+                self.company.account_default_pos_receivable_account_id.id,
+            'split_transactions': True,
+        })
 
     def create_product(self, name):
         return self.env['product.product'].create({
@@ -135,7 +140,7 @@ class TestPointOfSale(TestAccountChartTemplate):
              'invoice_journal_id', 'pricelist_id'])
         vals['name'] = 'Config Test'
         vals['company_id'] = self.company.id
-        pos_config = self.env['pos.config'].sudo(self.user).create(vals)
+        pos_config = self.env['pos.config'].with_user(self.user).create(vals)
         self.assertEquals(pos_config.sequence_id.company_id,
                           pos_config.company_id)
         self.assertEquals(pos_config.sequence_line_id.company_id,
@@ -149,24 +154,18 @@ class TestPointOfSale(TestAccountChartTemplate):
         vals['name'] = 'Config Test'
         vals['company_id'] = self.company.id
         vals['journal_id'] = self.sale_journal.id
-        vals['journal_ids'] = [(0, 0, {'name': 'Cash Journal - Test',
-                                       'code': 'TSC',
-                                       'type': 'cash',
-                                       'company_id': self.company.id,
-                                       'journal_user': True})]
-        pos_config = self.env['pos.config'].sudo(self.user).new(vals)
+        pos_config = self.env['pos.config'].with_user(self.user).new(vals)
         pos_config.company_id = self.company_2
         pos_config._onchange_company_id()
         self.assertNotEquals(pos_config.journal_id, self.sale_journal)
-        for journal in pos_config.journal_ids:
-            self.assertNotEquals(journal.company_id, self.company)
+        self.assertNotEquals(pos_config.journal_id.company_id, self.company)
 
     def test_constrains(self):
-        pos_session = self.env['pos.session'].sudo(self.user).create({
+        pos_session = self.env['pos.session'].with_user(self.user).create({
             'user_id': self.user.id,
             'config_id': self.pos_config.id,
         })
-        pos_1 = self.pos_model.sudo(self.user).create({
+        pos_1 = self.pos_model.with_user(self.user).create({
             'name': 'Pos - Test',
             'pricelist_id': self.pricelist.id,
             'company_id': self.company.id,
@@ -176,19 +175,21 @@ class TestPointOfSale(TestAccountChartTemplate):
             'amount_paid': 0,
             'amount_return': 0,
         })
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             pos_1.company_id = self.company_2
+            pass
 
     def test_pos_session_create(self):
         company_3 = self.env['res.company'].create({
             'name': 'C3',
         })
+        self._chart_of_accounts_create(
+            company_3, self.chart, self._get_templates())
         self.env['account.journal'].create(
             {'name': 'Cash Journal - c3',
              'code': 'CJ3',
              'type': 'cash',
              'company_id': company_3.id,
-             'journal_user': True
              }
         )
         sale_journal = self.env['account.journal'].create(
@@ -205,12 +206,17 @@ class TestPointOfSale(TestAccountChartTemplate):
         vals['name'] = 'Config Test'
         vals['journal_id'] = sale_journal.id
         vals['company_id'] = company_3.id
+        vals['payment_method_ids'] = [(0, 0, {
+            'name': 'payment method',
+            'receivable_account_id':
+                company_3.account_default_pos_receivable_account_id.id,
+            'company_id': company_3.id,
+        })]
         pos_config = self.env['pos.config'].create(vals)
         # I click on create a new session button
         pos_config.open_session_cb()
-        self.assertEquals(len(pos_config.journal_ids) > 0, True)
-        self.assertEquals(pos_config.journal_ids[0].journal_user, True)
-        with self.assertRaises(ValidationError):
+        self.assertEquals(len(pos_config.journal_id), 1)
+        with self.assertRaises(UserError):
             pos_config.company_id = self.company_2
 
     def test_create_from_ui(self):
@@ -218,16 +224,14 @@ class TestPointOfSale(TestAccountChartTemplate):
         Simulation of sales coming from the interface,
         even after closing the session
         """
-        fromproduct = object()
-
-        def compute_tax(product, price, taxes=fromproduct, qty=1):
-            if taxes is fromproduct:
-                taxes = product.taxes_id
+        def compute_tax(product, price, qty=1, taxes=None):
+            if not taxes:
+                taxes = product.taxes_id.filtered(
+                    lambda t: t.company_id.id == self.env.user.id)
             currency = self.pos_config.pricelist_id.currency_id
-            taxes = taxes.compute_all(price, currency, qty,
-                                      product=product)['taxes']
-            untax = price * qty
-            return untax, sum(tax.get('amount', 0.0) for tax in taxes)
+            res = taxes.compute_all(price, currency, qty, product=product)
+            untax = res['total_excluded']
+            return untax, sum(tax.get('amount', 0.0) for tax in res['taxes'])
 
         # I click on create a new session button
         self.pos_config.open_session_cb()
@@ -235,14 +239,15 @@ class TestPointOfSale(TestAccountChartTemplate):
         current_session = self.pos_config.current_session_id
         num_starting_orders = len(current_session.order_ids)
 
-        untax, atax = compute_tax(self.carotte, 0.9)
+        untax, atax = compute_tax(self.led_lamp, 0.9)
         carrot_order = {
             'data':
                 {'amount_paid': untax + atax,
                  'amount_return': 0,
                  'amount_tax': atax,
                  'amount_total': untax + atax,
-                 'creation_date': fields.Datetime.now(),
+                 'creation_date': fields.Datetime.to_string(
+                     fields.Datetime.now()),
                  'fiscal_position_id': False,
                  'pricelist_id': self.pos_config.available_pricelist_ids[0].id,
                  'lines': [[0, 0, {
@@ -250,11 +255,11 @@ class TestPointOfSale(TestAccountChartTemplate):
                      'id': 42,
                      'pack_lot_ids': [],
                      'price_unit': 0.9,
+                     'product_id': self.led_lamp.id,
                      'price_subtotal': 0.9,
-                     'price_subtotal_incl': untax + atax,
-                     'product_id': self.carotte.id,
+                     'price_subtotal_incl': 1.04,
                      'qty': 1,
-                     'tax_ids': [(6, 0, self.carotte.taxes_id.ids)]
+                     'tax_ids': [(6, 0, self.led_lamp.taxes_id.ids)]
                  }]],
                  'name': 'Order 00042-003-0014',
                  'partner_id': False,
@@ -262,28 +267,24 @@ class TestPointOfSale(TestAccountChartTemplate):
                  'sequence_number': 2,
                  'statement_ids': [
                      [0, 0,
-                      {'account_id':
-                       self.env.user.partner_id.with_context(
-                           force_company=self.company.id
-                       ).property_account_receivable_id.id,
-                       'amount': untax + atax,
-                       'journal_id': self.pos_config.journal_ids[0].id,
+                      {'amount': untax + atax,
                        'name': fields.Datetime.now(),
-                       'statement_id': current_session.statement_ids[0].id}]],
+                       'payment_method_id': self.cash_payment_method.id}]],
                  'uid': '00042-003-0014',
                  'user_id': self.env.uid
                  },
             'id': '00042-003-0014',
             'to_invoice': False}
 
-        untax, atax = compute_tax(self.courgette, 1.2)
+        untax, atax = compute_tax(self.whiteboard_pen, 1.2)
         zucchini_order = {
             'data':
                 {'amount_paid': untax + atax,
                  'amount_return': 0,
                  'amount_tax': atax,
                  'amount_total': untax + atax,
-                 'creation_date': fields.Datetime.now(),
+                 'creation_date': fields.Datetime.to_string(
+                     fields.Datetime.now()),
                  'fiscal_position_id': False,
                  'pricelist_id': self.pos_config.available_pricelist_ids[0].id,
                  'lines': [[0, 0, {
@@ -291,25 +292,20 @@ class TestPointOfSale(TestAccountChartTemplate):
                      'id': 3,
                      'pack_lot_ids': [],
                      'price_unit': 1.2,
+                     'product_id': self.whiteboard_pen.id,
                      'price_subtotal': 1.2,
-                     'price_subtotal_incl': untax + atax,
-                     'product_id': self.courgette.id,
+                     'price_subtotal_incl': 1.38,
                      'qty': 1,
-                     'tax_ids': [(6, 0, self.courgette.taxes_id.ids)]}]],
+                     'tax_ids': [(6, 0, self.whiteboard_pen.taxes_id.ids)]}]],
                  'name': 'Order 00043-003-0014',
                  'partner_id': False,
                  'pos_session_id': current_session.id,
                  'sequence_number': self.pos_config.journal_id.id,
                  'statement_ids': [
                      [0, 0,
-                      {'account_id':
-                       self.env.user.partner_id.with_context(
-                           force_company=self.company.id
-                       ).property_account_receivable_id.id,
-                       'amount': untax + atax,
-                       'journal_id': self.pos_config.journal_ids[0].id,
+                      {'amount': untax + atax,
                        'name': fields.Datetime.now(),
-                       'statement_id': current_session.statement_ids[0].id
+                       'payment_method_id': self.credit_payment_method.id
                        }
                       ]
                  ],
@@ -318,13 +314,14 @@ class TestPointOfSale(TestAccountChartTemplate):
             'id': '00043-003-0014',
             'to_invoice': False}
 
-        untax, atax = compute_tax(self.onions, 1.28)
-        self.onions_order = {
+        untax, atax = compute_tax(self.newspaper_rack, 1.28)
+        newspaper_rack_order = {
             'data': {'amount_paid': untax + atax,
                      'amount_return': 0,
                      'amount_tax': atax,
                      'amount_total': untax + atax,
-                     'creation_date': fields.Datetime.now(),
+                     'creation_date': fields.Datetime.to_string(
+                         fields.Datetime.now()),
                      'fiscal_position_id': False,
                      'pricelist_id': self.pos_config.available_pricelist_ids[
                          0].id,
@@ -334,12 +331,12 @@ class TestPointOfSale(TestAccountChartTemplate):
                            'id': 3,
                            'pack_lot_ids': [],
                            'price_unit': 1.28,
+                           'product_id': self.newspaper_rack.id,
                            'price_subtotal': 1.28,
-                           'price_subtotal_incl': untax + atax,
-                           'product_id': self.onions.id,
+                           'price_subtotal_incl': 1.47,
                            'qty': 1,
                            'tax_ids': [[6, False,
-                                        self.onions.taxes_id.ids]]
+                                        self.newspaper_rack.taxes_id.ids]]
                            }
                           ]
                      ],
@@ -349,14 +346,9 @@ class TestPointOfSale(TestAccountChartTemplate):
                      'sequence_number': self.pos_config.journal_id.id,
                      'statement_ids': [
                          [0, 0,
-                          {'account_id':
-                           self.env.user.partner_id.with_context(
-                               force_company=self.company.id
-                           ).property_account_receivable_id.id,
-                           'amount': untax + atax,
-                           'journal_id': self.pos_config.journal_ids[0].id,
+                          {'amount': untax + atax,
                            'name': fields.Datetime.now(),
-                           'statement_id': current_session.statement_ids[0].id
+                           'payment_method_id': self.bank_payment_method.id
                            }
                           ]
                      ],
@@ -371,11 +363,6 @@ class TestPointOfSale(TestAccountChartTemplate):
         self.assertEqual(num_starting_orders + 1, len(
             current_session.order_ids), "Submitted order not encoded")
 
-        # I resubmit the same order
-        self.pos_model.create_from_ui([carrot_order])
-        self.assertEqual(num_starting_orders + 1, len(
-            current_session.order_ids), "Resubmitted order was not skipped")
-
         # I close the session
         current_session.action_pos_session_closing_control()
         self.assertEqual(current_session.state, 'closed',
@@ -385,7 +372,8 @@ class TestPointOfSale(TestAccountChartTemplate):
 
         # I keep selling after the session is closed
         with mute_logger('odoo.addons.point_of_sale.models.pos_order'):
-            self.pos_model.create_from_ui([zucchini_order, self.onions_order])
+            self.pos_model.create_from_ui(
+                [zucchini_order, newspaper_rack_order])
         rescue_session = self.env['pos.session'].search([
             ('config_id', '=', self.pos_config.id),
             ('state', '=', 'opened'),

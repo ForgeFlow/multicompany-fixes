@@ -1,11 +1,11 @@
-# © 2016-17 Eficent Business and IT Consulting Services S.L.
+# Copyright 2016-17 ForgeFlow S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 import time
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.addons.mcfix_account.tests.test_account_chart_template_consistency \
     import TestAccountChartTemplate
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError
 
 
 class TestPurchaseOrderConsistency(TestAccountChartTemplate):
@@ -19,6 +19,7 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         super(TestPurchaseOrderConsistency, self).setUp()
         self.res_users_model = self.env['res.users']
         self.account_model = self.env['account.account']
+        self.journal_model = self.env['account.journal']
 
         # User
         self.user = self.env['res.users'].create({
@@ -64,6 +65,14 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
             'company_id': self.company.id,
         })
 
+        self.cash_journal = self.journal_model.with_user(
+            self.user).sudo().create({
+                'name': 'Cash Journal 1 - Test',
+                'code': 'test_cash_1',
+                'type': 'cash',
+                'company_id': self.company.id,
+            })
+
         # Create records for both companies
         self.partner_1 = self._create_partners(self.company)
         self.partner_2 = self._create_partners(self.company_2)
@@ -87,7 +96,8 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
 
         self.purchase1.button_confirm()
         self.invoice = self._create_invoice(
-            self.purchase1, self.partner_1, self.cash_account_id)
+            self.purchase1, self.partner_1, self.cash_journal,
+            self.cash_account_id)
 
     def _create_purchase(self, company, product, tax, partner):
         """ Create a purchase order.
@@ -110,13 +120,13 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         })
         return purchase
 
-    def _create_invoice(self, purchase, partner, account):
+    def _create_invoice(self, purchase, partner, journal, account):
         """ Create a vendor invoice for the purchase order."""
         invoice_vals = {
             'purchase_id': purchase.id,
             'partner_id': partner.id,
-            'account_id': account.id,
             'company_id': purchase.company_id.id,
+            'journal_id': journal.id,
             'type': 'in_invoice',
         }
         purchase_context = {
@@ -125,7 +135,7 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
             'active_model': 'purchase.order',
             'company_id': purchase.company_id.id,
         }
-        return self.env['account.invoice'].with_context(purchase_context).\
+        return self.env['account.move'].with_context(purchase_context).\
             create(invoice_vals)
 
     def _create_partners(self, company):
@@ -133,7 +143,6 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         partner = self.env['res.partner'].create({
             'name': 'Test partner',
             'company_id': company.id,
-            'customer': True,
         })
         return partner
 
@@ -162,16 +171,16 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
     def test_purchase_order_company_consistency(self):
         # Assertion on the constraints to ensure the consistency
         # on company dependent fields
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.purchase1.write({'partner_id': self.partner_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.purchase1.write({'payment_term_id': self.payment_terms_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.purchase1.write(
                 {'fiscal_position_id': self.fiscal_position_2.id})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.purchase1.order_line.write(
                 {'taxes_id': [(6, 0, [self.tax_2.id])]})
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             self.purchase1.order_line.write({'product_id': self.product2.id})
         self.assertEqual(self.purchase1.company_id, self.invoice.company_id)

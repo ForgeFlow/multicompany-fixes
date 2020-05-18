@@ -11,11 +11,6 @@
             <field name="journal_id" position="attributes">
                 <attribute name="domain">[('type', '=', 'general'),('company_id','=',company_id)]</attribute>
             </field>
-            <field name="tax_id" position="attributes">
-                <attribute name="domain">
-                    [('type_tax_use', '=', 'none'), ('company_id', '=', company_id)]
-                </attribute>
-            </field>
             <field name="debit_account_id" position="attributes">
                 <attribute name="domain">[('deprecated', '=', False),('company_id','=',company_id)]</attribute>
             </field>

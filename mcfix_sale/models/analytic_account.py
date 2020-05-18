@@ -1,5 +1,4 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import fields, models
 
 
 class AccountAnalyticAccount(models.Model):
@@ -19,11 +18,4 @@ class AccountAnalyticAccount(models.Model):
 class AccountAnalyticLine(models.Model):
     _inherit = 'account.analytic.line'
 
-    @api.multi
-    @api.constrains('company_id', 'so_line')
-    def _check_company_id_so_line(self):
-        for rec in self.sudo():
-            if not rec.so_line.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Account Analytic Line and in '
-                      'Sale Order Line must be the same.'))
+    so_line = fields.Many2one(check_company=True)

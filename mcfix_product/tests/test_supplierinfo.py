@@ -1,9 +1,9 @@
-# Copyright 2018 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2018 ForgeFlow, S.L.
 # License AGPL-3 - See https://www.gnu.org/licenses/agpl-3.0
 
 import logging
 from odoo.tests.common import TransactionCase
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class TestSupplierinfo(TransactionCase):
         multi_company_group = self.env.ref('base.group_multi_company')
         manager_product_test_group = self.create_full_access(
             ['product.supplierinfo', 'product.template', 'product.product',
-             'product.price.history', 'res.partner'])
+             'res.partner'])
         self.company = self.env['res.company'].create({
             'name': 'Test company',
         })
@@ -27,7 +27,7 @@ class TestSupplierinfo(TransactionCase):
         self.env.user.company_ids += self.company
         self.env.user.company_ids += self.company_2
 
-        self.user = self.env['res.users'].sudo(self.env.user).with_context(
+        self.user = self.env['res.users'].with_user(self.env.user).with_context(
             no_reset_password=True).create(
             {'name': 'Test User',
              'login': 'test_user',
@@ -36,7 +36,7 @@ class TestSupplierinfo(TransactionCase):
                                    multi_company_group.id,
                                    manager_product_test_group.id])],
              'company_id': self.company.id,
-             'company_ids': [(4, self.company.id)],
+             'company_ids': [(4, self.company.id), (4, self.company_2.id)],
              })
         self.uom_unit = self.env.ref('uom.product_uom_unit')
         self.uom_dunit = self.env['uom.uom'].create({
@@ -75,12 +75,12 @@ class TestSupplierinfo(TransactionCase):
             'uom_po_id': self.uom_unit.id,
             'company_id': False,
         })
-        partner_1 = self.env['res.partner'].sudo(self.user).create({
+        partner_1 = self.env['res.partner'].with_user(self.user).create({
             'name': 'Test Partner',
             'company_id': self.company.id,
             'is_company': True,
         })
-        supplier_1 = self.env['product.supplierinfo'].sudo(self.user).create({
+        supplier_1 = self.env['product.supplierinfo'].with_user(self.user).create({
             'name': partner_1.id,
             'product_tmpl_id': template_1.id,
         })
@@ -88,11 +88,11 @@ class TestSupplierinfo(TransactionCase):
             partner_1.company_id = self.company_2
         template_1.company_id = self.company
         partner_1.company_id = self.company
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             supplier_1.company_id = self.company_2
         with self.assertRaises(ValidationError):
-            template_1.company_id = self.company
+            template_1.company_id = self.company_2
         partner_1.company_id = False
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(UserError):
             supplier_1.sudo().company_id = self.company_2
             # The sudo is because there exists an ir_rule for access

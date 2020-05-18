@@ -1,4 +1,4 @@
-# © 2018 Eficent Business and IT Consulting Services S.L.
+# Copyright 2018 ForgeFlow S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 import logging
 from odoo.tests.common import TransactionCase
@@ -49,7 +49,9 @@ class TestAccountChartTemplate(TransactionCase):
             'company_ids': [(4, company.id)],
             'company_id': company.id,
         })
-        chart.load_for_current_company(15.0, 15.0)
+        if not chart:
+            return False
+        chart._load(15.0, 15.0, company)
         return True
 
     def setUp(self):
