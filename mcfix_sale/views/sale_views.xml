@@ -24,6 +24,9 @@
             <xpath expr="/form/sheet/notebook/page/field/tree/field[@name='product_id']" position="after">
                 <field name="company_id" invisible="1"/>
             </xpath>
+            <field name="order_line" position="attributes">
+                <attribute name="context">{'default_company_id': company_id}</attribute>
+            </field>
         </field>
     </record>
 
