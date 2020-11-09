@@ -12,6 +12,15 @@ class AccountInvoice(models.Model):
         res = self.add_company_suffix(names)
         return res
 
+    @api.model
+    def _prepare_refund(self, invoice, date_invoice=None, date=None, description=None,
+                        journal_id=None):
+        return super(AccountInvoice, self)._prepare_refund(
+            invoice.with_context(force_company=invoice.company_id.id),
+            date_invoice=date_invoice, date=date, description=description,
+            journal_id=journal_id
+        )
+
     @api.onchange('partner_id', 'company_id')
     def _onchange_partner_id(self):
         res = super(AccountInvoice, self)._onchange_partner_id()
