@@ -222,7 +222,7 @@ class AccountInvoiceLine(models.Model):
             self.account_id = account.id
         if not self.account_analytic_id.check_company(self.company_id):
             self.account_analytic_id = self.get_default_account_analytic()
-        self._set_taxes()
+        self.with_context(company_id=company_id)._set_taxes()
         return True
 
     def get_default_account_analytic(self):
