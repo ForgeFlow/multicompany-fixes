@@ -25,8 +25,7 @@ class ProductCategory(models.Model):
         for record in self:
             property_obj = self.env["product.category.property"]
             values = []
-            companies = self.env["res.company"].search([])
-            for company in companies:
+            for company in self.env.companies:
                 val = property_obj.create(
                     {"categ_id": record.id, "company_id": company.id}
                 )

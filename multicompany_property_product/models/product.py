@@ -26,8 +26,7 @@ class ProductTemplate(models.Model):
     def _compute_properties(self):
         for record in self:
             property_obj = self.env["product.property"]
-            companies = self.env["res.company"].search([])
-            for company in companies:
+            for company in self.env.companies:
                 val = property_obj.create(
                     {"company_id": company.id, "product_template_id": record.id}
                 )
@@ -53,8 +52,7 @@ class ProductProduct(models.Model):
     def _compute_properties(self):
         for record in self:
             property_obj = self.env["product.property"]
-            companies = self.env["res.company"].search([])
-            for company in companies:
+            for company in self.env.companies:
                 val = property_obj.create(
                     {
                         "company_id": company.id,
