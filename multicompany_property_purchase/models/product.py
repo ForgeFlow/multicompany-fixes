@@ -1,5 +1,5 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2017 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields, models
@@ -14,8 +14,9 @@ class ProductProperty(models.TransientModel):
         string="Price Difference Account",
         compute="_compute_property_fields",
         readonly=False,
-        help="This account will be used to value price difference "
-        "between purchase price and cost price.",
+        help="This account is used in automated inventory valuation to "
+        "record the price difference between a purchase order and "
+        "its related vendor bill when validating this vendor bill.",
     )
 
     def get_property_fields(self, object, properties):

@@ -30,7 +30,7 @@ odoo.define('account.ReconciliationModel.multicompany', function (require) {
             return self._rpc({
                     model: 'account.bank.statement',
                     method: 'get_company_ids',
-                    args: [statement_ids,],
+                    args: [statement_ids, ],
                 }).then(function (result) {
                     if (result.length > 0) {
                         context.company_ids = result;

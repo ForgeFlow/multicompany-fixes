@@ -1,5 +1,5 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2017 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields, models
@@ -77,10 +77,10 @@ class ProductProperty(models.TransientModel):
         "Cost",
         digits=dp.get_precision("Product Price"),
         groups="base.group_user",
-        help="Cost of the product template used for "
-        "standard stock valuation in accounting "
-        "and used as a base price on purchase orders. "
-        "Expressed in the default unit of measure of the product.",
+        help="""In Standard Price & AVCO: value of the product (automatically computed in AVCO).
+        In FIFO: value of the last unit that left the stock (automatically computed).
+        Used to value the product when the purchase cost is not known (e.g. inventory adjustment).
+        Used to compute margins on sale orders.""",
         compute="_compute_property_fields",
         readonly=False,
     )
