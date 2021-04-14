@@ -1,5 +1,5 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2017 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields, models
@@ -13,18 +13,16 @@ class PartnerProperty(models.TransientModel):
         string="Customer Location",
         compute="_compute_property_fields",
         readonly=False,
-        help="This stock location will be used, instead of "
-        "the default one, as the destination location for "
-        "goods you send to this partner",
+        domain="['|', ('company_id', '=', False), ('company_id', '=', allowed_company_ids[0])]",
+        help="The stock location used as destination when sending goods to this contact.",
     )
     property_stock_supplier = fields.Many2one(
         "stock.location",
         string="Vendor Location",
         compute="_compute_property_fields",
         readonly=False,
-        help="This stock location will be used, instead of "
-        "the default one, as the source location for goods "
-        "you receive from the current partner",
+        domain="['|', ('company_id', '=', False), ('company_id', '=', allowed_company_ids[0])]",
+        help="The stock location used as source when receiving goods from this contact.",
     )
 
     def get_property_fields(self, object, properties):
