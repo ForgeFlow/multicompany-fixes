@@ -1,5 +1,5 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2017 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields, models
@@ -11,7 +11,7 @@ class PartnerProperty(models.TransientModel):
     property_account_payable_id = fields.Many2one(
         comodel_name="account.account",
         string="Account Payable",
-        domain="[('internal_type', '=', 'payable'), " "('deprecated', '=', False)]",
+        domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
@@ -22,7 +22,7 @@ class PartnerProperty(models.TransientModel):
     property_account_receivable_id = fields.Many2one(
         comodel_name="account.account",
         string="Account Receivable",
-        domain="[('internal_type', '=', 'receivable'), " "('deprecated', '=', False)]",
+        domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
@@ -37,8 +37,8 @@ class PartnerProperty(models.TransientModel):
         compute="_compute_property_fields",
         readonly=False,
         store=False,
-        help="The fiscal position will determine taxes "
-        "and accounts used for the partner.",
+        help="The fiscal position determines the taxes/accounts "
+        "used for this contact.",
     )
     property_payment_term_id = fields.Many2one(
         comodel_name="account.payment.term",
@@ -57,6 +57,16 @@ class PartnerProperty(models.TransientModel):
         store=False,
         help="This payment term will be used instead of the "
         "default one for purchase orders and vendor bills",
+    )
+    trust = fields.Selection(
+        [
+            ('good', 'Good Debtor'),
+            ('normal', 'Normal Debtor'),
+            ('bad', 'Bad Debtor'),
+        ],
+        string='Degree of trust you have in this debtor',
+        compute="_compute_property_fields",
+        readonly=False,
     )
 
     def get_property_fields(self, object, properties):
@@ -77,6 +87,9 @@ class PartnerProperty(models.TransientModel):
             rec.property_supplier_payment_term_id = rec.get_property_value(
                 "property_supplier_payment_term_id", object, properties
             )
+            rec.trust = rec.get_property_value(
+                "trust", object, properties
+            )
 
     def get_property_fields_list(self):
         res = super(PartnerProperty, self).get_property_fields_list()
@@ -85,4 +98,5 @@ class PartnerProperty(models.TransientModel):
         res.append("property_account_position_id")
         res.append("property_payment_term_id")
         res.append("property_supplier_payment_term_id")
+        res.append("trust")
         return res

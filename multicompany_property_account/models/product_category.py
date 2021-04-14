@@ -1,5 +1,5 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2017 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields, models
@@ -11,22 +11,23 @@ class ProductCategoryProperty(models.TransientModel):
     property_account_income_categ_id = fields.Many2one(
         comodel_name="account.account",
         string="Income Account",
-        oldname="property_account_income_categ",
-        domain=[("deprecated", "=", False)],
+        domain="['&', ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
-        help="This account will be used for invoices to value sales.",
+        help="This account will be used when validating a customer invoice.",
     )
     property_account_expense_categ_id = fields.Many2one(
         comodel_name="account.account",
         string="Expense Account",
-        oldname="property_account_expense_categ",
-        domain=[("deprecated", "=", False)],
+        domain="['&', ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
-        help="This account will be used for invoices to value expenses.",
+        help="The expense is accounted for when a vendor bill is validated, "
+        "except in anglo-saxon accounting with perpetual inventory "
+        "valuation in which case the expense (Cost of Goods Sold account) "
+        "is recognized at the customer invoice validation.",
     )
 
     def get_property_fields(self, object, properties):

@@ -1,5 +1,5 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017 Eficent Business and IT Consulting Services, S.L.
+# Copyright 2017 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 from odoo import fields, models
@@ -11,22 +11,24 @@ class ProductProperty(models.TransientModel):
     property_account_income_id = fields.Many2one(
         comodel_name="account.account",
         string="Income Account",
-        domain=[("deprecated", "=", False)],
+        domain="['&', ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
-        help="This account will be used for invoices instead "
-        "of the default one to value sales for the current product.",
+        help="Keep this field empty to use the default value from the "
+        "product category.",
     )
     property_account_expense_id = fields.Many2one(
         comodel_name="account.account",
         string="Expense Account",
-        domain=[("deprecated", "=", False)],
+        domain="['&', ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
-        help="This account will be used for invoices instead "
-        "of the default one to value expenses for the current product.",
+        help="Keep this field empty to use the default value from the "
+        "product category. If anglo-saxon accounting with automated "
+        "valuation method is configured, the expense account on the "
+        "product category will be used.",
     )
 
     def get_property_fields(self, object, properties):
