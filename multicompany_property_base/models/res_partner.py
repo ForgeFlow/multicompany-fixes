@@ -25,8 +25,7 @@ class Partner(models.Model):
         for record in self:
             property_obj = self.env["res.partner.property"]
             values = []
-            companies = self.env["res.company"].search([])
-            for company in companies:
+            for company in self.env.companies:
                 val = property_obj.create(
                     {"partner_id": record.id, "company_id": company.id}
                 )
