@@ -23,16 +23,15 @@ class ProductCategoryProperty(models.TransientModel):
 
     property_cost_method = fields.Selection([
         ('standard', 'Standard Price'),
-        ('average', 'Average Price'),
-        ('real', 'Real Price')], string="Costing Method",
+        ('fifo', 'First In First Out (FIFO)'),
+        ('average', 'Average Cost (AVCO)')], string="Costing Method",
         compute='_compute_property_fields',
         readonly=False,
-        help="Standard Price: The cost price is manually updated at the end "
-             "of a specific period (usually once a year).\nAverage Price: "
-             "The cost price is recomputed at each incoming shipment and "
-             "used for the product valuation.\nReal Price: The cost price "
-             "displayed is the price of the last outgoing product (will be "
-             "used in case of inventory loss for example).""")
+        help="Standard Price: The products are valued at their standard cost "
+        "defined on the product.\nAverage Cost (AVCO): The products are "
+        "valued at weighted average cost.\nFirst In First Out (FIFO): The "
+        "products are valued supposing those that enter the company first "
+        "will also leave it first.")
     property_stock_journal = fields.Many2one(
         'account.journal', 'Stock Journal',
         compute='_compute_property_fields',
