@@ -37,11 +37,11 @@
         />
         <field
           name="property_payment_term_id"
-          domain="[('company_id','=',company_id)]"
+          domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
         />
         <field
           name="property_supplier_payment_term_id"
-          domain="[('company_id','=',company_id)]"
+          domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
         />
       </field>
     </field>
@@ -71,11 +71,11 @@
             />
             <field
               name="property_payment_term_id"
-              domain="[('company_id','=',company_id)]"
+              domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
             />
             <field
               name="property_supplier_payment_term_id"
-              domain="[('company_id','=',company_id)]"
+              domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
             />
             <field name="trust" domain="[('company_id','=',company_id)]" />
           </group>
