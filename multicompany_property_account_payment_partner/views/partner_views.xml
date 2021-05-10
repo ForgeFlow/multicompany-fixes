@@ -24,13 +24,13 @@
       <field name="property_supplier_payment_term_id" position="after">
         <field
           name="supplier_payment_mode_id"
-          domain="[('payment_type', '=', 'outbound'),('company_id','=',company_id)]"
+          domain="[('payment_type', '=', 'outbound'),'|', ('company_id','=',company_id), ('company_id','=',False)]"
         />
       </field>
       <field name="property_payment_term_id" position="after">
         <field
           name="customer_payment_mode_id"
-          domain="[('payment_type', '=', 'inbound'),('company_id','=',company_id)]"
+          domain="[('payment_type', '=', 'inbound'),'|', ('company_id','=',company_id), ('company_id','=',False)]"
         />
       </field>
     </field>
@@ -47,11 +47,11 @@
         <group>
           <field
             name="supplier_payment_mode_id"
-            domain="[('payment_type', '=', 'outbound'),('company_id','=',company_id)]"
+            domain="[('payment_type', '=', 'outbound'),'|', ('company_id','=',company_id), ('company_id','=',False)]"
           />
           <field
             name="customer_payment_mode_id"
-            domain="[('payment_type', '=', 'inbound'),('company_id','=',company_id)]"
+            domain="[('payment_type', '=', 'inbound'),'|', ('company_id','=',company_id), ('company_id','=',False)]"
           />
         </group>
       </page>
