@@ -26,11 +26,11 @@
           <group name="accounting_group">
             <field
               name="property_account_income_id"
-              domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+              domain="[('deprecated', '=', False), ('company_id','=',company_id)]"
             />
             <field
               name="property_account_expense_id"
-              domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+              domain="[('deprecated', '=', False), ('company_id','=',company_id)]"
             />
           </group>
         </page>
