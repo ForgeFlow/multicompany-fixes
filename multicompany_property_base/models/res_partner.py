@@ -37,6 +37,7 @@ class PartnerProperty(models.TransientModel):
     _name = "res.partner.property"
     _description = "Properties of Partner"
     _inherit = "model.property"
+    _description = "Partner Properties"
 
     partner_id = fields.Many2one(comodel_name="res.partner", string="Partner")
 
