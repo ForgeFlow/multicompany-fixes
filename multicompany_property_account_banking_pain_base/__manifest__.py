@@ -8,7 +8,7 @@
     'summary': 'Account Company Properties',
     'author': 'Creu Blanca, Eficent, Odoo Community Association (OCA)',
     'sequence': 30,
-    'license': 'LGPL-3',
+    'license': 'AGPL-3',
     'website': 'http://www.eficent.com',
     'depends': ['multicompany_property_account',
                 'account_banking_pain_base'],
