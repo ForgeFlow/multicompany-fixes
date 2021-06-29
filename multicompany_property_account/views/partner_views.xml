@@ -13,9 +13,11 @@
       </field>
       <field name="property_account_receivable_id" position="attributes">
         <attribute name="readonly">True</attribute>
+        <attribute name="required">0</attribute>
       </field>
       <field name="property_account_payable_id" position="attributes">
         <attribute name="readonly">True</attribute>
+        <attribute name="required">0</attribute>
       </field>
       <field name="property_account_position_id" position="attributes">
         <attribute name="readonly">True</attribute>
