@@ -8,7 +8,7 @@
     "summary": "Account Company Properties",
     "author": "Creu Blanca, ForgeFlow, Odoo Community Association (OCA)",
     "sequence": 30,
-    "license": "LGPL-3",
+    "license": "AGPL-3",
     "website": "http://www.forgeflow.com",
     "depends": ["multicompany_property_account", "account_banking_pain_base"],
     "data": ["views/res_company_views.xml"],

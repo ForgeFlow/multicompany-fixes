@@ -42,13 +42,12 @@ class ProductCategoryProperty(models.TransientModel):
 
     def _compute_property_fields(self):
         self.ensure_one()
-        object = self.categ_id
+        obj = self.categ_id
         self.get_property_fields(
-            object,
-            self.env["ir.property"].with_context(force_company=self.company_id.id),
+            obj, self.env["ir.property"].with_context(force_company=self.company_id.id),
         )
 
-    def get_property_fields(self, object, properties):
+    def get_property_fields(self, obj, properties):
         return
 
     def write(self, vals):

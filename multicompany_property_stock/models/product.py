@@ -39,17 +39,17 @@ class ProductProperty(models.TransientModel):
         "generated when you do an inventory.",
     )
 
-    def get_property_fields(self, object, properties):
-        super(ProductProperty, self).get_property_fields(object, properties)
+    def get_property_fields(self, obj, properties):
+        super(ProductProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.responsible_id = rec.get_property_value(
-                "responsible_id", object, properties
+                "responsible_id", obj, properties
             )
             rec.property_stock_production = rec.get_property_value(
-                "property_stock_production", object, properties
+                "property_stock_production", obj, properties
             )
             rec.property_stock_inventory = rec.get_property_value(
-                "property_stock_inventory", object, properties
+                "property_stock_inventory", obj, properties
             )
 
     def get_property_fields_list(self):

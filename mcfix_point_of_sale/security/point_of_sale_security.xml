@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <record id="point_of_sale.rule_pos_multi_company" model="ir.rule">
-        <field name="domain_force">[('company_id','child_of',[user.company_id.id])]</field>
-    </record>
-    <record id="point_of_sale.rule_pos_session_multi_company" model="ir.rule">
-        <field name="domain_force">[('company_id','child_of',[user.company_id.id])]</field>
-    </record>
-</odoo>

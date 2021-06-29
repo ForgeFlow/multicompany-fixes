@@ -21,8 +21,8 @@ Contributors
 ------------
 
 * Enric Tobella <etobella@creublanca.es>
-* Jordi Ballester <jordi.ballester@eficent.com>
-* Miquel Raïch <miquel.raich@eficent.com>
+* Jordi Ballester <jordi.ballester@forgeflow.com>
+* Miquel Raïch <miquel.raich@forgeflow.com>
 * Jaime Arroyo <jaime.arroyo@creublanca.es>
 
 Do not contact contributors directly about support or help with technical issues.

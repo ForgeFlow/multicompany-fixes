@@ -17,11 +17,11 @@ class PartnerProperties(models.TransientModel):
         "default one, for purchases from the current partner",
     )
 
-    def get_property_fields(self, object, properties):
-        super(PartnerProperties, self).get_property_fields(object, properties)
+    def get_property_fields(self, obj, properties):
+        super(PartnerProperties, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_purchase_currency_id = rec.get_property_value(
-                "property_purchase_currency_id", object, properties
+                "property_purchase_currency_id", obj, properties
             )
 
     def get_property_fields_list(self):

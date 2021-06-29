@@ -87,26 +87,26 @@ class ProductCategoryProperty(models.TransientModel):
         "value of the products.",
     )
 
-    def get_property_fields(self, object, properties):
-        super(ProductCategoryProperty, self).get_property_fields(object, properties)
+    def get_property_fields(self, obj, properties):
+        super(ProductCategoryProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_valuation = rec.get_property_value(
-                "property_valuation", object, properties
+                "property_valuation", obj, properties
             )
             rec.property_cost_method = rec.get_property_value(
-                "property_cost_method", object, properties
+                "property_cost_method", obj, properties
             )
             rec.property_stock_journal = rec.get_property_value(
-                "property_stock_journal", object, properties
+                "property_stock_journal", obj, properties
             )
             rec.property_stock_account_input_categ_id = rec.get_property_value(
-                "property_stock_account_input_categ_id", object, properties
+                "property_stock_account_input_categ_id", obj, properties
             )
             rec.property_stock_account_output_categ_id = rec.get_property_value(
-                "property_stock_account_output_categ_id", object, properties
+                "property_stock_account_output_categ_id", obj, properties
             )
             rec.property_stock_valuation_account_id = rec.get_property_value(
-                "property_stock_valuation_account_id", object, properties
+                "property_stock_valuation_account_id", obj, properties
             )
 
     def get_property_fields_list(self):

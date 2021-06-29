@@ -1,9 +1,6 @@
-from odoo import fields, models
+from odoo import models
 
 
 class StockScrap(models.Model):
-    _inherit = 'stock.scrap'
-
-    company_id = fields.Many2one(
-        'res.company', related='picking_id.company_id', string='Company',
-        readonly=True, default=lambda self: self.env.user.company_id)
+    _inherit = "stock.scrap"
+    _check_company_auto = True

@@ -1,46 +1,17 @@
-from odoo import api, models, _
-from odoo.exceptions import ValidationError
+from odoo import api, models
 
 
 class SupplierInfo(models.Model):
     _inherit = "product.supplierinfo"
+    _check_company_auto = True
 
     @api.model_create_multi
-    def create(self, vals):
-        for val in vals:
-            if 'company_id' not in val:
-                if 'name' in val:
-                    partner = self.env['res.partner'].browse([val['name']])
-                    val['company_id'] = partner.company_id.id
+    def create(self, vals_list):
+        for vals in vals_list:
+            if "company_id" not in vals:
+                if "name" in vals:
+                    partner = self.env["res.partner"].browse([vals["name"]])
+                    vals["company_id"] = partner.company_id.id
                 else:
-                    val['company_id'] = False
-        return super(SupplierInfo, self).create(vals)
-
-    @api.multi
-    @api.constrains('company_id', 'product_tmpl_id')
-    def _check_company_id_product_tmpl_id(self):
-        for rec in self.sudo():
-            if not rec.product_tmpl_id.check_company(
-                rec.company_id
-            ):
-                raise ValidationError(
-                    _('The Company in the Product Supplierinfo and in '
-                      'Product Template must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'name')
-    def _check_company_id_name(self):
-        for rec in self.sudo():
-            if not rec.name.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Product Supplierinfo and in '
-                      'Res Partner must be the same.'))
-
-    @api.multi
-    @api.constrains('company_id', 'product_id')
-    def _check_company_id_product_id(self):
-        for rec in self.sudo():
-            if not rec.product_id.check_company(rec.company_id):
-                raise ValidationError(
-                    _('The Company in the Product Supplierinfo and in '
-                      'Product Product must be the same.'))
+                    vals["company_id"] = False
+        return super(SupplierInfo, self).create(vals_list)

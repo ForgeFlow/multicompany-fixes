@@ -60,22 +60,21 @@ class AccountTaxGroupProperty(models.TransientModel):
 
     def _compute_property_fields(self):
         self.ensure_one()
-        object = self.tax_group_id
+        obj = self.tax_group_id
         self.get_property_fields(
-            object,
-            self.env["ir.property"].with_context(force_company=self.company_id.id),
+            obj, self.env["ir.property"].with_context(force_company=self.company_id.id),
         )
 
-    def get_property_fields(self, object, properties):
+    def get_property_fields(self, obj, properties):
         for rec in self:
             rec.property_tax_payable_account_id = rec.get_property_value(
-                "property_tax_payable_account_id", object, properties
+                "property_tax_payable_account_id", obj, properties
             )
             rec.property_tax_receivable_account_id = rec.get_property_value(
-                "property_tax_receivable_account_id", object, properties
+                "property_tax_receivable_account_id", obj, properties
             )
             rec.property_advance_tax_payment_account_id = rec.get_property_value(
-                "property_advance_tax_payment_account_id", object, properties
+                "property_advance_tax_payment_account_id", obj, properties
             )
 
     def get_property_fields_list(self):

@@ -9,14 +9,15 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
     def setUp(self):
         super().setUp()
         self.product = self.env["product.product"].create(
-            {"name": "Product Product", "company_id": False,}
+            {"name": "Product Product", "company_id": False}
         )
         self.product_template = self.env["product.template"].create(
-            {"name": "Product template", "company_id": False,}
+            {"name": "Product template", "company_id": False}
         )
         self.category = self.env["product.category"].create({"name": "Category"})
 
     def test_product(self):
+        self.product.invalidate_cache()
         self.assertTrue(self.product.property_ids)
         self.product.property_ids.filtered(
             lambda r: r.company_id == self.company_1
@@ -38,6 +39,7 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         )
 
     def test_product_template(self):
+        self.product_template.invalidate_cache()
         self.assertTrue(self.product_template.property_ids)
         self.product_template.property_ids.filtered(
             lambda r: r.company_id == self.company_1
@@ -59,4 +61,5 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         )
 
     def test_product_category(self):
+        self.category.property_ids.invalidate_cache()
         self.assertTrue(self.category.property_ids)

@@ -1,19 +1,16 @@
-from odoo import models
+from odoo import fields, models
 
 
 class ResPartnerBank(models.Model):
-    _inherit = 'res.partner.bank'
+    _inherit = "res.partner.bank"
+    _check_company_auto = True
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res += [self.journal_id, ]
-        return res
-
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res += [
-            ('account.bank.statement.line',
-             [('bank_account_id', '=', self.id)]),
-            ('account.invoice', [('partner_bank_id', '=', self.id)]),
-        ]
-        return res
+    journal_id = fields.One2many(check_company=True)
+    bank_statement_line_ids = fields.One2many(
+        "account.bank.statement.line",
+        inverse_name="bank_account_id",
+        check_company=True,
+    )
+    account_move_ids = fields.One2many(
+        "account.move", inverse_name="invoice_partner_bank_id", check_company=True
+    )

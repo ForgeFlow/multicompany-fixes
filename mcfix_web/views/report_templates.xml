@@ -1,40 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-
-    <template id="internal_layout" inherit_id="web.internal_layout">
-        <xpath expr="//div[1]" position="before">
-            <t t-if="company_id">
-                <t t-set="company" t-value="company_id"/>
-                <t t-set="res_company" t-value="company_id"/>
-            </t>
-            <t t-if="not company_id">
-                <t t-set="company" t-value="res_company"/>
-            </t>
-        </xpath>
-    </template>
-
-    <template id="external_layout_background" inherit_id="web.external_layout_background">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
-        </xpath>
-    </template>
-
-    <template id="external_layout_boxed" inherit_id="web.external_layout_boxed">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
-        </xpath>
-    </template>
-
-    <template id="external_layout_clean" inherit_id="web.external_layout_clean">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
-        </xpath>
-    </template>
-
-    <template id="external_layout_standard" inherit_id="web.external_layout_standard">
-        <xpath expr="//div[1]" position="before">
-            <t t-set="company" t-value="company.with_context(not_display_company=True)" />
-        </xpath>
-    </template>
-
+  <!--    <template id="internal_layout" inherit_id="web.internal_layout">-->
+  <!--        <xpath expr="//div[1]" position="before">-->
+  <!--            <t t-if="company_id">-->
+  <!--                <t t-set="company" t-value="company_id"/>-->
+  <!--                <t t-set="res_company" t-value="company_id"/>-->
+  <!--            </t>-->
+  <!--            <t t-if="not company_id">-->
+  <!--                <t t-set="company" t-value="res_company"/>-->
+  <!--            </t>-->
+  <!--        </xpath>-->
+  <!--    </template>-->
+  <template id="external_layout_background" inherit_id="web.external_layout_background">
+    <xpath expr="//div[1]" position="before">
+      <t t-set="company" t-value="company.with_context(not_display_company=True)" />
+    </xpath>
+  </template>
+  <template id="external_layout_boxed" inherit_id="web.external_layout_boxed">
+    <xpath expr="//div[1]" position="before">
+      <t t-set="company" t-value="company.with_context(not_display_company=True)" />
+    </xpath>
+  </template>
+  <template id="external_layout_clean" inherit_id="web.external_layout_clean">
+    <xpath expr="//div[1]" position="before">
+      <t t-set="company" t-value="company.with_context(not_display_company=True)" />
+    </xpath>
+  </template>
+  <template id="external_layout_standard" inherit_id="web.external_layout_standard">
+    <xpath expr="//div[1]" position="before">
+      <t t-set="company" t-value="company.with_context(not_display_company=True)" />
+    </xpath>
+  </template>
 </odoo>

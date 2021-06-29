@@ -1,12 +1,10 @@
-from odoo import models
+from odoo import fields, models
 
 
 class Partner(models.Model):
-    _inherit = 'res.partner'
+    _inherit = "res.partner"
+    _check_company_auto = True
 
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res += [
-            ('product.supplierinfo', [('name', '=', self.id)]),
-        ]
-        return res
+    supplier_info_ids = fields.One2many(
+        "product.supplierinfo", inverse_name="name", check_company=True
+    )

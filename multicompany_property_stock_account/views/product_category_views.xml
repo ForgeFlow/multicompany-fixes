@@ -56,10 +56,7 @@
       <group name="account_property" position="before">
         <group>
           <group string="Inventory Valuation">
-            <field
-              name="property_cost_method"
-              groups="stock_account.group_stock_manager"
-            />
+            <field name="property_cost_method" groups="stock.group_stock_manager" />
             <field name="property_valuation" />
           </group>
         </group>
