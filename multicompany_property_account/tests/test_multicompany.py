@@ -11,9 +11,9 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         chart_template_id = self.env["account.chart.template"].search([], limit=1)
         if not company.chart_template_id:
             self.env.user.write(
-                {"company_ids": [(4, company.id)], "company_id": company.id,}
+                {"company_ids": [(4, company.id)], "company_id": company.id}
             )
-            chart_template_id.load_for_current_company(15.0, 15.0)
+            chart_template_id.try_loading_for_current_company()
         return company
 
     def test_partner(self):
@@ -30,9 +30,7 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         prop = self.partner.property_ids.filtered(
             lambda r: r.company_id == self.company_1
         )
-        prop.write(
-            {"property_account_payable_id": account.id,}
-        )
+        prop.write({"property_account_payable_id": account.id})
         self.assertEqual(
             self.partner.with_context(
                 force_company=self.company_1.id
@@ -56,9 +54,7 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         prop = self.category.property_ids.filtered(
             lambda r: r.company_id == self.company_1
         )
-        prop.write(
-            {"property_account_income_categ_id": account.id,}
-        )
+        prop.write({"property_account_income_categ_id": account.id})
         self.assertEqual(
             self.category.with_context(
                 force_company=self.company_1.id
@@ -82,9 +78,7 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         prop = self.product_template.property_ids.filtered(
             lambda r: r.company_id == self.company_1
         )
-        prop.write(
-            {"property_account_income_id": account.id,}
-        )
+        prop.write({"property_account_income_id": account.id})
         self.assertEqual(
             self.product_template.with_context(
                 force_company=self.company_1.id

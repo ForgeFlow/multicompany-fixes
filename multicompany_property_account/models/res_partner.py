@@ -59,37 +59,31 @@ class PartnerProperty(models.TransientModel):
         "default one for purchase orders and vendor bills",
     )
     trust = fields.Selection(
-        [
-            ('good', 'Good Debtor'),
-            ('normal', 'Normal Debtor'),
-            ('bad', 'Bad Debtor'),
-        ],
-        string='Degree of trust you have in this debtor',
+        [("good", "Good Debtor"), ("normal", "Normal Debtor"), ("bad", "Bad Debtor")],
+        string="Degree of trust you have in this debtor",
         compute="_compute_property_fields",
         readonly=False,
     )
 
-    def get_property_fields(self, object, properties):
-        super(PartnerProperty, self).get_property_fields(object, properties)
+    def get_property_fields(self, obj, properties):
+        super(PartnerProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_account_payable_id = rec.get_property_value(
-                "property_account_payable_id", object, properties
+                "property_account_payable_id", obj, properties
             )
             rec.property_account_receivable_id = rec.get_property_value(
-                "property_account_receivable_id", object, properties
+                "property_account_receivable_id", obj, properties
             )
             rec.property_account_position_id = rec.get_property_value(
-                "property_account_position_id", object, properties
+                "property_account_position_id", obj, properties
             )
             rec.property_payment_term_id = rec.get_property_value(
-                "property_payment_term_id", object, properties
+                "property_payment_term_id", obj, properties
             )
             rec.property_supplier_payment_term_id = rec.get_property_value(
-                "property_supplier_payment_term_id", object, properties
+                "property_supplier_payment_term_id", obj, properties
             )
-            rec.trust = rec.get_property_value(
-                "trust", object, properties
-            )
+            rec.trust = rec.get_property_value("trust", obj, properties)
 
     def get_property_fields_list(self):
         res = super(PartnerProperty, self).get_property_fields_list()

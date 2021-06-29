@@ -11,7 +11,8 @@ class ProductProperty(models.TransientModel):
     property_account_income_id = fields.Many2one(
         comodel_name="account.account",
         string="Income Account",
-        domain="['&', ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
+        domain="['&', ('deprecated', '=', False),"
+        "('company_id', '=', current_company_id)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
@@ -21,7 +22,8 @@ class ProductProperty(models.TransientModel):
     property_account_expense_id = fields.Many2one(
         comodel_name="account.account",
         string="Expense Account",
-        domain="['&', ('deprecated', '=', False), ('company_id', '=', current_company_id)]",
+        domain="['&', ('deprecated', '=', False),"
+        "('company_id', '=', current_company_id)]",
         compute="_compute_property_fields",
         readonly=False,
         store=False,
@@ -31,14 +33,14 @@ class ProductProperty(models.TransientModel):
         "product category will be used.",
     )
 
-    def get_property_fields(self, object, properties):
-        super(ProductProperty, self).get_property_fields(object, properties)
+    def get_property_fields(self, obj, properties):
+        super(ProductProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_account_income_id = rec.get_property_value(
-                "property_account_income_id", object, properties
+                "property_account_income_id", obj, properties
             )
             rec.property_account_expense_id = rec.get_property_value(
-                "property_account_expense_id", object, properties
+                "property_account_expense_id", obj, properties
             )
 
     def get_property_fields_list(self):
