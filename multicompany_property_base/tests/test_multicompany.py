@@ -11,11 +11,12 @@ class TestMulticompanyProperty(TransactionCase):
         self.company_1 = self.create_company("company 1")
         self.company_2 = self.create_company("company 2")
         self.partner = self.env["res.partner"].create(
-            {"name": "Partner", "company_id": False,}
+            {"name": "Partner", "company_id": False}
         )
 
     def create_company(self, name):
         return self.env["res.company"].create({"name": name})
 
     def test_partner(self):
+        self.partner.property_ids.invalidate_cache()
         self.assertTrue(self.partner.property_ids)
