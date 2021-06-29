@@ -4,8 +4,6 @@
 
 from odoo import fields, models
 
-import odoo.addons.decimal_precision as dp
-
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
@@ -75,37 +73,38 @@ class ProductProperty(models.TransientModel):
     product_id = fields.Many2one(comodel_name="product.product", string="Product")
     standard_price = fields.Float(
         "Cost",
-        digits=dp.get_precision("Product Price"),
+        digits="Product Price",
         groups="base.group_user",
-        help="""In Standard Price & AVCO: value of the product (automatically computed in AVCO).
+        help="""In Standard Price & AVCO: value of the product
+        (automatically computed in AVCO).
         In FIFO: value of the last unit that left the stock (automatically computed).
-        Used to value the product when the purchase cost is not known (e.g. inventory adjustment).
-        Used to compute margins on sale orders.""",
+        Used to value the product when the purchase cost is not known
+        (e.g. inventory adjustment). Used to compute margins on sale orders.""",
         compute="_compute_property_fields",
         readonly=False,
     )
 
     def _compute_property_fields(self):
         for rec in self:
-            object = rec.product_id or rec.product_template_id
+            obj = rec.product_id or rec.product_template_id
             rec.get_property_fields(
-                object,
+                obj,
                 rec.env["ir.property"].with_context(force_company=rec.company_id.id),
             )
 
-    def get_property_fields(self, object, properties):
+    def get_property_fields(self, obj, properties):
         for rec in self:
-            if object._name == "product.template":
-                if len(object.product_variant_ids) == 1:
-                    variant = object.product_variant_ids[0]
+            if obj._name == "product.template":
+                if len(obj.product_variant_ids) == 1:
+                    variant = obj.product_variant_ids[0]
                     rec.standard_price = rec.get_property_value(
                         "standard_price", variant, properties
                     )
                 else:
                     rec.standard_price = 0.0
-            elif object._name == "product.product":
+            elif obj._name == "product.product":
                 rec.standard_price = rec.get_property_value(
-                    "standard_price", object, properties
+                    "standard_price", obj, properties
                 )
 
     def write(self, vals):
@@ -123,14 +122,10 @@ class ProductProperty(models.TransientModel):
                         self.set_property(
                             pv, "standard_price", vals["standard_price"], prop_obj
                         )
-                        pv.with_context(
-                            force_company=rec.company_id.id
-                        )._set_standard_price(vals.get("standard_price", 0.0))
                 elif obj._name == "product.product":
                     self.set_property(
                         obj, "standard_price", vals["standard_price"], prop_obj
                     )
-                    obj._set_standard_price(vals.get("standard_price", 0.0))
         p_fields = self.get_property_fields_list()
         for field in p_fields:
             if field in vals:
