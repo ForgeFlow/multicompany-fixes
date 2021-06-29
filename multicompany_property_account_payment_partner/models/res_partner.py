@@ -27,14 +27,14 @@ class PartnerProperty(models.TransientModel):
         help="Select the default payment mode for this customer.",
     )
 
-    def get_property_fields(self, object, properties):
-        super(PartnerProperty, self).get_property_fields(object, properties)
+    def get_property_fields(self, obj, properties):
+        super(PartnerProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.supplier_payment_mode_id = rec.get_property_value(
-                "supplier_payment_mode_id", object, properties
+                "supplier_payment_mode_id", obj, properties
             )
             rec.customer_payment_mode_id = rec.get_property_value(
-                "customer_payment_mode_id", object, properties
+                "customer_payment_mode_id", obj, properties
             )
 
     def get_property_fields_list(self):
