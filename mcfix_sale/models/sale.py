@@ -8,11 +8,12 @@ class SaleOrder(models.Model):
     partner_invoice_id = fields.Many2one(check_company=True)
     partner_shipping_id = fields.Many2one(check_company=True)
     invoice_ids = fields.Many2many(check_company=True)
+    order_line = fields.One2many(check_company=True)
 
     def default_analytic_account(self):
         return False
 
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         if not self.analytic_account_id.check_company(self.company_id):
             self.analytic_account_id = self.default_analytic_account()
@@ -33,20 +34,16 @@ class SaleOrder(models.Model):
         self.onchange_partner_shipping_id()
         self.order_line.change_company_id()
 
-    @api.onchange('partner_id')
+    @api.onchange("partner_id")
     def onchange_partner_id(self):
         company_id = self.company_id.id or self.env.user.company_id.id
-        super(SaleOrder, self.with_context(force_company=company_id)).\
-            onchange_partner_id()
+        super(
+            SaleOrder, self.with_context(force_company=company_id)
+        ).onchange_partner_id()
 
-    @api.constrains('company_id')
+    @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
-
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res += [self.order_line, ]
-        return res
 
 
 class SaleOrderLine(models.Model):
@@ -56,7 +53,7 @@ class SaleOrderLine(models.Model):
     invoice_lines = fields.Many2many(check_company=True)
     tax_id = fields.Many2many(check_company=True)
 
-    @api.depends('company_id')
+    @api.depends("company_id")
     def name_get(self):
         names = super(SaleOrderLine, self).name_get()
         res = self.add_company_suffix(names)
@@ -68,23 +65,18 @@ class SaleOrderLine(models.Model):
 
     def _prepare_invoice_line(self):
         company_id = self.company_id.id or self.env.user.company_id.id
-        return super(SaleOrderLine,
-                     self.with_context(force_company=company_id)).\
-            _prepare_invoice_line()
+        return super(
+            SaleOrderLine, self.with_context(force_company=company_id)
+        )._prepare_invoice_line()
 
-    @api.constrains('company_id')
+    @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
-
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res += [self.invoice_lines, ]
-        return res
 
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res += [
-            ('account.analytic.line', [('so_line', '=', self.id)]),
-            ('account.move.line', [('sale_line_ids', 'in', self.ids)]),
+            ("account.analytic.line", [("so_line", "=", self.id)]),
+            ("account.move.line", [("sale_line_ids", "in", self.ids)]),
         ]
         return res

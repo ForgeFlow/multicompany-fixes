@@ -10,6 +10,6 @@ class Location(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res += [
-            ('pos.order', [('location_id', '=', self.id)]),
+            ("pos.order", [("location_id", "=", self.id)]),
         ]
         return res

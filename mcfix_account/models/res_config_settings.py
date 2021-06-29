@@ -2,11 +2,11 @@ from odoo import api, fields, models
 
 
 class ResConfigSettings(models.TransientModel):
-    _inherit = 'res.config.settings'
+    _inherit = "res.config.settings"
 
     chart_template_id = fields.Many2one(check_company=True)
 
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         super(ResConfigSettings, self)._onchange_company_id()
         if not self.chart_template_id.check_company(self.company_id):

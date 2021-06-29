@@ -4,7 +4,7 @@ from odoo import api, fields, models
 class Location(models.Model):
     _inherit = "stock.location"
 
-    @api.depends('company_id')
+    @api.depends("company_id")
     def name_get(self):
         names = super(Location, self).name_get()
         res = self.add_company_suffix(names)
@@ -49,19 +49,22 @@ class Location(models.Model):
     #             {'company_id': company})
     #     return result
     #
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         if not self.location_id.check_company(self.company_id):
             self.location_id = False
 
-    @api.constrains('company_id')
+    @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
-        res += [self.child_ids, ]
+        res += [
+            self.child_ids,
+        ]
         return res
+
     #
     # def _check_company_id_search(self):
     #     res = super()._check_company_id_search()
@@ -94,7 +97,7 @@ class Location(models.Model):
 
 
 class Route(models.Model):
-    _inherit = 'stock.location.route'
+    _inherit = "stock.location.route"
 
     warehouse_ids = fields.Many2many(check_company=True)
     supplied_wh_id = fields.Many2one(check_company=True)
@@ -105,7 +108,7 @@ class Route(models.Model):
     #                             'move_id', 'Moves',
     #                             help="Related moves")
     #
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         if not self.move_ids:
             if not self.supplied_wh_id.check_company(self.company_id):
@@ -113,14 +116,19 @@ class Route(models.Model):
             if not self.supplier_wh_id.check_company(self.company_id):
                 self.supplier_wh_id = False
             if not self.product_ids.check_company(self.company_id):
-                self.product_ids = self.env['product.template'].search(
-                    [('route_ids', 'in', [self.id]),
-                     ('company_id', '=', False),
-                     ('company_id', '=', self.company_id.id)])
+                self.product_ids = self.env["product.template"].search(
+                    [
+                        ("route_ids", "in", [self.id]),
+                        ("company_id", "=", False),
+                        ("company_id", "=", self.company_id.id),
+                    ]
+                )
             if not self.warehouse_ids.check_company(self.company_id):
                 if self.company_id and self.warehouse_ids:
                     self.warehouse_ids = self.warehouse_ids.filtered(
-                        lambda w: w.company_id == self.company_id)
+                        lambda w: w.company_id == self.company_id
+                    )
+
     #
     # @api.constrains('company_id', 'move_ids')
     # def _check_company_id_move_ids(self):
@@ -132,7 +140,7 @@ class Route(models.Model):
     #                       'Stock Move (%s) must be the same.'
     #                       ) % line.name_get()[0][1])
 
-    @api.constrains('company_id')
+    @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
@@ -146,10 +154,10 @@ class Route(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res = res + [
-            ('stock.move', [('route_ids', 'in', self.ids)]),
-            ('stock.warehouse', [('crossdock_route_id', '=', self.id)]),
-            ('stock.warehouse', [('delivery_route_id', '=', self.id)]),
-            ('stock.warehouse', [('route_ids', 'in', self.ids)]),
-            ('stock.warehouse', [('reception_route_id', '=', self.id)]),
+            ("stock.move", [("route_ids", "in", self.ids)]),
+            ("stock.warehouse", [("crossdock_route_id", "=", self.id)]),
+            ("stock.warehouse", [("delivery_route_id", "=", self.id)]),
+            ("stock.warehouse", [("route_ids", "in", self.ids)]),
+            ("stock.warehouse", [("reception_route_id", "=", self.id)]),
         ]
         return res

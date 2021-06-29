@@ -7,6 +7,6 @@ class AccountPaymentTerm(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res += [
-            ('sale.order', [('payment_term_id', '=', self.id)]),
+            ("sale.order", [("payment_term_id", "=", self.id)]),
         ]
         return res

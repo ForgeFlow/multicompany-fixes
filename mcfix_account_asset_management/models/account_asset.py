@@ -5,7 +5,7 @@ from odoo import fields, models
 
 
 class AccountAsset(models.Model):
-    _inherit = 'account.asset'
+    _inherit = "account.asset"
     _check_company_auto = True
 
     company_id = fields.Many2one(readonly=False)
@@ -16,13 +16,10 @@ class AccountAsset(models.Model):
 
 
 class AccountAssetLine(models.Model):
-    _inherit = 'account.asset.line'
+    _inherit = "account.asset.line"
     _check_company_auto = True
 
     company_id = fields.Many2one(
-        'res.company',
-        store=True,
-        readonly=True,
-        related='asset_id.company_id',
+        "res.company", store=True, readonly=True, related="asset_id.company_id",
     )
     move_id = fields.Many2one(check_company=True)

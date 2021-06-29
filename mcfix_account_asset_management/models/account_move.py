@@ -5,7 +5,7 @@ from odoo import fields, models
 
 
 class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
+    _inherit = "account.move.line"
 
     asset_profile_id = fields.Many2one(check_company=True)
     asset_id = fields.Many2one(check_company=True)

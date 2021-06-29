@@ -12,7 +12,6 @@ exclude: |
   (LICENSE.*|COPYING.*)
 default_language_version:
   python: python3
-  node: "14.13.0"
 repos:
   - repo: https://github.com/psf/black
     rev: 19.10b0
@@ -98,6 +97,12 @@ repos:
         name: isort except __init__.py
         exclude: /__init__\.py$
   - repo: https://github.com/acsone/setuptools-odoo
-    rev: 2.5.2
+    rev: 2.6.0
     hooks:
       - id: setuptools-odoo-make-default
+      - id: setuptools-odoo-get-requirements
+        args:
+          - --output
+          - requirements.txt
+          - --header
+          - "# generated from manifests external_dependencies"

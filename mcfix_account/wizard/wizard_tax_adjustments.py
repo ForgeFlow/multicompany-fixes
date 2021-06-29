@@ -1,21 +1,22 @@
-from odoo import fields, api, models
+from odoo import api, fields, models
 
 
 class TaxAdjustments(models.TransientModel):
-    _inherit = 'tax.adjustments.wizard'
+    _inherit = "tax.adjustments.wizard"
 
     company_id = fields.Many2one(
-        comodel_name='res.company',
+        comodel_name="res.company",
         required=True,
-        default=lambda self: self.env.user.company_id)
+        default=lambda self: self.env.user.company_id,
+    )
     journal_id = fields.Many2one(default=False, check_company=True)
     company_currency_id = fields.Many2one(
-        default=False,
-        compute='_compute_currency', store=True)
+        default=False, compute="_compute_currency", store=True
+    )
     debit_account_id = fields.Many2one(check_company=True)
     credit_account_id = fields.Many2one(check_company=True)
 
-    @api.depends('company_id')
+    @api.depends("company_id")
     def _compute_currency(self):
         for tax in self:
             tax.company_currency_id = tax.company_id.currency_id
@@ -23,7 +24,7 @@ class TaxAdjustments(models.TransientModel):
             tax.credit_account_id = False
             tax.journal_id = False
 
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         if not self.debit_account_id.check_company(self.company_id):
             self.debit_account_id = False

@@ -5,11 +5,11 @@ from odoo import models
 
 
 class AccountJournal(models.Model):
-    _inherit = 'account.journal'
+    _inherit = "account.journal"
 
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res += [
-            ('pos.order', [('sale_journal', '=', self.id)]),
+            ("pos.order", [("sale_journal", "=", self.id)]),
         ]
         return res

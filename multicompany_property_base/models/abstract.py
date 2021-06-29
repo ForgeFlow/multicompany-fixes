@@ -20,14 +20,14 @@ class ModelProperty(models.AbstractModel):
         If it is not defined by the models, will raise an error message."""
         raise MissingError(_("It must be redefined"))
 
-    def get_property_fields(self, object, properties):
+    def get_property_fields(self, obj, properties):
         """ This method must be redefined by modules that
         introduce property fields in the relevant models.
         It intends to be used to compute the value of property fields.
         The models that implement this method will define the the logic
         to obtain the value of the property field for a certain object.
         If it is not defined by the models, will raise an error message.
-        @param object: actual object for which we intend to get the property
+        @param obj: actual object for which we intend to get the property
         values.
         @param properties: ir.property recordset, including in
         the context the company for which we intend to obtain the value
@@ -37,12 +37,12 @@ class ModelProperty(models.AbstractModel):
         """
         raise MissingError(_("It must be redefined"))
 
-    def set_property(self, object, fieldname, value, properties):
+    def set_property(self, obj, fieldname, value, properties):
         """ This method will set the intended value
         of a property field to the ir.property table, in the right company.
-        @param object: actual object for which we intend to set the property
+        @param obj: actual object for which we intend to set the property
         value.
-        @param field: property field for the given object that we intend
+        @param fieldname: property field for the given object that we intend
         to save.
         @param value: value of the property to save.
         @param properties: ir.property recordset, including in
@@ -50,28 +50,27 @@ class ModelProperty(models.AbstractModel):
         for the given object.
         """
         properties.with_context(force_company=self.company_id.id).sudo().set_multi(
-            fieldname, object._name, {object.id: value}
+            fieldname, obj._name, {obj.id: value}
         )
 
-    def get_property_value(self, field, object, prop_obj):
+    def get_property_value(self, field, obj, prop_obj):
         """ This method will assist in obtaining the value of a property
         field from the ir.property table, in the right company.
-        @param object: actual object for which we intend to set the property
+        @param obj: actual object for which we intend to set the property
         value.
         @param field: property field for the given object that we intend
         to save.
-        @param value: value of the property to save.
-        @param properties: ir.property recordset, including in the context
+        @param prop_obj: ir.property recordset, including in the context
         the company for which we intend to save the value for
         the given object.
         """
-        value = prop_obj.get(field, object._name, (object._name + ",%s") % object.id)
+        value = prop_obj.get(field, obj._name, (obj._name + ",%s") % obj.id)
         if value:
             if isinstance(value, list):
                 return value[0]
             else:
                 return value
-        value = prop_obj.get(field, object._name)
+        value = prop_obj.get(field, obj._name)
         if value:
             if isinstance(value, list):
                 return value[0]

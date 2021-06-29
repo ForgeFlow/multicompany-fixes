@@ -5,6 +5,6 @@ from odoo import fields, models
 
 
 class AccountAccount(models.Model):
-    _inherit = 'account.account'
+    _inherit = "account.account"
 
     asset_profile_id = fields.Many2one(check_company=True)

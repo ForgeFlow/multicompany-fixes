@@ -48,7 +48,7 @@ class PartnerProperty(models.TransientModel):
                 rec.env["ir.property"].with_context(force_company=rec.company_id.id),
             )
 
-    def get_property_fields(self, object, properties):
+    def get_property_fields(self, obj, properties):
         """ We have no property fields in this module, but we still
         have to implement the method to avoid error."""
         return

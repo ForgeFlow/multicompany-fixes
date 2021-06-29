@@ -2,12 +2,12 @@ from odoo import api, fields, models
 
 
 class ProcurementRule(models.Model):
-    _inherit = 'stock.rule'
+    _inherit = "stock.rule"
 
     route_id = fields.Many2one(check_company=True)
     propagate_warehouse_id = fields.Many2one(check_company=True)
 
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         if not self.location_src_id.check_company(self.company_id):
             self.location_src_id = False
@@ -22,14 +22,14 @@ class ProcurementRule(models.Model):
         if not self.propagate_warehouse_id.check_company(self.company_id):
             self.propagate_warehouse_id = False
 
-    @api.constrains('company_id')
+    @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res = res + [
-            ('stock.move', [('rule_id', '=', self.id)]),
-            ('stock.warehouse', [('mto_pull_id', '=', self.id)]),
+            ("stock.move", [("rule_id", "=", self.id)]),
+            ("stock.warehouse", [("mto_pull_id", "=", self.id)]),
         ]
         return res

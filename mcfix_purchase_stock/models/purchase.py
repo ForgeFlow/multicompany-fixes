@@ -7,12 +7,10 @@ class PurchaseOrder(models.Model):
     picking_ids = fields.Many2many(check_company=True)
     picking_type_id = fields.Many2one(check_company=True)
 
-    @api.onchange('picking_type_id')
+    @api.onchange("picking_type_id")
     def _onchange_picking_type_id(self):
         super(PurchaseOrder, self)._onchange_picking_type_id()
-        if self.picking_type_id and not self.env.context.get(
-            'no_change_company'
-        ):
+        if self.picking_type_id and not self.env.context.get("no_change_company"):
             self.company_id = self.picking_type_id.warehouse_id.company_id.id
 
     def set_picking_type(self):
@@ -20,7 +18,7 @@ class PurchaseOrder(models.Model):
             company_id=self.company_id.id
         )._default_picking_type()
 
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         if not self.picking_type_id.check_company(self.company_id):
             self.set_picking_type()
@@ -28,11 +26,8 @@ class PurchaseOrder(models.Model):
 
 
 class PurchaseOrderLine(models.Model):
-    _inherit = 'purchase.order.line'
+    _inherit = "purchase.order.line"
 
     orderpoint_id = fields.Many2one(check_company=True)
-
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res += [self.move_ids, self.move_dest_ids, ]
-        return res
+    move_ids = fields.One2many(check_company=True)
+    move_dest_ids = fields.One2many(check_company=True)

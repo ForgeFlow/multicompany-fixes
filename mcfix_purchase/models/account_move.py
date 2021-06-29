@@ -2,17 +2,17 @@ from odoo import api, fields, models
 
 
 class AccountInvoice(models.Model):
-    _inherit = 'account.move'
+    _inherit = "account.move"
 
     purchase_id = fields.Many2one(check_company=True)
 
-    @api.onchange('purchase_id')
+    @api.onchange("purchase_id")
     def purchase_order_change(self):
         if self.purchase_id:
             self.company_id = self.purchase_id.company_id
         return super().purchase_order_change()
 
-    @api.onchange('company_id')
+    @api.onchange("company_id")
     def _onchange_company_id(self):
         super()._onchange_company_id()
         if not self.purchase_id.check_company(self.company_id):
@@ -21,12 +21,12 @@ class AccountInvoice(models.Model):
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
         res += [
-            ('purchase.order', [('invoice_ids', 'in', self.ids)]),
+            ("purchase.order", [("invoice_ids", "in", self.ids)]),
         ]
         return res
 
 
 class AccountInvoiceLine(models.Model):
-    _inherit = 'account.move.line'
+    _inherit = "account.move.line"
 
     purchase_line_id = fields.Many2one(check_company=True)

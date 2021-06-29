@@ -6,5 +6,7 @@ class CrmTeam(models.Model):
 
     def _check_company_id_fields(self):
         res = super()._check_company_id_fields()
-        res += [self.pos_config_ids, ]
+        res += [
+            self.pos_config_ids,
+        ]
         return res

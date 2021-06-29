@@ -1,13 +1,12 @@
-from odoo import models
+from odoo import fields, models
 
 
 class IrSequence(models.Model):
-    _inherit = 'ir.sequence'
+    _inherit = "ir.sequence"
 
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res += [
-            ('account.journal', [('refund_sequence_id', '=', self.id)]),
-            ('account.journal', [('sequence_id', '=', self.id)]),
-        ]
-        return res
+    journal_ids = fields.One2many(
+        "account.journal", inverse_name="sequence_id", check_company=True
+    )
+    refund_journal_ids = fields.One2many(
+        "account.journal", inverse_name="refund_sequence_id", check_company=True
+    )

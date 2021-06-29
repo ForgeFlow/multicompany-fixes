@@ -1,13 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <data noupdate="1">
-        <record id="point_of_sale.product_product_tip" model="product.product">
-            <field name="company_id" eval="False"/>
-        </record>
-
-        <record id="point_of_sale.product_product_consumable"
-                model="product.product">
-            <field name="company_id" eval="False"/>
-        </record>
-    </data>
+  <data noupdate="1">
+    <record id="point_of_sale.product_product_tip" model="product.product">
+      <field name="company_id" eval="False" />
+    </record>
+    <record id="point_of_sale.product_product_consumable" model="product.product">
+      <field name="company_id" eval="False" />
+    </record>
+  </data>
 </odoo>

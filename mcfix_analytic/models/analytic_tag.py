@@ -4,5 +4,5 @@ from odoo import models
 
 
 class AccountAnalyticTag(models.Model):
-    _inherit = 'account.analytic.tag'
+    _inherit = "account.analytic.tag"
     _check_company_auto = True

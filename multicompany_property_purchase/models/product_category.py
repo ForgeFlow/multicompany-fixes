@@ -17,11 +17,11 @@ class ProductCategoryProperty(models.TransientModel):
         "difference between purchase price and accounting cost.",
     )
 
-    def get_property_fields(self, object, properties):
-        super(ProductCategoryProperty, self).get_property_fields(object, properties)
+    def get_property_fields(self, obj, properties):
+        super(ProductCategoryProperty, self).get_property_fields(obj, properties)
         for rec in self:
             val = rec.get_property_value(
-                "property_account_creditor_price_difference_categ", object, properties
+                "property_account_creditor_price_difference_categ", obj, properties
             )
             rec.property_account_creditor_price_difference_categ = val
 

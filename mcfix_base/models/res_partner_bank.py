@@ -5,9 +5,9 @@ from odoo import api, models
 
 
 class ResPartnerBank(models.Model):
-    _inherit = 'res.partner.bank'
+    _inherit = "res.partner.bank"
     _check_company_auto = True
 
-    @api.constrains('company_id')
+    @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
