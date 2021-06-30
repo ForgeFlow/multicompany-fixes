@@ -7,6 +7,7 @@
     "website": "http://www.forgeflow.com",
     "license": "LGPL-3",
     "depends": ["purchase", "mcfix_account"],
+    "data": ["views/purchase_order.xml"],
     "sequence": 30,
     "installable": True,
     "application": False,
