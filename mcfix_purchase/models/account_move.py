@@ -6,12 +6,6 @@ class AccountInvoice(models.Model):
 
     purchase_id = fields.Many2one(check_company=True)
 
-    @api.onchange("purchase_id")
-    def purchase_order_change(self):
-        if self.purchase_id:
-            self.company_id = self.purchase_id.company_id
-        return super().purchase_order_change()
-
     @api.onchange("company_id")
     def _onchange_company_id(self):
         super()._onchange_company_id()
