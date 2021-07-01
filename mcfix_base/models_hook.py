@@ -37,6 +37,8 @@ def post_load_hook():
         inconsistent_recs = self.browse()
         for record in self:
             company = record.company_id if record._name != "res.company" else record
+            if not company:
+                continue
             for name in regular_fields:
                 corecord = record.sudo()[name]
 

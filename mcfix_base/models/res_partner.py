@@ -65,11 +65,13 @@ class Partner(models.Model):
         company."""
         # https://github.com/odoo/odoo/pull/21219
         company = False
-        if vals.get("company_id") and not self._context.get("stop_recursion_company"):
+        check_company = False
+        if "company_id" in vals and not self.env.context.get("stop_recursion_company"):
             company = vals["company_id"]
+            check_company = True
             del vals["company_id"]
         result = super(Partner, self).write(vals)
-        if company and not self._context.get("stop_recursion_company"):
+        if check_company and not self.env.context.get("stop_recursion_company"):
             top_partner = self._get_top_parent()
             partners = top_partner._get_all_children()
             partners = partners.filtered(lambda p: p.company_id)

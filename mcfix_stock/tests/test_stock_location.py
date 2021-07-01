@@ -129,7 +129,7 @@ class TestStockLocation(TransactionCase):
                     {
                         "name": "test location 4",
                         "location_id": self.location_3.id,
-                        "company_id": False,
+                        "company_id": self.company.id,
                     }
                 )
             )
