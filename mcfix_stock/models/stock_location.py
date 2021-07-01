@@ -3,6 +3,10 @@ from odoo import api, fields, models
 
 class Location(models.Model):
     _inherit = "stock.location"
+    _check_company_auto = True
+
+    child_ids = fields.One2many(check_company=True)
+    location_id = fields.Many2one(check_company=True)
 
     @api.depends("company_id")
     def name_get(self):
@@ -58,13 +62,6 @@ class Location(models.Model):
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
 
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res += [
-            self.child_ids,
-        ]
-        return res
-
     #
     # def _check_company_id_search(self):
     #     res = super()._check_company_id_search()
@@ -98,6 +95,7 @@ class Location(models.Model):
 
 class Route(models.Model):
     _inherit = "stock.location.route"
+    _check_company_auto = True
 
     warehouse_ids = fields.Many2many(check_company=True)
     supplied_wh_id = fields.Many2one(check_company=True)
@@ -143,13 +141,6 @@ class Route(models.Model):
     @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
-
-    def _check_company_id_fields(self):
-        res = super()._check_company_id_fields()
-        res += [
-            self.warehouse_ids,
-        ]
-        return res
 
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
