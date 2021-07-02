@@ -10,7 +10,7 @@ class PosConfig(models.Model):
 
     def _default_pricelist(self):
         super()._default_pricelist()
-        company_id = self.env.context.get("company_id") or self.env.company_id.id
+        company_id = self.env.context.get("company_id") or self.env.company.id
         company = self.env["res.company"].browse(company_id)
         return self.env["product.pricelist"].search(
             [
@@ -22,7 +22,7 @@ class PosConfig(models.Model):
 
     def _default_sale_journal(self):
         super()._default_sale_journal()
-        company_id = self.env.context.get("company_id") or self.env.company_id.id
+        company_id = self.env.context.get("company_id") or self.env.company.id
         return self.env["account.journal"].search(
             [
                 ("type", "=", "sale"),
@@ -34,7 +34,7 @@ class PosConfig(models.Model):
 
     def _default_invoice_journal(self):
         super()._default_invoice_journal()
-        company_id = self.env.context.get("company_id") or self.env.company_id.id
+        company_id = self.env.context.get("company_id") or self.env.company.id
         return self.env["account.journal"].search(
             [("type", "=", "sale"), ("company_id", "=", company_id)], limit=1
         )

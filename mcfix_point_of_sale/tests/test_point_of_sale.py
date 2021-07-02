@@ -307,7 +307,7 @@ class TestPointOfSale(TestAccountChartTemplate):
         def compute_tax(product, price, qty=1, taxes=None):
             if not taxes:
                 taxes = product.taxes_id.filtered(
-                    lambda t: t.company_id.id == self.env.user.id
+                    lambda t: t.company_id.id == self.env.company.id
                 )
             currency = self.pos_config.pricelist_id.currency_id
             res = taxes.compute_all(price, currency, qty, product=product)

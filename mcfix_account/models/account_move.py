@@ -8,9 +8,6 @@ class AccountMove(models.Model):
     journal_id = fields.Many2one(
         check_company=True, domain="[('id', 'in', suitable_journal_ids)]"
     )
-    suitable_journal_ids = fields.Many2many(
-        comodel_name="account.journal", compute="_compute_suitable_journal_ids"
-    )
     partner_id = fields.Many2one(check_company=True)
     reversed_entry_id = fields.Many2one(check_company=True)
     fiscal_position_id = fields.Many2one(check_company=True)
@@ -22,15 +19,6 @@ class AccountMove(models.Model):
     )
     tax_cash_basis_rec_id = fields.Many2one(check_company=True)
     line_ids = fields.One2many(check_company=True)
-
-    @api.depends("company_id", "invoice_filter_type_domain")
-    def _compute_suitable_journal_ids(self):
-        for m in self:
-            domain = [
-                ("company_id", "=", m.company_id.id),
-                ("type", "=?", m.invoice_filter_type_domain),
-            ]
-            m.suitable_journal_ids = self.env["account.journal"].search(domain)
 
     @api.model_create_multi
     def create(self, mvals):
@@ -56,12 +44,21 @@ class AccountMove(models.Model):
 
     @api.onchange("company_id")
     def _onchange_company_id(self):
-        default = self.env.context["default_journal_type"]
+        move_type = self._context.get("default_type", "entry")
+        journal_type = "general"
+        if move_type in self.get_sale_types(include_receipts=True):
+            journal_type = "sale"
+        elif move_type in self.get_purchase_types(include_receipts=True):
+            journal_type = "purchase"
+
         for record in self:
             record.journal_id = (
                 self.env["account.journal"]
                 .search(
-                    [("company_id", "=", record.company_id.id), ("type", "=", default)],
+                    [
+                        ("company_id", "=", record.company_id.id),
+                        ("type", "=", journal_type),
+                    ],
                     limit=1,
                 )
                 .id
