@@ -9,7 +9,7 @@ class PosOrder(models.Model):
     _check_company_auto = True
 
     def _default_company(self):
-        return self.env.context.get("company_id") or self.env.company_id.id
+        return self.env.context.get("company_id") or self.env.company.id
 
     company_id = fields.Many2one(default=_default_company)
     account_move = fields.Many2one(check_company=True)

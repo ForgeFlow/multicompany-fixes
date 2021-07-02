@@ -8,10 +8,7 @@ class PosDetails(models.TransientModel):
     _inherit = "pos.details.wizard"
 
     company_id = fields.Many2one(
-        "res.company",
-        string="Company",
-        required=True,
-        default=lambda s: s.env.company_id,
+        "res.company", string="Company", required=True, default=lambda s: s.env.company,
     )
     pos_config_ids = fields.Many2many(
         required=True,
