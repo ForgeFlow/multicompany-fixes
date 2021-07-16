@@ -1,7 +1,8 @@
 # Copyright 2016 ForgeFlow S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
+from odoo.tests.common import Form
 
 from odoo.addons.mcfix_account.tests.test_account_chart_template_consistency import (
     TestAccountChartTemplate,
@@ -291,3 +292,13 @@ class TestSaleOrderConsistency(TestAccountChartTemplate):
             self.sale_order_2.order_line.write({"tax_id": [(6, 0, [self.tax_2.id])]})
         with self.assertRaises(UserError):
             self.sale_order_2.order_line.write({"product_id": self.product2.id})
+
+    def test_sale_order_invoice_consistency(self):
+        self.sale_order_1.action_confirm()
+        move = self.sale_order_1._create_invoices()
+        move.partner_id.company_id = False
+        self.assertTrue(move)
+        form = Form(move)
+        form.company_id = self.company
+        with self.assertRaises(ValidationError):
+            form.save()
