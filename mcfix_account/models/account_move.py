@@ -63,7 +63,6 @@ class AccountMove(models.Model):
                 )
                 .id
             )
-            record.line_ids = False
 
     @api.constrains("company_id")
     def _check_company_id_out_model(self):
