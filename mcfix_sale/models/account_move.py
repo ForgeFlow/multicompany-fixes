@@ -12,10 +12,8 @@ class AccountMove(models.Model):
         super()._onchange_company_id()
         if not self.partner_shipping_id.check_company(self.company_id):
             self.partner_shipping_id = False
-            if self.refund_invoice_id.partner_shipping_id:
-                self.partner_shipping_id = self.refund_invoice_id.partner_shipping_id
-            else:
-                self.partner_shipping_id = False
+            if self.reversed_entry_id.partner_shipping_id:
+                self.partner_shipping_id = self.reversed_entry_id.partner_shipping_id
         if not self.team_id.check_company(self.company_id):
             self.team_id = False
 
