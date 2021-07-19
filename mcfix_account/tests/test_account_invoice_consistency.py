@@ -6,78 +6,85 @@ from ..tests.test_account_chart_template_consistency import TestAccountChartTemp
 
 
 class TestAccountInvoiceConsistency(TestAccountChartTemplate):
-    def setUp(self):
-        super(TestAccountInvoiceConsistency, self).setUp()
-        self.res_users_model = self.env["res.users"]
-        self.account_model = self.env["account.account"]
-        self.journal_model = self.env["account.journal"]
+    @classmethod
+    def setUpClass(cls):
+        super(TestAccountInvoiceConsistency, cls).setUpClass()
+        cls.res_users_model = cls.env["res.users"]
+        cls.account_model = cls.env["account.account"]
+        cls.journal_model = cls.env["account.journal"]
 
-        self.journal_c1 = self._create_journal("J1", self.company)
-        self.journal_c2 = self._create_journal("J2", self.company_2)
+        cls.journal_c1 = cls._create_journal("J1", cls.company)
+        cls.journal_c2 = cls._create_journal("J2", cls.company_2)
 
-        self.pricelist_1 = self._create_pricelist(self.company)
-        self.pricelist_2 = self._create_pricelist(self.company_2)
+        cls.pricelist_1 = cls._create_pricelist(cls.company)
+        cls.pricelist_2 = cls._create_pricelist(cls.company_2)
 
-        self.tax_1 = self._create_tax(self.company)
-        self.tax_2 = self._create_tax(self.company_2)
+        cls.tax_1 = cls._create_tax(cls.company)
+        cls.tax_2 = cls._create_tax(cls.company_2)
 
-        self.fiscal_position_1 = self._create_fiscal_position(self.company)
-        self.fiscal_position_2 = self._create_fiscal_position(self.company_2)
-        self.main_partner.with_context(
-            force_company=self.company.id
-        ).property_account_position_id = self.fiscal_position_1
-        self.main_partner.with_context(
-            force_company=self.company_2.id
-        ).property_account_position_id = self.fiscal_position_2
-        self.partner_2 = self.env["res.partner"].create(
-            {"name": "Partner 2", "company_id": self.company_2.id}
+        cls.fiscal_position_1 = cls._create_fiscal_position(cls.company)
+        cls.fiscal_position_2 = cls._create_fiscal_position(cls.company_2)
+        cls.main_partner.with_context(
+            force_company=cls.company.id
+        ).property_account_position_id = cls.fiscal_position_1
+        cls.main_partner.with_context(
+            force_company=cls.company_2.id
+        ).property_account_position_id = cls.fiscal_position_2
+        cls.partner_2 = cls.env["res.partner"].create(
+            {"name": "Partner 2", "company_id": cls.company_2.id}
         )
 
-        self.payment_term_1 = self._create_payment_terms(self.company)
-        self.payment_term_2 = self._create_payment_terms(self.company_2)
+        cls.payment_term_1 = cls._create_payment_terms(cls.company)
+        cls.payment_term_2 = cls._create_payment_terms(cls.company_2)
 
-        self.account_invoice = self._create_account_invoice(self.company)
+        cls.account_invoice = cls._create_account_invoice(cls.company)
 
-    def _create_journal(self, name, company):
+    @classmethod
+    def _create_journal(cls, name, company):
         # Create a cash account
         # Create a journal for cash account
-        cash_journal = self.journal_model.create(
+        cash_journal = cls.journal_model.create(
             {"name": name, "code": name, "type": "sale", "company_id": company.id}
         )
         return cash_journal
 
-    def _create_pricelist(self, company):
-        pricelist = self.env["product.pricelist"].create(
+    @classmethod
+    def _create_pricelist(cls, company):
+        pricelist = cls.env["product.pricelist"].create(
             {"name": "Test Pricelist", "company_id": company.id}
         )
         return pricelist
 
-    def _create_tax(self, company):
-        tax = self.env["account.tax"].create(
+    @classmethod
+    def _create_tax(cls, company):
+        tax = cls.env["account.tax"].create(
             {"name": "Test Tax", "company_id": company.id, "amount": 3.3}
         )
         return tax
 
-    def _create_fiscal_position(self, company):
-        fiscal_position = self.env["account.fiscal.position"].create(
+    @classmethod
+    def _create_fiscal_position(cls, company):
+        fiscal_position = cls.env["account.fiscal.position"].create(
             {"name": "Test Fiscal Position", "company_id": company.id}
         )
         return fiscal_position
 
-    def _create_payment_terms(self, company):
-        terms = self.env["account.payment.term"].create(
+    @classmethod
+    def _create_payment_terms(cls, company):
+        terms = cls.env["account.payment.term"].create(
             {"name": "Test payment Terms", "company_id": company.id}
         )
         return terms
 
-    def _create_account_invoice(self, company):
-        invoice = self.env["account.move"].create(
+    @classmethod
+    def _create_account_invoice(cls, company):
+        invoice = cls.env["account.move"].create(
             {
-                "partner_id": self.main_partner.id,
+                "partner_id": cls.main_partner.id,
                 "company_id": company.id,
-                "fiscal_position_id": self.fiscal_position_1.id,
-                "invoice_payment_term_id": self.payment_term_1.id,
-                "journal_id": self.journal_c1.id,
+                "fiscal_position_id": cls.fiscal_position_1.id,
+                "invoice_payment_term_id": cls.payment_term_1.id,
+                "journal_id": cls.journal_c1.id,
                 "type": "out_invoice",
             }
         )

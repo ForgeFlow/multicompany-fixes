@@ -16,31 +16,32 @@ class TestAccountInvoice(TestAccountChartTemplate):
         self.env = self.env(context=context)
         return self
 
-    def setUp(self):
-        super(TestAccountInvoice, self).setUp()
-        employees_group = self.env.ref("base.group_user")
-        multi_company_group = self.env.ref("base.group_multi_company")
-        account_user_group = self.env.ref("account.group_account_user")
-        account_manager_group = self.env.ref("account.group_account_manager")
-        self.account_model = self.env["account.account"]
-        self.journal_model = self.env["account.journal"]
-        self.invoice_model = self.env["account.move"]
-        self.invoice_line_model = self.env["account.move.line"]
-        self.tax_model = self.env["account.tax"]
-        self.account_template_model = self.env["account.account.template"]
-        self.chart_template_model = self.env["account.chart.template"]
-        manager_account_test_group = self.create_full_access(
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        employees_group = cls.env.ref("base.group_user")
+        multi_company_group = cls.env.ref("base.group_multi_company")
+        account_user_group = cls.env.ref("account.group_account_user")
+        account_manager_group = cls.env.ref("account.group_account_manager")
+        cls.account_model = cls.env["account.account"]
+        cls.journal_model = cls.env["account.journal"]
+        cls.invoice_model = cls.env["account.move"]
+        cls.invoice_line_model = cls.env["account.move.line"]
+        cls.tax_model = cls.env["account.tax"]
+        cls.account_template_model = cls.env["account.account.template"]
+        cls.chart_template_model = cls.env["account.chart.template"]
+        manager_account_test_group = cls.create_full_access(
             ["account.move", "account.account", "account.journal", "res.partner"]
         )
 
-        self.company_2.parent_id = self.company.id
+        cls.company_2.parent_id = cls.company.id
 
-        self.env.user.company_ids += self.company
-        self.env.user.company_ids += self.company_2
+        cls.env.user.company_ids += cls.company
+        cls.env.user.company_ids += cls.company_2
 
-        self.user = (
-            self.env["res.users"]
-            .with_user(self.env.user)
+        cls.user = (
+            cls.env["res.users"]
+            .with_user(cls.env.user)
             .with_context(no_reset_password=True)
             .create(
                 {
@@ -60,114 +61,112 @@ class TestAccountInvoice(TestAccountChartTemplate):
                             ],
                         )
                     ],
-                    "company_id": self.company.id,
-                    "company_ids": [(4, self.company.id), (4, self.company_2.id)],
+                    "company_id": cls.company.id,
+                    "company_ids": [(4, cls.company.id), (4, cls.company_2.id)],
                 }
             )
         )
 
-        self.user_type = self.env.ref("account.data_account_type_liquidity")
+        cls.user_type = cls.env.ref("account.data_account_type_liquidity")
 
-        self.partner = (
-            self.env["res.partner"]
-            .with_user(self.user)
+        cls.partner = (
+            cls.env["res.partner"]
+            .with_user(cls.user)
             .create(
                 {
                     "name": "Partner Test",
-                    "company_id": self.company.id,
+                    "company_id": cls.company.id,
                     "is_company": True,
                 }
             )
         )
-        self.account = self.account_model.with_user(self.user).create(
+        cls.account = cls.account_model.with_user(cls.user).create(
             {
                 "name": "Account - Test",
                 "code": "test_cash",
-                "user_type_id": self.user_type.id,
-                "company_id": self.company.id,
+                "user_type_id": cls.user_type.id,
+                "company_id": cls.company.id,
             }
         )
-        self.cash_journal = self.journal_model.with_user(self.user).create(
+        cls.cash_journal = cls.journal_model.with_user(cls.user).create(
             {
                 "name": "Cash Journal 1 - Test",
                 "code": "test_cash_1",
                 "type": "cash",
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
             }
         )
-        self.sale_journal = self.journal_model.with_user(self.user).create(
+        cls.sale_journal = cls.journal_model.with_user(cls.user).create(
             {
                 "name": "Sale Journal 1 - Test",
                 "code": "test_sale_1",
                 "type": "sale",
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
             }
         )
 
-        self.invoice = self.invoice_model.with_user(self.user).create(
+        cls.invoice = cls.invoice_model.with_user(cls.user).create(
             {
-                "partner_id": self.partner.id,
-                "company_id": self.company.id,
-                "journal_id": self.sale_journal.id,
+                "partner_id": cls.partner.id,
+                "company_id": cls.company.id,
+                "journal_id": cls.sale_journal.id,
                 "type": "out_invoice",
             }
         )
-        self.tax_c1_cust = self.tax_model.create(
+        cls.tax_c1_cust = cls.tax_model.create(
             {
                 "name": "Tax c1 customer - Test",
                 "amount": 10.0,
                 "type_tax_use": "sale",
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
             }
         )
-        self.tax_c1_supp = self.tax_model.create(
+        cls.tax_c1_supp = cls.tax_model.create(
             {
                 "name": "Tax c1  - Test",
                 "amount": 10.0,
                 "type_tax_use": "purchase",
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
             }
         )
-        self.tax_c2_cust = self.tax_model.create(
+        cls.tax_c2_cust = cls.tax_model.create(
             {
                 "name": "Tax c2 customer  - Test",
                 "amount": 20.0,
                 "type_tax_use": "sale",
-                "company_id": self.company_2.id,
+                "company_id": cls.company_2.id,
             }
         )
-        self.tax_c2_supp = self.tax_model.create(
+        cls.tax_c2_supp = cls.tax_model.create(
             {
                 "name": "Tax c2 supplier  - Test",
                 "amount": 20.0,
                 "type_tax_use": "purchase",
-                "company_id": self.company_2.id,
+                "company_id": cls.company_2.id,
             }
         )
 
-        self.product_1 = self.env["product.product"].create(
+        cls.product_1 = cls.env["product.product"].create(
             {
                 "name": "Service product",
                 "default_code": "service_prod_1",
                 "type": "service",
-                "categ_id": self.env.ref("product.product_category_all").id,
+                "categ_id": cls.env.ref("product.product_category_all").id,
                 "sale_ok": True,
                 "purchase_ok": False,
                 "list_price": 10,
                 "company_id": False,
-                "taxes_id": [(6, 0, (self.tax_c1_cust | self.tax_c2_cust).ids)],
-                "supplier_taxes_id": [
-                    (6, 0, (self.tax_c1_supp | self.tax_c2_supp).ids)
-                ],
+                "taxes_id": [(6, 0, (cls.tax_c1_cust | cls.tax_c2_cust).ids)],
+                "supplier_taxes_id": [(6, 0, (cls.tax_c1_supp | cls.tax_c2_supp).ids)],
             }
         )
 
-        self.product_2 = self.env["product.product"].create(
+        cls.product_2 = cls.env["product.product"].create(
             {
                 "name": "Service product 2",
                 "default_code": "service_prod_2",
                 "type": "service",
-                "categ_id": self.env.ref("product.product_category_all").id,
+                "categ_id": cls.env.ref("product.product_category_all").id,
                 "sale_ok": True,
                 "purchase_ok": False,
                 "list_price": 10,
@@ -176,20 +175,21 @@ class TestAccountInvoice(TestAccountChartTemplate):
                 "supplier_taxes_id": False,
             }
         )
-        self.product_2.taxes_id |= self.tax_c1_cust
-        self.product_2.taxes_id |= self.tax_c2_cust
-        self.product_2.supplier_taxes_id |= self.tax_c1_supp
-        self.product_2.supplier_taxes_id |= self.tax_c2_supp
+        cls.product_2.taxes_id |= cls.tax_c1_cust
+        cls.product_2.taxes_id |= cls.tax_c2_cust
+        cls.product_2.supplier_taxes_id |= cls.tax_c1_supp
+        cls.product_2.supplier_taxes_id |= cls.tax_c2_supp
 
-    def create_full_access(self, list_of_models):
+    @classmethod
+    def create_full_access(cls, list_of_models):
         manager_account_test_group = (
-            self.env["res.groups"].sudo().create({"name": "group_manager_product_test"})
+            cls.env["res.groups"].sudo().create({"name": "group_manager_product_test"})
         )
         for model in list_of_models:
-            model_id = self.env["ir.model"].sudo().search([("model", "=", model)])
+            model_id = cls.env["ir.model"].sudo().search([("model", "=", model)])
             if model_id:
                 access = (
-                    self.env["ir.model.access"]
+                    cls.env["ir.model.access"]
                     .sudo()
                     .create(
                         {

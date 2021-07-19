@@ -5,33 +5,33 @@
 import logging
 
 from odoo.exceptions import UserError
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import SavepointCase
 
 _logger = logging.getLogger(__name__)
 
 
-class TestResPartner(TransactionCase):
-    def with_context(self, *args, **kwargs):
-        context = dict(args[0] if args else self.env.context, **kwargs)
-        self.env = self.env(context=context)
-        return self
+class TestResPartner(SavepointCase):
+    @classmethod
+    def with_context(cls, *args, **kwargs):
+        context = dict(args[0] if args else cls.env.context, **kwargs)
+        cls.env = cls.env(context=context)
+        return cls
 
-    def setUp(self):
-        super(TestResPartner, self).setUp()
-        self.employees_group = self.env.ref("base.group_user")
-        self.partner_manager_group = self.env.ref("base.group_partner_manager")
-        self.company = self.env["res.company"].create({"name": "Test company"})
-        self.company_2 = self.env["res.company"].create(
-            {"name": "Test company 2", "parent_id": self.company.id}
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.employees_group = cls.env.ref("base.group_user")
+        cls.partner_manager_group = cls.env.ref("base.group_partner_manager")
+        cls.company = cls.env["res.company"].create({"name": "Test company"})
+        cls.company_2 = cls.env["res.company"].create(
+            {"name": "Test company 2", "parent_id": cls.company.id}
         )
-        self.env.user.company_ids += self.company
-        self.env.user.company_ids += self.company_2
+        cls.env.user.company_ids += cls.company
+        cls.env.user.company_ids += cls.company_2
 
-        # self.with_context(
-        #     company_id=self.company.id, force_company=self.company.id)
-        self.user = (
-            self.env["res.users"]
-            .with_user(self.env.user)
+        cls.user = (
+            cls.env["res.users"]
+            .with_user(cls.env.user)
             .with_context(no_reset_password=True)
             .create(
                 {
@@ -39,10 +39,10 @@ class TestResPartner(TransactionCase):
                     "login": "test_user",
                     "email": "test@oca.com",
                     "groups_id": [
-                        (6, 0, [self.employees_group.id, self.partner_manager_group.id])
+                        (6, 0, [cls.employees_group.id, cls.partner_manager_group.id])
                     ],
-                    "company_id": self.company.id,
-                    "company_ids": [(4, self.company.id), (4, self.company_2.id)],
+                    "company_id": cls.company.id,
+                    "company_ids": [(4, cls.company.id), (4, cls.company_2.id)],
                 }
             )
         )
@@ -91,16 +91,6 @@ class TestResPartner(TransactionCase):
         self.assertEqual(partner_3.commercial_partner_id, partner_2)
 
     def test_user_partner_company(self):
-        # user = self.env['res.users'].with_user(self.env.user).with_context(
-        #     no_reset_password=True).create(
-        #     {'name': 'Test User',
-        #      'login': 'test_user_2',
-        #      'email': 'test@oca.com',
-        #      'groups_id': [(6, 0, [self.employees_group.id,
-        #                            self.partner_manager_group.id])],
-        #      'company_id': self.company.id,
-        #      'company_ids': [(4, self.company.id), (4, self.company_2.id)],
-        #      })
         self.assertFalse(self.user.partner_id.company_id)
         self.user.company_id = self.company_2
         self.assertFalse(self.user.partner_id.company_id)

@@ -4,33 +4,34 @@
 import logging
 
 from odoo.exceptions import UserError, ValidationError
-from odoo.tests.common import TransactionCase
+from odoo.tests.common import SavepointCase
 
 _logger = logging.getLogger(__name__)
 
 
-class TestPaymentAcquirer(TransactionCase):
-    def setUp(self):
-        super(TestPaymentAcquirer, self).setUp()
-        employees_group = self.env.ref("base.group_user")
-        multi_company_group = self.env.ref("base.group_multi_company")
-        account_user_group = self.env.ref("account.group_account_user")
-        account_manager_group = self.env.ref("account.group_account_manager")
-        self.journal_model = self.env["account.journal"]
-        self.payment_acquirer_model = self.env["payment.acquirer"]
-        manager_account_test_group = self.create_full_access(
+class TestPaymentAcquirer(SavepointCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        employees_group = cls.env.ref("base.group_user")
+        multi_company_group = cls.env.ref("base.group_multi_company")
+        account_user_group = cls.env.ref("account.group_account_user")
+        account_manager_group = cls.env.ref("account.group_account_manager")
+        cls.journal_model = cls.env["account.journal"]
+        cls.payment_acquirer_model = cls.env["payment.acquirer"]
+        manager_account_test_group = cls.create_full_access(
             ["account.move", "account.journal", "account.account", "res.partner"]
         )
-        self.company = self.env["res.company"].create({"name": "Test company"})
-        self.company_2 = self.env["res.company"].create(
-            {"name": "Test company 2", "parent_id": self.company.id}
+        cls.company = cls.env["res.company"].create({"name": "Test company"})
+        cls.company_2 = cls.env["res.company"].create(
+            {"name": "Test company 2", "parent_id": cls.company.id}
         )
-        self.env.user.company_ids += self.company
-        self.env.user.company_ids += self.company_2
+        cls.env.user.company_ids += cls.company
+        cls.env.user.company_ids += cls.company_2
 
-        self.user = (
-            self.env["res.users"]
-            .with_user(self.env.user)
+        cls.user = (
+            cls.env["res.users"]
+            .with_user(cls.env.user)
             .with_context(no_reset_password=True)
             .create(
                 {
@@ -50,33 +51,34 @@ class TestPaymentAcquirer(TransactionCase):
                             ],
                         )
                     ],
-                    "company_id": self.company.id,
-                    "company_ids": [(4, self.company.id), (4, self.company_2.id)],
+                    "company_id": cls.company.id,
+                    "company_ids": [(4, cls.company.id), (4, cls.company_2.id)],
                 }
             )
         )
 
-        self.view_template = self.env["ir.ui.view"].search(
+        cls.view_template = cls.env["ir.ui.view"].search(
             [("name", "=", "default_acquirer_button")]
         )
-        self.bank_journal = self.journal_model.with_user(self.user).create(
+        cls.bank_journal = cls.journal_model.with_user(cls.user).create(
             {
                 "name": "Bank Journal 1 - Test",
                 "code": "test_bank_1",
                 "type": "bank",
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
             }
         )
 
-    def create_full_access(self, list_of_models):
+    @classmethod
+    def create_full_access(cls, list_of_models):
         manager_account_test_group = (
-            self.env["res.groups"].sudo().create({"name": "group_manager_product_test"})
+            cls.env["res.groups"].sudo().create({"name": "group_manager_product_test"})
         )
         for model in list_of_models:
-            model_id = self.env["ir.model"].sudo().search([("model", "=", model)])
+            model_id = cls.env["ir.model"].sudo().search([("model", "=", model)])
             if model_id:
                 access = (
-                    self.env["ir.model.access"]
+                    cls.env["ir.model.access"]
                     .sudo()
                     .create(
                         {
