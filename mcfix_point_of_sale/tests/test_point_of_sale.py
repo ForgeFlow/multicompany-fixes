@@ -15,20 +15,22 @@ _logger = logging.getLogger(__name__)
 
 
 class TestPointOfSale(TestAccountChartTemplate):
-    def with_context(self, *args, **kwargs):
-        context = dict(args[0] if args else self.env.context, **kwargs)
-        self.env = self.env(context=context)
-        return self
+    @classmethod
+    def with_context(cls, *args, **kwargs):
+        context = dict(args[0] if args else cls.env.context, **kwargs)
+        cls.env = cls.env(context=context)
+        return cls
 
-    def setUp(self):
-        super(TestPointOfSale, self).setUp()
-        employees_group = self.env.ref("base.group_user")
-        multi_company_group = self.env.ref("base.group_multi_company")
-        pos_manager_group = self.env.ref("point_of_sale.group_pos_manager")
-        self.pos_model = self.env["pos.order"]
-        self.journal_model = self.env["account.journal"]
+    @classmethod
+    def setUpClass(cls):
+        super(TestPointOfSale, cls).setUpClass()
+        employees_group = cls.env.ref("base.group_user")
+        multi_company_group = cls.env.ref("base.group_multi_company")
+        pos_manager_group = cls.env.ref("point_of_sale.group_pos_manager")
+        cls.pos_model = cls.env["pos.order"]
+        cls.journal_model = cls.env["account.journal"]
 
-        manager_pos_test_group = self.create_full_access(
+        manager_pos_test_group = cls.create_full_access(
             [
                 "pos.order",
                 "pos.order.line",
@@ -42,13 +44,13 @@ class TestPointOfSale(TestAccountChartTemplate):
                 "account.asset.category",
             ]
         )
-        self.env.user.company_id = self.company
-        self.env.user.company_ids += self.company
-        self.env.user.company_ids += self.company_2
+        cls.env.user.company_id = cls.company
+        cls.env.user.company_ids += cls.company
+        cls.env.user.company_ids += cls.company_2
 
-        self.user = (
-            self.env["res.users"]
-            .with_user(self.env.user)
+        cls.user = (
+            cls.env["res.users"]
+            .with_user(cls.env.user)
             .with_context(no_reset_password=True)
             .create(
                 {
@@ -67,35 +69,35 @@ class TestPointOfSale(TestAccountChartTemplate):
                             ],
                         )
                     ],
-                    "company_id": self.company.id,
-                    "company_ids": [(4, self.company.id), (4, self.company_2.id)],
+                    "company_id": cls.company.id,
+                    "company_ids": [(4, cls.company.id), (4, cls.company_2.id)],
                 }
             )
         )
 
-        self.pricelist = (
-            self.env["product.pricelist"]
-            .with_user(self.user)
+        cls.pricelist = (
+            cls.env["product.pricelist"]
+            .with_user(cls.user)
             .create(
                 {
                     "name": "Pricelist Test",
-                    "currency_id": self.env.ref("base.EUR").id,
-                    "company_id": self.company.id,
+                    "currency_id": cls.env.ref("base.EUR").id,
+                    "company_id": cls.company.id,
                 }
             )
         )
 
-        self.sale_journal = self.journal_model.with_user(self.user).create(
+        cls.sale_journal = cls.journal_model.with_user(cls.user).create(
             {
                 "name": "Sale Journal 1 - Test",
                 "code": "test_sale_1",
                 "type": "sale",
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
             }
         )
         vals = (
-            self.env["pos.config"]
-            .with_context(company_id=self.company.id)
+            cls.env["pos.config"]
+            .with_context(company_id=cls.company.id)
             .default_get(
                 [
                     "journal_id",
@@ -106,60 +108,62 @@ class TestPointOfSale(TestAccountChartTemplate):
             )
         )
         vals["name"] = "Config Test"
-        vals["company_id"] = self.company.id
-        self.pos_config = self.env["pos.config"].create(vals)
-        self.income_account = self.env["account.account"].create(
+        vals["company_id"] = cls.company.id
+        cls.pos_config = cls.env["pos.config"].create(vals)
+        cls.income_account = cls.env["account.account"].create(
             {
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
                 "code": "INC1",
                 "name": "Income",
-                "user_type_id": self.env.ref("account.data_account_type_revenue").id,
+                "user_type_id": cls.env.ref("account.data_account_type_revenue").id,
             }
         )
 
-        self.led_lamp = self.env.ref("point_of_sale.led_lamp")
-        self.whiteboard_pen = self.env.ref("point_of_sale.whiteboard_pen")
-        self.newspaper_rack = self.env.ref("point_of_sale.newspaper_rack")
+        cls.led_lamp = cls.env.ref("point_of_sale.led_lamp")
+        cls.whiteboard_pen = cls.env.ref("point_of_sale.whiteboard_pen")
+        cls.newspaper_rack = cls.env.ref("point_of_sale.newspaper_rack")
 
-        self.newspaper_rack.categ_id.with_context(
-            force_company=self.company.id
-        ).property_account_income_categ_id = self.env["account.account"].create(
+        cls.newspaper_rack.categ_id.with_context(
+            force_company=cls.company.id
+        ).property_account_income_categ_id = cls.env["account.account"].create(
             {
-                "company_id": self.company.id,
+                "company_id": cls.company.id,
                 "code": "INCOME",
                 "name": "Income",
-                "user_type_id": self.env.ref("account.data_account_type_revenue").id,
+                "user_type_id": cls.env.ref("account.data_account_type_revenue").id,
             }
         )
 
-        self.cash_payment_method = self.pos_config.payment_method_ids.filtered(
+        cls.cash_payment_method = cls.pos_config.payment_method_ids.filtered(
             lambda pm: pm.name == "Cash"
         )
-        self.bank_payment_method = self.pos_config.payment_method_ids.filtered(
+        cls.bank_payment_method = cls.pos_config.payment_method_ids.filtered(
             lambda pm: pm.name == "Bank"
         )
-        account = self.company.account_default_pos_receivable_account_id
-        self.credit_payment_method = self.env["pos.payment.method"].create(
+        account = cls.company.account_default_pos_receivable_account_id
+        cls.credit_payment_method = cls.env["pos.payment.method"].create(
             {
                 "name": "Credit",
                 "receivable_account_id": account.id,
                 "split_transactions": True,
             }
         )
-        self.pos_config.payment_method_ids |= self.credit_payment_method
+        cls.pos_config.payment_method_ids |= cls.credit_payment_method
 
-    def create_product(self, name):
-        return self.env["product.product"].create({"name": name, "type": "consu"})
+    @classmethod
+    def create_product(cls, name):
+        return cls.env["product.product"].create({"name": name, "type": "consu"})
 
-    def create_full_access(self, list_of_models):
+    @classmethod
+    def create_full_access(cls, list_of_models):
         manager_pos_test_group = (
-            self.env["res.groups"].sudo().create({"name": "group_manager_pos_test"})
+            cls.env["res.groups"].sudo().create({"name": "group_manager_pos_test"})
         )
         for model in list_of_models:
-            model_id = self.env["ir.model"].sudo().search([("model", "=", model)])
+            model_id = cls.env["ir.model"].sudo().search([("model", "=", model)])
             if model_id:
                 access = (
-                    self.env["ir.model.access"]
+                    cls.env["ir.model.access"]
                     .sudo()
                     .create(
                         {
@@ -175,7 +179,8 @@ class TestPointOfSale(TestAccountChartTemplate):
                 access.group_id = manager_pos_test_group
         return manager_pos_test_group
 
-    def create_company(self, name, parent_id=False):
+    @classmethod
+    def create_company(cls, name, parent_id=False):
         dict_company = {
             "name": name,
             "parent_id": parent_id,

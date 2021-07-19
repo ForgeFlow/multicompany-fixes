@@ -11,9 +11,10 @@ class ProductTemplate(models.Model):
             self.route_ids = self.env["stock.location.route"].search(
                 [
                     ("product_ids", "in", [self.id]),
+                    "|",
                     ("company_id", "=", False),
                     ("company_id", "=", self.company_id.id),
                 ]
             )
 
-    route_ids = fields.Many2many(checkc_company=True)
+    route_ids = fields.Many2many(check_company=True)

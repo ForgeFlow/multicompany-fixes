@@ -9,15 +9,16 @@ from odoo.addons.mcfix_sale.tests.test_sale_order_consistency import (
 
 
 class TestSaleStockOrderConsistency(TestSaleOrderConsistency):
-    def setUp(self):
-        super(TestSaleStockOrderConsistency, self).setUp()
-        self.sale_order_4 = self._create_sale_order(
-            self.company_2,
-            self.product2,
-            self.tax_2,
-            self.partner_2,
-            self.team_2,
-            self.user_4,
+    @classmethod
+    def setUpClass(cls):
+        super(TestSaleStockOrderConsistency, cls).setUpClass()
+        cls.sale_order_4 = cls._create_sale_order(
+            cls.company_2,
+            cls.product2,
+            cls.tax_2,
+            cls.partner_2,
+            cls.team_2,
+            cls.user_4,
         )
 
     def test_sale_stock_company_consistency(self):
