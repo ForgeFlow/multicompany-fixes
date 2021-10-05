@@ -27,22 +27,5 @@ odoo.define("account.ReconciliationModel.multicompany", function(require) {
         }
       });
     },
-    load: function(context) {
-      var self = this;
-      var _super = self._super.bind(self);
-      var statement_ids = context.statement_ids;
-      return self
-        ._rpc({
-          model: "account.bank.statement",
-          method: "get_company_ids",
-          args: [statement_ids],
-        })
-        .then(function(result) {
-          if (result.length > 0) {
-            context.company_ids = result;
-          }
-          return _super(context);
-        });
-    },
   });
 });
