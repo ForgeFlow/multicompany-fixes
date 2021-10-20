@@ -45,6 +45,7 @@
               <field name="fiscalyear_last_day" />
               <field name="fiscalyear_last_month" />
               <field name="fiscalyear_lock_date" />
+              <field name="tax_lock_date" />
               <field name="period_lock_date" />
             </group>
           </group>
