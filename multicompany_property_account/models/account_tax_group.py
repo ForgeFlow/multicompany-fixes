@@ -16,9 +16,9 @@ class AccountTaxGroup(models.Model):
     )
 
     def _inverse_properties(self):
-        """ Hack here: We do not really store any value here.
+        """Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
-        model editable. """
+        model editable."""
         return
 
     def _compute_properties(self):
@@ -62,7 +62,8 @@ class AccountTaxGroupProperty(models.TransientModel):
         self.ensure_one()
         obj = self.tax_group_id
         self.get_property_fields(
-            obj, self.env["ir.property"].with_context(force_company=self.company_id.id),
+            obj,
+            self.env["ir.property"].with_context(force_company=self.company_id.id),
         )
 
     def get_property_fields(self, obj, properties):
