@@ -45,7 +45,7 @@ class PartnerProperty(models.TransientModel):
         for rec in self:
             rec.get_property_fields(
                 rec.partner_id,
-                rec.env["ir.property"].with_company(self.company_id),
+                rec.env["ir.property"].with_company(rec.company_id),
             )
 
     def get_property_fields(self, obj, properties):

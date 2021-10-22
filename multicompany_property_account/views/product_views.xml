@@ -37,4 +37,26 @@
       </notebook>
     </field>
   </record>
+
+    <record id="view_product_property_tree" model="ir.ui.view">
+        <field name="name">product.property.tree</field>
+        <field name="model">product.property</field>
+        <field
+            name="inherit_id"
+            ref="multicompany_property_product.view_product_property_tree"
+        />
+        <field name="arch" type="xml">
+            <field name="company_id" position="after">
+                <field
+                    name="property_account_income_id"
+                    domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+                />
+                <field
+                    name="property_account_expense_id"
+                    domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+                />
+            </field>
+        </field>
+    </record>
+
 </odoo>

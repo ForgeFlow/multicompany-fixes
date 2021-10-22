@@ -1,10 +1,10 @@
 # Copyright 2017 Creu Blanca
-# Copyright 2017 ForgeFlow, S.L.
+# Copyright 2017-21 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 {
     "name": "Multi Company Property Account",
-    "version": "13.0.1.0.0",
+    "version": "14.0.1.0.0",
     "summary": "Account Company Properties",
     "author": "Creu Blanca, ForgeFlow, Odoo Community Association (OCA)",
     "sequence": 30,
@@ -12,6 +12,7 @@
     "website": "https://github.com/OCA/multicompany-fixes",
     "depends": ["account", "multicompany_property_product"],
     "data": [
+        "security/ir.model.access.csv",
         "views/partner_views.xml",
         "views/product_views.xml",
         "views/product_category_views.xml",

@@ -34,6 +34,14 @@
     <field name="arch" type="xml">
       <field name="company_id" position="after">
         <field
+                    name="property_account_payable_id"
+                    domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False),('company_id','=',company_id)]"
+                />
+        <field
+                    name="property_account_receivable_id"
+                    domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False),('company_id','=',company_id)]"
+                />
+        <field
                     name="property_account_position_id"
                     domain="[('company_id','=',company_id)]"
                 />
@@ -79,7 +87,7 @@
                             name="property_supplier_payment_term_id"
                             domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
                         />
-            <field name="trust" domain="[('company_id','=',company_id)]" />
+            <field name="trust" />
           </group>
         </page>
       </notebook>
