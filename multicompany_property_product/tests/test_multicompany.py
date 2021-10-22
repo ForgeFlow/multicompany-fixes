@@ -26,13 +26,13 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             lambda r: r.company_id == self.company_2
         ).write({"standard_price": 20})
         self.assertEqual(
-            self.product.with_context(force_company=self.company_1.id).standard_price,
+            self.product.with_company(self.company_1).standard_price,
             self.product.property_ids.filtered(
                 lambda r: r.company_id == self.company_1
             ).standard_price,
         )
         self.assertEqual(
-            self.product.with_context(force_company=self.company_2.id).standard_price,
+            self.product.with_company(self.company_2).standard_price,
             self.product.property_ids.filtered(
                 lambda r: r.company_id == self.company_2
             ).standard_price,
@@ -48,15 +48,11 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             lambda r: r.company_id == self.company_2
         ).standard_price = 20
         self.assertEqual(
-            self.product_template.with_context(
-                force_company=self.company_1.id
-            ).standard_price,
+            self.product_template.with_company(self.company_1.id).standard_price,
             10,
         )
         self.assertEqual(
-            self.product_template.with_context(
-                force_company=self.company_2.id
-            ).standard_price,
+            self.product_template.with_company(self.company_2).standard_price,
             20,
         )
 
