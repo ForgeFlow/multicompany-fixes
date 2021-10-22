@@ -49,7 +49,7 @@ class ModelProperty(models.AbstractModel):
         the context the company for which we intend to save the value
         for the given object.
         """
-        properties.with_context(force_company=self.company_id.id).sudo().set_multi(
+        properties.with_company(self.company_id).sudo()._set_multi(
             fieldname, obj._name, {obj.id: value}
         )
 
@@ -64,13 +64,13 @@ class ModelProperty(models.AbstractModel):
         the company for which we intend to save the value for
         the given object.
         """
-        value = prop_obj.get(field, obj._name, (obj._name + ",%s") % obj.id)
+        value = prop_obj._get(field, obj._name, (obj._name + ",%s") % obj.id)
         if value:
             if isinstance(value, list):
                 return value[0]
             else:
                 return value
-        value = prop_obj.get(field, obj._name)
+        value = prop_obj._get(field, obj._name)
         if value:
             if isinstance(value, list):
                 return value[0]
