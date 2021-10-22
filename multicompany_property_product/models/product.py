@@ -89,7 +89,7 @@ class ProductProperty(models.TransientModel):
             obj = rec.product_id or rec.product_template_id
             rec.get_property_fields(
                 obj,
-                rec.env["ir.property"].with_context(force_company=rec.company_id.id),
+                rec.env["ir.property"].with_company(rec.company_id),
             )
 
     def get_property_fields(self, obj, properties):
@@ -110,13 +110,11 @@ class ProductProperty(models.TransientModel):
     def write(self, vals):
         """Standard price do not follow the usual workflow
         as it has special considerations"""
-        prop_obj = self.env["ir.property"].with_context(
-            force_company=self.company_id.id
-        )
+        prop_obj = self.env["ir.property"].with_company(self.company_id)
         if "standard_price" in vals:
             for rec in self:
                 obj = rec.product_id or rec.product_template_id
-                obj = obj.with_context(force_company=rec.company_id.id)
+                obj = obj.with_company(rec.company_id)
                 if obj._name == "product.template":
                     for pv in obj.product_variant_ids:
                         self.set_property(
