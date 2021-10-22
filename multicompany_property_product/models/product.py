@@ -16,9 +16,9 @@ class ProductTemplate(models.Model):
     )
 
     def _inverse_properties(self):
-        """ Hack here: We do not really store any value here.
+        """Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
-        model editable. """
+        model editable."""
         return
 
     def _compute_properties(self):
@@ -42,9 +42,9 @@ class ProductProduct(models.Model):
     )
 
     def _inverse_properties(self):
-        """ Hack here: We do not really store any value here.
+        """Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
-        model editable. """
+        model editable."""
         return
 
     def _compute_properties(self):
@@ -108,8 +108,8 @@ class ProductProperty(models.TransientModel):
                 )
 
     def write(self, vals):
-        """ Standard price do not follow the usual workflow
-        as it has special considerations """
+        """Standard price do not follow the usual workflow
+        as it has special considerations"""
         prop_obj = self.env["ir.property"].with_context(
             force_company=self.company_id.id
         )
