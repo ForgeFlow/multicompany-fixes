@@ -15,13 +15,13 @@ class ModelProperty(models.AbstractModel):
     )
 
     def _compute_property_fields(self):
-        """ This method must be redefined by modules that
+        """This method must be redefined by modules that
         introduce property fields in the relevant models.
         If it is not defined by the models, will raise an error message."""
         raise MissingError(_("It must be redefined"))
 
     def get_property_fields(self, obj, properties):
-        """ This method must be redefined by modules that
+        """This method must be redefined by modules that
         introduce property fields in the relevant models.
         It intends to be used to compute the value of property fields.
         The models that implement this method will define the the logic
@@ -38,7 +38,7 @@ class ModelProperty(models.AbstractModel):
         raise MissingError(_("It must be redefined"))
 
     def set_property(self, obj, fieldname, value, properties):
-        """ This method will set the intended value
+        """This method will set the intended value
         of a property field to the ir.property table, in the right company.
         @param obj: actual object for which we intend to set the property
         value.
@@ -54,7 +54,7 @@ class ModelProperty(models.AbstractModel):
         )
 
     def get_property_value(self, field, obj, prop_obj):
-        """ This method will assist in obtaining the value of a property
+        """This method will assist in obtaining the value of a property
         field from the ir.property table, in the right company.
         @param obj: actual object for which we intend to set the property
         value.
@@ -79,7 +79,7 @@ class ModelProperty(models.AbstractModel):
         return False
 
     def get_property_fields_list(self):
-        """ This should be implemented by the models that implement this
+        """This should be implemented by the models that implement this
         abstract method, providing the list of property fields that the model
         includes. This will help to set/get the property values.
         """

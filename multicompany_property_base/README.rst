@@ -40,6 +40,7 @@ Contributors
 * Enric Tobella <etobella@creublanca.es>
 * Jordi Ballester <jordi.ballester@forgeflow.com>
 * Miquel Raïch <miquel.raich@forgeflow.com>
+* Lois Rilo <lois.rilo@forgeflow.com>
 
 Do not contact contributors directly about support or help with technical issues.
 

@@ -16,9 +16,9 @@ class Partner(models.Model):
     )
 
     def _inverse_properties(self):
-        """ Hack here: We do not really store any value here.
+        """Hack here: We do not really store any value here.
         But this allows us to have the fields of the transient
-        model editable. """
+        model editable."""
         return
 
     def _compute_properties(self):
@@ -49,7 +49,7 @@ class PartnerProperty(models.TransientModel):
             )
 
     def get_property_fields(self, obj, properties):
-        """ We have no property fields in this module, but we still
+        """We have no property fields in this module, but we still
         have to implement the method to avoid error."""
         return
 
