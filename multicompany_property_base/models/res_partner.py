@@ -45,7 +45,7 @@ class PartnerProperty(models.TransientModel):
         for rec in self:
             rec.get_property_fields(
                 rec.partner_id,
-                rec.env["ir.property"].with_context(force_company=rec.company_id.id),
+                rec.env["ir.property"].with_company(self.company_id),
             )
 
     def get_property_fields(self, obj, properties):
@@ -54,9 +54,7 @@ class PartnerProperty(models.TransientModel):
         return
 
     def write(self, vals):
-        prop_obj = self.env["ir.property"].with_context(
-            force_company=self.company_id.id
-        )
+        prop_obj = self.env["ir.property"].with_company(self.company_id)
         p_fields = self.get_property_fields_list()
         for field in p_fields:
             if field in vals:
