@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_partner_property_form" model="ir.ui.view">
+    <field name="name">res.partner.property.form.inherit</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="account.view_partner_property_form" />
+    <field name="arch" type="xml">
+      <field name="property_payment_term_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+      </field>
+      <field name="property_supplier_payment_term_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+      </field>
+      <field name="property_account_receivable_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+        <attribute name="required">0</attribute>
+      </field>
+      <field name="property_account_payable_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+        <attribute name="required">0</attribute>
+      </field>
+      <field name="property_account_position_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+      </field>
+    </field>
+  </record>
+  <record id="view_partner_property_multicompany_tree" model="ir.ui.view">
+    <field name="name">res.partner.property.tree</field>
+    <field name="model">res.partner.property</field>
+    <field
+            name="inherit_id"
+            ref="multicompany_property_base.view_partner_property_multicompany_tree"
+        />
+    <field name="arch" type="xml">
+      <field name="company_id" position="after">
+        <field
+                    name="property_account_payable_id"
+                    domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False),('company_id','=',company_id)]"
+                />
+        <field
+                    name="property_account_receivable_id"
+                    domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False),('company_id','=',company_id)]"
+                />
+        <field
+                    name="property_account_position_id"
+                    domain="[('company_id','=',company_id)]"
+                />
+        <field
+                    name="property_payment_term_id"
+                    domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
+                />
+        <field
+                    name="property_supplier_payment_term_id"
+                    domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
+                />
+      </field>
+    </field>
+  </record>
+  <record id="view_partner_property_multicompany_form" model="ir.ui.view">
+    <field name="name">res.partner.property.form</field>
+    <field name="model">res.partner.property</field>
+    <field
+            name="inherit_id"
+            ref="multicompany_property_base.view_partner_property_multicompany_form"
+        />
+    <field name="arch" type="xml">
+      <notebook position="inside">
+        <page name="accounting" string="Accounting">
+          <group>
+            <field
+                            name="property_account_payable_id"
+                            domain="[('internal_type', '=', 'payable'), ('deprecated', '=', False),('company_id','=',company_id)]"
+                        />
+            <field
+                            name="property_account_receivable_id"
+                            domain="[('internal_type', '=', 'receivable'), ('deprecated', '=', False),('company_id','=',company_id)]"
+                        />
+            <field
+                            name="property_account_position_id"
+                            domain="[('company_id','=',company_id)]"
+                        />
+            <field
+                            name="property_payment_term_id"
+                            domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
+                        />
+            <field
+                            name="property_supplier_payment_term_id"
+                            domain="['|', ('company_id', '=', False), ('company_id','=',company_id)]"
+                        />
+            <field name="trust" />
+          </group>
+        </page>
+      </notebook>
+    </field>
+  </record>
+</odoo>
