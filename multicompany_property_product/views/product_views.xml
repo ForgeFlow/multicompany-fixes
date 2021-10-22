@@ -23,10 +23,10 @@
         <field name="product_template_id" invisible="1" />
         <field name="company_id" />
         <field
-          name="standard_price"
-          widget='monetary'
-          options="{'currency_field': 'currency_id'}"
-        />
+                    name="standard_price"
+                    widget='monetary'
+                    options="{'currency_field': 'currency_id'}"
+                />
       </tree>
     </field>
   </record>
@@ -40,10 +40,10 @@
           <field name="product_id" invisible="1" />
           <field name="company_id" />
           <field
-            name="standard_price"
-            widget='monetary'
-            options="{'currency_field': 'currency_id'}"
-          />
+                        name="standard_price"
+                        widget='monetary'
+                        options="{'currency_field': 'currency_id'}"
+                    />
         </group>
         <notebook>
 
