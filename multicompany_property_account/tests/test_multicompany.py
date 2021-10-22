@@ -13,7 +13,7 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             self.env.user.write(
                 {"company_ids": [(4, company.id)], "company_id": company.id}
             )
-            chart_template_id.try_loading_for_current_company()
+            chart_template_id.try_loading()
         return company
 
     def test_partner(self):
@@ -32,15 +32,11 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         )
         prop.write({"property_account_payable_id": account.id})
         self.assertEqual(
-            self.partner.with_context(
-                force_company=self.company_1.id
-            ).property_account_payable_id,
+            self.partner.with_company(self.company_1).property_account_payable_id,
             account,
         )
         self.assertEqual(
-            self.partner.with_context(
-                force_company=self.company_1.id
-            ).property_account_payable_id,
+            self.partner.with_company(self.company_1).property_account_payable_id,
             prop.property_account_payable_id,
         )
 
@@ -56,15 +52,11 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         )
         prop.write({"property_account_income_categ_id": account.id})
         self.assertEqual(
-            self.category.with_context(
-                force_company=self.company_1.id
-            ).property_account_income_categ_id,
+            self.category.with_company(self.company_1).property_account_income_categ_id,
             account,
         )
         self.assertEqual(
-            self.category.with_context(
-                force_company=self.company_1.id
-            ).property_account_income_categ_id,
+            self.category.with_company(self.company_1).property_account_income_categ_id,
             prop.property_account_income_categ_id,
         )
 
@@ -80,14 +72,14 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         )
         prop.write({"property_account_income_id": account.id})
         self.assertEqual(
-            self.product_template.with_context(
-                force_company=self.company_1.id
+            self.product_template.with_company(
+                self.company_1
             ).property_account_income_id,
             account,
         )
         self.assertEqual(
-            self.product_template.with_context(
-                force_company=self.company_1.id
+            self.product_template.with_company(
+                self.company_1
             ).property_account_income_id,
             prop.property_account_income_id,
         )
