@@ -63,10 +63,35 @@ class AccountMove(models.Model):
                 )
                 .id
             )
+            record._onchange_partner_id()
+            if record.is_invoice(include_receipts=True):
+                record = record.with_context(force_company=record.company_id.id)
+                for line in record.line_ids:
+                    if (
+                        line.display_type in ("line_section", "line_note")
+                        or line.exclude_from_invoice_tab
+                    ):
+                        continue
+                    if not line.product_id:
+                        default_values = line.with_context(
+                            journal_id=record.journal_id.id, default_type=record.type
+                        ).default_get(["account_id"])
+                        line.account_id = default_values["account_id"]
+                    else:
+                        line.account_id = line._get_computed_account()
+                    taxes = line._get_computed_taxes()
+                    if taxes and line.move_id.fiscal_position_id:
+                        taxes = line.move_id.fiscal_position_id.map_tax(
+                            taxes, partner=line.partner_id
+                        )
+                    line.tax_ids = taxes
+                record._recompute_dynamic_lines(recompute_all_taxes=True)
 
     @api.constrains("company_id")
     def _check_company_id_out_model(self):
         self._check_company_id_base_model()
+        self.line_ids._check_company()
+        self.line_ids._check_company_id_out_model()
 
 
 class AccountMoveLine(models.Model):
