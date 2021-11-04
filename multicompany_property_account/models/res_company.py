@@ -87,7 +87,7 @@ class ResCompany(models.Model):
     )
 
     def get_property_value(self, model, field):
-        value = self.env["ir.property"].with_company(self).sudo().get(field, model)
+        value = self.env["ir.property"].with_company(self).sudo()._get(field, model)
         if value:
             if isinstance(value, list):
                 return value[0]
