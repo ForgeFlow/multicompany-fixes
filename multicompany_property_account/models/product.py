@@ -11,8 +11,7 @@ class ProductProperty(models.TransientModel):
     property_account_income_id = fields.Many2one(
         comodel_name="account.account",
         string="Income Account",
-        domain="['&', ('deprecated', '=', False),"
-        "('company_id', '=', current_company_id)]",
+        domain=[("deprecated", "=", False)],
         compute="_compute_property_fields",
         readonly=False,
         store=False,
@@ -22,8 +21,7 @@ class ProductProperty(models.TransientModel):
     property_account_expense_id = fields.Many2one(
         comodel_name="account.account",
         string="Expense Account",
-        domain="['&', ('deprecated', '=', False),"
-        "('company_id', '=', current_company_id)]",
+        domain=[("deprecated", "=", False)],
         compute="_compute_property_fields",
         readonly=False,
         store=False,
