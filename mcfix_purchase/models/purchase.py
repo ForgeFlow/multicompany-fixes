@@ -36,6 +36,7 @@ class PurchaseOrder(models.Model):
             self.partner_id = False
         if not self.dest_address_id.check_company(self.company_id):
             self.dest_address_id = False
+        self.order_line.with_context(force_company=self.company_id.id)._compute_tax_id()
 
     def _check_company_id_search(self):
         res = super()._check_company_id_search()
