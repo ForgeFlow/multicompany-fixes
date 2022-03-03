@@ -16,6 +16,7 @@ class ProductCategoryProperty(models.TransientModel):
         string="Inventory Valuation",
         compute="_compute_property_fields",
         readonly=False,
+        required=True,
         help="If perpetual valuation is enabled for a product, the system "
         "will automatically create journal entries corresponding to "
         "stock moves, with product price as specified by the 'Costing "
@@ -34,6 +35,7 @@ class ProductCategoryProperty(models.TransientModel):
         string="Costing Method",
         compute="_compute_property_fields",
         readonly=False,
+        required=True,
         help="Standard Price: The products are valued at their standard cost "
         "defined on the product.\nAverage Cost (AVCO): The products are valued "
         "at weighted average cost.\nFirst In First Out (FIFO): The products "
