@@ -47,6 +47,7 @@ class ProductCategoryProperty(models.TransientModel):
         "Stock Journal",
         compute="_compute_property_fields",
         readonly=False,
+        required=True,
         help="When doing real-time inventory valuation, this is "
         "the Accounting Journal in which entries will be "
         "automatically posted when stock moves are processed.",
@@ -57,6 +58,7 @@ class ProductCategoryProperty(models.TransientModel):
         domain=[("deprecated", "=", False)],
         compute="_compute_property_fields",
         readonly=False,
+        required=True,
         help="When doing real-time inventory valuation, counterpart "
         "journal items for all incoming stock moves will be posted "
         "in this account, unless "
@@ -71,6 +73,7 @@ class ProductCategoryProperty(models.TransientModel):
         domain=[("deprecated", "=", False)],
         compute="_compute_property_fields",
         readonly=False,
+        required=True,
         help="When doing real-time inventory valuation, counterpart journal "
         "items for all outgoing stock moves will be posted in this "
         "account, unless there is a specific valuation account set "
@@ -83,6 +86,7 @@ class ProductCategoryProperty(models.TransientModel):
         "Stock Valuation Account",
         compute="_compute_property_fields",
         readonly=False,
+        required=True,
         domain=[("deprecated", "=", False)],
         help="When real-time inventory valuation is enabled "
         "on a product, this account will hold the current "
