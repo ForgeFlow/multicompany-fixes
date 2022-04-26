@@ -101,42 +101,25 @@ class Route(models.Model):
     supplied_wh_id = fields.Many2one(check_company=True)
     supplier_wh_id = fields.Many2one(check_company=True)
 
-    # move_ids = fields.Many2many('stock.move',
-    #                             'stock_location_route_move', 'route_id',
-    #                             'move_id', 'Moves',
-    #                             help="Related moves")
-    #
     @api.onchange("company_id")
     def _onchange_company_id(self):
-        if not self.move_ids:
-            if not self.supplied_wh_id.check_company(self.company_id):
-                self.supplied_wh_id = False
-            if not self.supplier_wh_id.check_company(self.company_id):
-                self.supplier_wh_id = False
-            if not self.product_ids.check_company(self.company_id):
-                self.product_ids = self.env["product.template"].search(
-                    [
-                        ("route_ids", "in", [self.id]),
-                        ("company_id", "=", False),
-                        ("company_id", "=", self.company_id.id),
-                    ]
+        if not self.supplied_wh_id.check_company(self.company_id):
+            self.supplied_wh_id = False
+        if not self.supplier_wh_id.check_company(self.company_id):
+            self.supplier_wh_id = False
+        if not self.product_ids.check_company(self.company_id):
+            self.product_ids = self.env["product.template"].search(
+                [
+                    ("route_ids", "in", [self.id]),
+                    ("company_id", "=", False),
+                    ("company_id", "=", self.company_id.id),
+                ]
+            )
+        if not self.warehouse_ids.check_company(self.company_id):
+            if self.company_id and self.warehouse_ids:
+                self.warehouse_ids = self.warehouse_ids.filtered(
+                    lambda w: w.company_id == self.company_id
                 )
-            if not self.warehouse_ids.check_company(self.company_id):
-                if self.company_id and self.warehouse_ids:
-                    self.warehouse_ids = self.warehouse_ids.filtered(
-                        lambda w: w.company_id == self.company_id
-                    )
-
-    #
-    # @api.constrains('company_id', 'move_ids')
-    # def _check_company_id_move_ids(self):
-    #     for rec in self.sudo():
-    #         for line in rec.move_ids:
-    #             if not line.check_company(rec.company_id):
-    #                 raise ValidationError(
-    #                     _('The Company in the Stock Location Route and in '
-    #                       'Stock Move (%s) must be the same.'
-    #                       ) % line.name_get()[0][1])
 
     @api.constrains("company_id")
     def _check_company_id_out_model(self):
