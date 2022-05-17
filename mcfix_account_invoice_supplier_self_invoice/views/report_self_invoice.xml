@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_invoice_self_document" inherit_id="account_invoice_supplier_self_invoice.report_invoice_self_document">
+            <xpath expr="//t[@t-set='o']" position="after">
+                <t t-set="o" t-value="o.with_context({'not_display_company': True})" />
+            </xpath>
+        </template>
+    </data>
+</odoo>
