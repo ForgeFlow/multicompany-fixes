@@ -7,4 +7,4 @@ from odoo.addons.multicompany_property_product.tests import test_multicompany
 
 class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
     def test_product(self):
-        super().test_product()
+        return super().test_product()

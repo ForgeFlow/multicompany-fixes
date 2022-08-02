@@ -4,7 +4,7 @@
 
 {
     "name": "Multi Company Stock",
-    "version": "13.0.1.0.0",
+    "version": "15.0.1.0.0",
     "summary": "Stock Company Properties",
     "author": "Creu Blanca, ForgeFlow, Odoo Community Association (OCA)",
     "sequence": 30,

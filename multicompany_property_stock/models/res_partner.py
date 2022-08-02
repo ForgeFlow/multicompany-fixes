@@ -30,7 +30,7 @@ class PartnerProperty(models.TransientModel):
     )
 
     def get_property_fields(self, obj, properties):
-        super(PartnerProperty, self).get_property_fields(obj, properties)
+        res = super(PartnerProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_stock_customer = rec.get_property_value(
                 "property_stock_customer", obj, properties
@@ -38,6 +38,7 @@ class PartnerProperty(models.TransientModel):
             rec.property_stock_supplier = rec.get_property_value(
                 "property_stock_supplier", obj, properties
             )
+        return res
 
     def get_property_fields_list(self):
         res = super(PartnerProperty, self).get_property_fields_list()
