@@ -17,9 +17,9 @@
     <field name="name">product.property.form</field>
     <field name="model">product.property</field>
     <field
-      name="inherit_id"
-      ref="multicompany_property_product.view_product_property_form"
-    />
+            name="inherit_id"
+            ref="multicompany_property_product.view_product_property_form"
+        />
     <field name="arch" type="xml">
       <notebook position="inside">
         <page string="Inventory">
