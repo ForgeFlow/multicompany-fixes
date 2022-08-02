@@ -3,8 +3,8 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
 {
-    "name": "Multi Company Stock",
-    "version": "13.0.1.0.0",
+    "name": "Multi Company Delivery",
+    "version": "15.0.1.0.0",
     "summary": "Delivery Company Properties",
     "author": "Creu Blanca, ForgeFlow, Odoo Community Association (OCA)",
     "sequence": 30,
