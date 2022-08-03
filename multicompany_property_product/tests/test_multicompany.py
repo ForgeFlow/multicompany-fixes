@@ -6,15 +6,16 @@ from odoo.addons.multicompany_property_base.tests import test_multicompany
 
 
 class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
-    def setUp(self):
-        super().setUp()
-        self.product = self.env["product.product"].create(
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.product = cls.env["product.product"].create(
             {"name": "Product Product", "company_id": False}
         )
-        self.product_template = self.env["product.template"].create(
+        cls.product_template = cls.env["product.template"].create(
             {"name": "Product template", "company_id": False}
         )
-        self.category = self.env["product.category"].create({"name": "Category"})
+        cls.category = cls.env["product.category"].create({"name": "Category"})
 
     def test_product(self):
         self.product.invalidate_cache()

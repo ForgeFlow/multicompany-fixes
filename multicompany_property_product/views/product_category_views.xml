@@ -16,7 +16,7 @@
     <field name="name">product.category.property.tree</field>
     <field name="model">product.category.property</field>
     <field name="arch" type="xml">
-      <tree string="Properties">
+      <tree>
         <field name="categ_id" invisible="1" />
         <field name="company_id" />
       </tree>
