@@ -20,11 +20,12 @@ class ProductProperty(models.TransientModel):
     )
 
     def get_property_fields(self, obj, properties):
-        super(ProductProperty, self).get_property_fields(obj, properties)
+        res = super(ProductProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_account_creditor_price_difference = rec.get_property_value(
                 "property_account_creditor_price_difference", obj, properties
             )
+        return res
 
     def get_property_fields_list(self):
         res = super(ProductProperty, self).get_property_fields_list()
