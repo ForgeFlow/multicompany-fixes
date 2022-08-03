@@ -4,7 +4,7 @@
 
 {
     "name": "Multi Company Property Account",
-    "version": "14.0.1.0.0",
+    "version": "15.0.1.0.0",
     "summary": "Account Company Properties",
     "author": "Creu Blanca, ForgeFlow, Odoo Community Association (OCA)",
     "sequence": 30,

@@ -5,7 +5,7 @@
     <field name="name">account.tax.group.property.tree</field>
     <field name="model">account.tax.group.property</field>
     <field name="arch" type="xml">
-      <tree string="Properties">
+      <tree>
         <field name="tax_group_id" invisible="1" />
         <field name="company_id" />
       </tree>

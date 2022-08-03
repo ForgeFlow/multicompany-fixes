@@ -32,7 +32,7 @@ class ProductProperty(models.TransientModel):
     )
 
     def get_property_fields(self, obj, properties):
-        super(ProductProperty, self).get_property_fields(obj, properties)
+        res = super(ProductProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_account_income_id = rec.get_property_value(
                 "property_account_income_id", obj, properties
@@ -40,6 +40,7 @@ class ProductProperty(models.TransientModel):
             rec.property_account_expense_id = rec.get_property_value(
                 "property_account_expense_id", obj, properties
             )
+        return res
 
     def get_property_fields_list(self):
         res = super(ProductProperty, self).get_property_fields_list()

@@ -17,7 +17,7 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         return company
 
     def test_partner(self):
-        super().test_partner()
+        res = super().test_partner()
         account = self.env["account.account"].search(
             [
                 ("deprecated", "=", False),
@@ -39,9 +39,10 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             self.partner.with_company(self.company_1).property_account_payable_id,
             prop.property_account_payable_id,
         )
+        return res
 
     def test_product_category(self):
-        super().test_product_category()
+        res = super().test_product_category()
         account = self.env["account.account"].search(
             [("deprecated", "=", False), ("company_id", "=", self.company_1.id)],
             limit=1,
@@ -59,9 +60,10 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             self.category.with_company(self.company_1).property_account_income_categ_id,
             prop.property_account_income_categ_id,
         )
+        return res
 
     def test_product_template(self):
-        super().test_product_template()
+        res = super().test_product_template()
         account = self.env["account.account"].search(
             [("deprecated", "=", False), ("company_id", "=", self.company_1.id)],
             limit=1,
@@ -83,3 +85,4 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             ).property_account_income_id,
             prop.property_account_income_id,
         )
+        return res
