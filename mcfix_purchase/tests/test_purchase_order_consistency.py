@@ -4,6 +4,7 @@
 import time
 
 from odoo.exceptions import UserError
+from odoo.tests.common import Form
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 from odoo.addons.mcfix_account.tests.test_account_chart_template_consistency import (
@@ -63,9 +64,7 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
             }
         )
 
-        cls.product2.write(
-            {"responsible_id": cls.user.id, "company_id": cls.company_2.id}
-        )
+        cls.product2.write({"company_id": cls.company_2.id})
 
         # Account
         user_type = cls.env.ref("account.data_account_type_liquidity")
@@ -102,6 +101,18 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
                 }
             )
         )
+        cls.purchase_journal_2 = (
+            cls.journal_model.with_user(cls.user)
+            .sudo()
+            .create(
+                {
+                    "name": "Cash Journal 2 - Test",
+                    "code": "purchase_cash_2",
+                    "type": "purchase",
+                    "company_id": cls.company_2.id,
+                }
+            )
+        )
 
         # Create records for both companies
         cls.partner_1 = cls._create_partners(cls.company)
@@ -121,6 +132,8 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         )
 
         cls.purchase1.button_confirm()
+        for line in cls.purchase1.order_line:
+            line.qty_received = line.product_qty
         cls.invoice = cls._create_invoice(
             cls.purchase1, cls.partner_1, cls.purchase_journal, cls.cash_account_id
         )
@@ -148,22 +161,19 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
     @classmethod
     def _create_invoice(cls, purchase, partner, journal, account):
         """ Create a vendor invoice for the purchase order."""
-        invoice_vals = {
-            "purchase_id": purchase.id,
-            "partner_id": partner.id,
-            "company_id": purchase.company_id.id,
-            "journal_id": journal.id,
-            "type": "in_invoice",
-        }
         purchase_context = {
             "active_id": purchase.id,
             "active_ids": purchase.ids,
             "active_model": "purchase.order",
             "company_id": purchase.company_id.id,
+            "default_company_id": purchase.company_id.id,
+            "default_purchase_id": purchase.id,
+            "default_partner_id": partner.id,
+            "default_journal_id": journal.id,
+            "default_type": "in_invoice",
         }
-        return (
-            cls.env["account.move"].with_context(purchase_context).create(invoice_vals)
-        )
+        f = Form(cls.env["account.move"].with_context(purchase_context))
+        return f.save()
 
     @classmethod
     def _create_partners(cls, company):
@@ -208,3 +218,11 @@ class TestPurchaseOrderConsistency(TestAccountChartTemplate):
         with self.assertRaises(UserError):
             self.purchase1.order_line.write({"product_id": self.product2.id})
         self.assertEqual(self.purchase1.company_id, self.invoice.company_id)
+
+    def test_purchase_order_invoice_consistency(self):
+        f = Form(self.invoice)
+        f.company_id = self.company_2
+        f.journal_id = self.purchase_journal_2
+        f.partner_id = self.partner_2
+        with self.assertRaises(UserError):
+            f.save()
