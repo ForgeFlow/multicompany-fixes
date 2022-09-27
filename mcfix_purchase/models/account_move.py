@@ -10,14 +10,7 @@ class AccountInvoice(models.Model):
     def _onchange_company_id(self):
         super()._onchange_company_id()
         if not self.purchase_id.check_company(self.company_id):
-            self.purchase_id = self.refund_invoice_id.purchase_id
-
-    def _check_company_id_search(self):
-        res = super()._check_company_id_search()
-        res += [
-            ("purchase.order", [("invoice_ids", "in", self.ids)]),
-        ]
-        return res
+            self.purchase_id = False
 
 
 class AccountInvoiceLine(models.Model):
