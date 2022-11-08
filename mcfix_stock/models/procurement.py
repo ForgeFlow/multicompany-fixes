@@ -24,7 +24,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'location_id')
     def _check_company_id_location_id(self):
         for rec in self.sudo():
-            if not rec.location_id.check_company(rec.company_id):
+            if not rec.location_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Procurement Rule and in '
                       'Stock Location must be the same.'))
@@ -33,7 +33,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'route_id')
     def _check_company_id_route_id(self):
         for rec in self.sudo():
-            if not rec.route_id.check_company(rec.company_id):
+            if not rec.route_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Procurement Rule and in '
                       'Stock Location Route must be the same.'))
@@ -53,7 +53,7 @@ class ProcurementRule(models.Model):
     @api.constrains('company_id', 'warehouse_id')
     def _check_company_id_warehouse_id(self):
         for rec in self.sudo():
-            if not rec.warehouse_id.check_company(rec.company_id):
+            if not rec.warehouse_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Procurement Rule and in '
                       'Stock Warehouse must be the same.'))

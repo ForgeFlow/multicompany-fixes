@@ -15,7 +15,7 @@ class StockPicking(models.Model):
     @api.constrains('company_id', 'carrier_id')
     def _check_company_id_carrier_id(self):
         for rec in self.sudo():
-            if not rec.carrier_id.check_company(rec.company_id):
+            if not rec.carrier_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Picking and in '
                       'the Carrier must be the same.'))

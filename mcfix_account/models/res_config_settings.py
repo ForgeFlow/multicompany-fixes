@@ -19,7 +19,7 @@ class ResConfigSettings(models.TransientModel):
     @api.constrains('company_id', 'tax_cash_basis_journal_id')
     def _check_company_id_tax_cash_basis_journal_id(self):
         for rec in self.sudo():
-            if not rec.tax_cash_basis_journal_id.check_company(rec.company_id):
+            if not rec.tax_cash_basis_journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Res Config Settings and in '
                       'Account Journal must be the same.'))
@@ -39,7 +39,7 @@ class ResConfigSettings(models.TransientModel):
     @api.constrains('company_id', 'chart_template_id')
     def _check_company_id_chart_template_id(self):
         for rec in self.sudo():
-            if not rec.chart_template_id.check_company(rec.company_id):
+            if not rec.chart_template_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Res Config Settings and in '
                       'Account Chart Template must be the same.'))

@@ -59,7 +59,7 @@ class PurchaseOrder(models.Model):
     def _check_company_id_invoice_ids(self):
         for rec in self.sudo():
             for line in rec.invoice_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Purchase Order and in '
                           'Account Invoice (%s) must be the same.'
@@ -70,7 +70,7 @@ class PurchaseOrder(models.Model):
     def _check_company_id_picking_ids(self):
         for rec in self.sudo():
             for line in rec.picking_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Purchase Order and in '
                           'Stock Picking (%s) must be the same.'
@@ -102,7 +102,7 @@ class PurchaseOrder(models.Model):
     @api.constrains('company_id', 'partner_id')
     def _check_company_id_partner_id(self):
         for rec in self.sudo():
-            if not rec.partner_id.check_company(rec.company_id):
+            if not rec.partner_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Purchase Order and in '
                       'Res Partner must be the same.'))
@@ -111,7 +111,7 @@ class PurchaseOrder(models.Model):
     @api.constrains('company_id', 'fiscal_position_id')
     def _check_company_id_fiscal_position_id(self):
         for rec in self.sudo():
-            if not rec.fiscal_position_id.check_company(rec.company_id):
+            if not rec.fiscal_position_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Purchase Order and in '
                       'Account Fiscal Position must be the same.'))
@@ -155,7 +155,7 @@ class PurchaseOrderLine(models.Model):
     def _check_company_id_taxes_id(self):
         for rec in self.sudo():
             for line in rec.taxes_id:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Purchase Order Line and in '
                           'Account Tax (%s) must be the same.'
@@ -165,7 +165,7 @@ class PurchaseOrderLine(models.Model):
     @api.constrains('company_id', 'orderpoint_id')
     def _check_company_id_orderpoint_id(self):
         for rec in self.sudo():
-            if not rec.orderpoint_id.check_company(rec.company_id):
+            if not rec.orderpoint_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Purchase Order Line and in '
                       'Stock Warehouse Orderpoint must be the same.'))
@@ -185,7 +185,7 @@ class PurchaseOrderLine(models.Model):
     @api.constrains('company_id', 'product_id')
     def _check_company_id_product_id(self):
         for rec in self.sudo():
-            if not rec.product_id.check_company(rec.company_id):
+            if not rec.product_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Purchase Order Line and in '
                       'Product Product must be the same.'))
@@ -194,7 +194,7 @@ class PurchaseOrderLine(models.Model):
     @api.constrains('company_id', 'order_id')
     def _check_company_id_order_id(self):
         for rec in self.sudo():
-            if not rec.order_id.check_company(rec.company_id):
+            if not rec.order_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Purchase Order Line and in '
                       'Purchase Order must be the same.'))

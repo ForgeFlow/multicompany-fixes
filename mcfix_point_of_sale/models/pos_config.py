@@ -146,7 +146,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'invoice_journal_id')
     def _check_company_id_invoice_journal_id(self):
         for rec in self.sudo():
-            if not rec.invoice_journal_id.check_company(rec.company_id):
+            if not rec.invoice_journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Invoice Journal must be the same.'))
@@ -155,7 +155,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'journal_id')
     def _check_company_id_journal_id(self):
         for rec in self.sudo():
-            if not rec.journal_id.check_company(rec.company_id):
+            if not rec.journal_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Account Journal must be the same.'))
@@ -164,7 +164,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'pricelist_id')
     def _check_company_id_pricelist_id(self):
         for rec in self.sudo():
-            if not rec.pricelist_id.check_company(rec.company_id):
+            if not rec.pricelist_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Product Pricelist must be the same.'))
@@ -173,7 +173,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'sequence_line_id')
     def _check_company_id_sequence_line_id(self):
         for rec in self.sudo():
-            if not rec.sequence_line_id.check_company(rec.company_id):
+            if not rec.sequence_line_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Ir Sequence must be the same.'))
@@ -182,7 +182,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'stock_location_id')
     def _check_company_id_stock_location_id(self):
         for rec in self.sudo():
-            if not rec.stock_location_id.check_company(rec.company_id):
+            if not rec.stock_location_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Stock Location must be the same.'))
@@ -202,7 +202,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'tip_product_id')
     def _check_company_id_tip_product_id(self):
         for rec in self.sudo():
-            if not rec.tip_product_id.check_company(rec.company_id):
+            if not rec.tip_product_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Product Product must be the same.'))
@@ -212,7 +212,7 @@ class PosConfig(models.Model):
     def _check_company_id_available_pricelist_ids(self):
         for rec in self.sudo():
             for line in rec.available_pricelist_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Pos Config and in '
                           'Product Pricelist (%s) must be the same.'
@@ -223,7 +223,7 @@ class PosConfig(models.Model):
     def _check_company_id_journal_ids(self):
         for rec in self.sudo():
             for line in rec.journal_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Pos Config and in '
                           'Account Journal (%s) must be the same.'
@@ -234,7 +234,7 @@ class PosConfig(models.Model):
     def _check_company_id_fiscal_position_ids(self):
         for rec in self.sudo():
             for line in rec.fiscal_position_ids:
-                if not line.check_company(rec.company_id):
+                if not line.check_company(rec):
                     raise ValidationError(
                         _('The Company in the Pos Config and in '
                           'Account Fiscal Position (%s) must be the same.'
@@ -244,7 +244,7 @@ class PosConfig(models.Model):
     @api.constrains('company_id', 'sequence_id')
     def _check_company_id_sequence_id(self):
         for rec in self.sudo():
-            if not rec.sequence_id.check_company(rec.company_id):
+            if not rec.sequence_id.check_company(rec):
                 raise ValidationError(
                     _('The Company in the Pos Config and in '
                       'Ir Sequence must be the same.'))
