@@ -21,7 +21,7 @@
               <field name="default_purchase_tax_id" />
               <field
                 name="transfer_account_id"
-                domain="[('company_id', '=', active_id)]"
+                domain="[('company_id','=',active_id)]"
                 context="{'default_company_id': active_id}"
               />
               <field

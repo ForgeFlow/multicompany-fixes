@@ -37,15 +37,15 @@
         <group name="account_stock_property" string="Account Stock Properties">
           <field
             name="property_stock_account_input_categ_id"
-            domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+            domain="[('deprecated', '=', False), ('company_id','=',company_id)]"
           />
           <field
             name="property_stock_account_output_categ_id"
-            domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+            domain="[('deprecated', '=', False), ('company_id','=',company_id)]"
           />
           <field
             name="property_stock_valuation_account_id"
-            domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+            domain="[('deprecated', '=', False), ('company_id','=',company_id)]"
           />
           <field
             name="property_stock_journal"
