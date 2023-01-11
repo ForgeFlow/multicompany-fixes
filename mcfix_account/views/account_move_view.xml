@@ -27,7 +27,7 @@
                 <attribute name="domain">[('company_id','=',company_id)]</attribute>
             </xpath>
             <field name="analytic_account_id" position="attributes">
-                <attribute name="domain">[('company_id', '=', company_id)]</attribute>
+                <attribute name="domain">['|', ('company_id', '=', company_id), ('company_id', '=', False)]</attribute>
             </field>
         </field>
     </record>
@@ -45,7 +45,7 @@
                 <attribute name="domain">['&amp;', '|', ('parent_id', '=', False), ('is_company', '=', True), '|', ('company_id', '=', parent.company_id), ('company_id', '=', False)]</attribute>
             </xpath>
             <xpath expr="/form/sheet/notebook/page/field[@name='line_ids']/tree/field[@name='analytic_account_id']" position="attributes">
-                <attribute name="domain">[('company_id', '=', parent.company_id)]</attribute>
+                <attribute name="domain">['|', ('company_id', '=', parent.company_id), ('company_id', '=', False)]</attribute>
             </xpath>
         </field>
     </record>
