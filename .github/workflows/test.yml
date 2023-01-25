@@ -35,7 +35,7 @@ jobs:
       matrix:
         include:
           - container: ghcr.io/oca/oca-ci/py3.8-odoo15.0:latest
-            makepot: "true"
+            makepot: "false"
             name: test with Odoo
     services:
       postgres:
