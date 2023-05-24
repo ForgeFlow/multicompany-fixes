@@ -11,7 +11,11 @@
     "license": "LGPL-3",
     "website": "http://www.forgeflow.com",
     "depends": ["product", "multicompany_property_base"],
-    "data": ["views/product_views.xml", "views/product_category_views.xml"],
+    "data": [
+        "views/product_views.xml",
+        "views/product_category_views.xml",
+        "views/res_partner_views.xml",
+    ],
     "installable": True,
     "application": False,
     "auto_install": True,

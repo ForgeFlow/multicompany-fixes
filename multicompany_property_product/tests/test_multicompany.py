@@ -63,3 +63,26 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
     def test_product_category(self):
         self.category.property_ids.invalidate_cache()
         self.assertTrue(self.category.property_ids)
+
+    def test_partner(self):
+        super().test_partner()
+        pricelist_1 = self.env["product.pricelist"].create({"name": "Pricelist 1"})
+        pricelist_2 = self.env["product.pricelist"].create({"name": "Pricelist 2"})
+        self.partner.property_ids.filtered(
+            lambda r: r.company_id == self.company_1
+        ).property_product_pricelist = pricelist_1
+        self.partner.property_ids.filtered(
+            lambda r: r.company_id == self.company_2
+        ).property_product_pricelist = pricelist_2
+        self.assertEqual(
+            self.partner.with_context(
+                force_company=self.company_1.id
+            ).property_product_pricelist,
+            pricelist_1,
+        )
+        self.assertEqual(
+            self.partner.with_context(
+                force_company=self.company_2.id
+            ).property_product_pricelist,
+            pricelist_2,
+        )
