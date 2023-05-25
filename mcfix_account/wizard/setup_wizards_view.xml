@@ -10,8 +10,8 @@
       </field>
       <field name="linked_journal_id" position="attributes">
         <attribute
-          name="domain"
-        >[('type','=','bank'), ('bank_account_id', '=', False), ('company_id', '=', company_id)]</attribute>
+                    name="domain"
+                >[('type','=','bank'), ('bank_account_id', '=', False), ('company_id', '=', company_id)]</attribute>
       </field>
     </field>
   </record>

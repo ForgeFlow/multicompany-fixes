@@ -17,21 +17,21 @@
     <field name="name">product.property.form</field>
     <field name="model">product.property</field>
     <field
-      name="inherit_id"
-      ref="multicompany_property_product.view_product_property_form"
-    />
+            name="inherit_id"
+            ref="multicompany_property_product.view_product_property_form"
+        />
     <field name="arch" type="xml">
       <notebook position="inside">
         <page name="accounting" string="Accounting">
           <group name="accounting_group">
             <field
-              name="property_account_income_id"
-              domain="[('deprecated', '=', False),('company_id','=',company_id)]"
-            />
+                            name="property_account_income_id"
+                            domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+                        />
             <field
-              name="property_account_expense_id"
-              domain="[('deprecated', '=', False),('company_id','=',company_id)]"
-            />
+                            name="property_account_expense_id"
+                            domain="[('deprecated', '=', False),('company_id','=',company_id)]"
+                        />
           </group>
         </page>
       </notebook>

@@ -248,7 +248,6 @@ class TestPointOfSale(TestAccountChartTemplate):
         )
         with self.assertRaises(UserError):
             pos_1.company_id = self.company_2
-            pass
 
     def test_pos_session_create(self):
         company_3 = self.env["res.company"].create({"name": "C3"})

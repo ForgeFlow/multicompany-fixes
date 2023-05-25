@@ -4,7 +4,7 @@
     "version": "13.0.1.0.0",
     "summary": "Sale fixes",
     "author": "ForgeFlow, Odoo Community Association (OCA)",
-    "website": "http://www.forgeflow.com",
+    "website": "https://github.com/ForgeFlow/multicompany-fixes",
     "license": "LGPL-3",
     "depends": ["sale", "mcfix_sales_team", "mcfix_account"],
     "data": ["report/sale_report_templates.xml"],

@@ -14,15 +14,15 @@
     <field name="name">res.partner.property.tree</field>
     <field name="model">res.partner.property</field>
     <field
-      name="inherit_id"
-      ref="multicompany_property_base.view_partner_property_multicompany_tree"
-    />
+            name="inherit_id"
+            ref="multicompany_property_base.view_partner_property_multicompany_tree"
+        />
     <field name="arch" type="xml">
       <field name="company_id" position="after">
         <field
-          name="property_purchase_currency_id"
-          options="{'no_create': True, 'no_open': True}"
-        />
+                    name="property_purchase_currency_id"
+                    options="{'no_create': True, 'no_open': True}"
+                />
       </field>
     </field>
   </record>
@@ -30,15 +30,15 @@
     <field name="name">res.partner.property.form</field>
     <field name="model">res.partner.property</field>
     <field
-      name="inherit_id"
-      ref="multicompany_property_account.view_partner_property_multicompany_form"
-    />
+            name="inherit_id"
+            ref="multicompany_property_account.view_partner_property_multicompany_form"
+        />
     <field name="arch" type="xml">
       <field name="property_supplier_payment_term_id" position="after">
         <field
-          name="property_purchase_currency_id"
-          options="{'no_create': True, 'no_open': True}"
-        />
+                    name="property_purchase_currency_id"
+                    options="{'no_create': True, 'no_open': True}"
+                />
       </field>
     </field>
   </record>

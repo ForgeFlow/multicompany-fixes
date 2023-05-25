@@ -4,7 +4,7 @@
     "version": "13.0.1.0.0",
     "summary": "Account Check Printing fixes",
     "author": "ForgeFlow, Odoo Community Association (OCA)",
-    "website": "http://www.forgeflow.com",
+    "website": "https://github.com/ForgeFlow/multicompany-fixes",
     "license": "LGPL-3",
     "depends": ["account_check_printing", "mcfix_account"],
     "sequence": 30,

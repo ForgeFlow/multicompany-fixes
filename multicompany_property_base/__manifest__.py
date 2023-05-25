@@ -8,7 +8,7 @@
     "author": "Creu Blanca, ForgeFlow, Odoo Community Association (OCA)",
     "license": "LGPL-3",
     "sequence": 30,
-    "website": "https://github.com/OCA/multi-company",
+    "website": "https://github.com/ForgeFlow/multicompany-fixes",
     "depends": ["base"],
     "data": ["views/partner_views.xml", "views/res_company_views.xml"],
     "installable": True,

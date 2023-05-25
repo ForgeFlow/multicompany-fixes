@@ -4,7 +4,7 @@
     "version": "13.0.1.0.0",
     "summary": "Pos Sale fixes",
     "author": "ForgeFlow, Odoo Community Association (OCA)",
-    "website": "http://www.forgeflow.com",
+    "website": "https://github.com/ForgeFlow/multicompany-fixes",
     "license": "LGPL-3",
     "depends": ["pos_sale", "mcfix_point_of_sale", "mcfix_sale"],
     "sequence": 30,
