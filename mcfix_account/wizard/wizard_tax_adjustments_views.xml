@@ -10,18 +10,18 @@
       </field>
       <field name="journal_id" position="attributes">
         <attribute
-          name="domain"
-        >[('type', '=', 'general'),('company_id','=',company_id)]</attribute>
+                    name="domain"
+                >[('type', '=', 'general'),('company_id','=',company_id)]</attribute>
       </field>
       <field name="debit_account_id" position="attributes">
         <attribute
-          name="domain"
-        >[('deprecated', '=', False),('company_id','=',company_id)]</attribute>
+                    name="domain"
+                >[('deprecated', '=', False),('company_id','=',company_id)]</attribute>
       </field>
       <field name="credit_account_id" position="attributes">
         <attribute
-          name="domain"
-        >[('deprecated', '=', False),('company_id','=',company_id)]</attribute>
+                    name="domain"
+                >[('deprecated', '=', False),('company_id','=',company_id)]</attribute>
       </field>
     </field>
   </record>

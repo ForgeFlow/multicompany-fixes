@@ -4,7 +4,7 @@
     "version": "13.0.1.0.0",
     "summary": "Purchase fixes",
     "author": "ForgeFlow, Odoo Community Association (OCA)",
-    "website": "http://www.forgeflow.com",
+    "website": "https://github.com/ForgeFlow/multicompany-fixes",
     "license": "LGPL-3",
     "depends": ["purchase", "mcfix_account"],
     "data": ["views/purchase_order.xml"],

@@ -17,21 +17,21 @@
     <field name="name">res.partner.property.tree</field>
     <field name="model">res.partner.property</field>
     <field
-      name="inherit_id"
-      ref="multicompany_property_account.view_partner_property_multicompany_tree"
-    />
+            name="inherit_id"
+            ref="multicompany_property_account.view_partner_property_multicompany_tree"
+        />
     <field name="arch" type="xml">
       <field name="property_supplier_payment_term_id" position="after">
         <field
-          name="supplier_payment_mode_id"
-          domain="[('payment_type', '=', 'outbound'),('company_id','=',company_id)]"
-        />
+                    name="supplier_payment_mode_id"
+                    domain="[('payment_type', '=', 'outbound'),('company_id','=',company_id)]"
+                />
       </field>
       <field name="property_payment_term_id" position="after">
         <field
-          name="customer_payment_mode_id"
-          domain="[('payment_type', '=', 'inbound'),('company_id','=',company_id)]"
-        />
+                    name="customer_payment_mode_id"
+                    domain="[('payment_type', '=', 'inbound'),('company_id','=',company_id)]"
+                />
       </field>
     </field>
   </record>
@@ -39,20 +39,20 @@
     <field name="name">res.partner.property.form</field>
     <field name="model">res.partner.property</field>
     <field
-      name="inherit_id"
-      ref="multicompany_property_base.view_partner_property_multicompany_form"
-    />
+            name="inherit_id"
+            ref="multicompany_property_base.view_partner_property_multicompany_form"
+        />
     <field name="arch" type="xml">
       <page name="accounting" position="inside">
         <group>
           <field
-            name="supplier_payment_mode_id"
-            domain="[('payment_type', '=', 'outbound'),('company_id','=',company_id)]"
-          />
+                        name="supplier_payment_mode_id"
+                        domain="[('payment_type', '=', 'outbound'),('company_id','=',company_id)]"
+                    />
           <field
-            name="customer_payment_mode_id"
-            domain="[('payment_type', '=', 'inbound'),('company_id','=',company_id)]"
-          />
+                        name="customer_payment_mode_id"
+                        domain="[('payment_type', '=', 'inbound'),('company_id','=',company_id)]"
+                    />
         </group>
       </page>
     </field>

@@ -8,8 +8,8 @@
     <field name="arch" type="xml">
       <field name="journal_id" position="attributes">
         <attribute
-          name="domain"
-        >[('company_id', '=', company_id), ('type', '=?', invoice_filter_type_domain)]</attribute>
+                    name="domain"
+                >[('company_id', '=', company_id), ('type', '=?', invoice_filter_type_domain)]</attribute>
       </field>
     </field>
   </record>

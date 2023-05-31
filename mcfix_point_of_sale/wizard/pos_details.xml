@@ -7,11 +7,11 @@
     <field name="arch" type="xml">
       <field name="end_date" position="after">
         <field
-          name="company_id"
-          options="{'no_create': True}"
-          groups="base.group_multi_company"
-          invisible="0"
-        />
+                    name="company_id"
+                    options="{'no_create': True}"
+                    groups="base.group_multi_company"
+                    invisible="0"
+                />
       </field>
     </field>
   </record>

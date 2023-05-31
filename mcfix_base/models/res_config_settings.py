@@ -10,4 +10,3 @@ class ResConfigSettings(models.TransientModel):
     @api.onchange("company_id")
     def _onchange_company_id(self):
         """To be used by other modules (mcfix_account)"""
-        pass
