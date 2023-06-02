@@ -248,8 +248,9 @@ class AccountInvoiceLine(models.Model):
         for rec in self.sudo():
             if not rec.partner_id.check_company(rec.company_id):
                 raise ValidationError(
-                    _('The Company in the Account Invoice Line and in '
-                      'Res Partner must be the same.'))
+                    _('The Company in the Account Invoice Line (%s) of Account Invoice (%s) and Company in '
+                      'Res Partner (%s) must be the same.'
+                      ) % (rec.name_get()[0][1], rec.invoice_id.name_get()[0][1], rec.partner_id.name_get()[0][1]))
 
     @api.multi
     @api.constrains('company_id', 'product_id')
@@ -257,8 +258,9 @@ class AccountInvoiceLine(models.Model):
         for rec in self.sudo():
             if not rec.product_id.check_company(rec.company_id):
                 raise ValidationError(
-                    _('The Company in the Account Invoice Line and in '
-                      'Product Product must be the same.'))
+                    _('The Company in the Account Invoice Line (%s) of Account Invoice (%s) and Company in '
+                      'Product Product (%s) must be the same.'
+                      ) % (rec.name_get()[0][1], rec.invoice_id.name_get()[0][1], rec.product_id.name_get()[0][1]))
 
     @api.multi
     @api.constrains('company_id', 'account_analytic_id')
@@ -266,8 +268,9 @@ class AccountInvoiceLine(models.Model):
         for rec in self.sudo():
             if not rec.account_analytic_id.check_company(rec.company_id):
                 raise ValidationError(
-                    _('The Company in the Account Invoice Line and in '
-                      'Account Analytic Account must be the same.'))
+                    _('The Company in the Account Invoice Line (%s) of Account Invoice (%s) and Company in '
+                      'Account Analytic Account (%s) must be the same.'
+                      ) % (rec.name_get()[0][1], rec.invoice_id.name_get()[0][1], rec.account_analytic_id.name_get()[0][1]))
 
     @api.multi
     @api.constrains('company_id', 'invoice_line_tax_ids')
@@ -276,9 +279,9 @@ class AccountInvoiceLine(models.Model):
             for line in rec.invoice_line_tax_ids:
                 if not line.check_company(rec.company_id):
                     raise ValidationError(
-                        _('The Company in the Account Invoice Line and in '
+                        _('The Company in the Account Invoice Line (%s) of Account Invoice (%s) and Company in '
                           'Account Tax (%s) must be the same.'
-                          ) % line.name_get()[0][1])
+                          ) % (rec.name_get()[0][1], rec.invoice_id.name_get()[0][1], line.name_get()[0][1]))
 
     @api.multi
     @api.constrains('company_id', 'invoice_id')
@@ -286,8 +289,9 @@ class AccountInvoiceLine(models.Model):
         for rec in self.sudo():
             if not rec.invoice_id.check_company(rec.company_id):
                 raise ValidationError(
-                    _('The Company in the Account Invoice Line and in '
-                      'Account Invoice must be the same.'))
+                    _('The Company in the Account Invoice Line (%s) of Account Invoice (%s) and Company in '
+                      'Account Invoice (%s) must be the same.'
+                      ) % (rec.name_get()[0][1], rec.invoice_id.name_get()[0][1], rec.invoice_id.name_get()[0][1]))
 
     @api.multi
     @api.constrains('company_id', 'account_id')
@@ -295,8 +299,9 @@ class AccountInvoiceLine(models.Model):
         for rec in self.sudo():
             if not rec.account_id.check_company(rec.company_id):
                 raise ValidationError(
-                    _('The Company in the Account Invoice Line and in '
-                      'Account Account must be the same.'))
+                    _('The Company in the Account Invoice Line (%s) of Account Invoice (%s) and Company in '
+                      'Account Account (%s) must be the same.'
+                      ) % (rec.name_get()[0][1], rec.invoice_id.name_get()[0][1], rec.account_id.name_get()[0][1]))
 
     @api.constrains('company_id')
     def _check_company_id_out_model(self):
