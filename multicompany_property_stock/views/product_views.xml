@@ -23,7 +23,7 @@
     <field name="arch" type="xml">
       <notebook position="inside">
         <page string="Inventory">
-          <group name="stock_property" groups="base.group_no_one">
+          <group name="stock_property">
             <field name="responsible_id" />
             <field name="property_stock_production" />
             <field name="property_stock_inventory" />
