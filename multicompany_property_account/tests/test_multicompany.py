@@ -83,3 +83,60 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             ).property_account_income_id,
             prop.property_account_income_id,
         )
+
+    def test_sync_partner_child_commercial_fields(self):
+        """
+        When a value for a property is edited and the field is part of the commercial
+        fields stated in Odoo standard, also sync the fields to it's children contacts.
+        Using `property_payment_term_id` as the field in the test but it could be any
+        other company dependent + commercial field.
+        """
+        comm_fields = self.env["res.partner"]._commercial_fields()
+        self.assertTrue("property_payment_term_id" in comm_fields)
+        self.env.companies = self.company_1 + self.company_2
+        parent_c1_prop = self.partner.property_ids.filtered(
+            lambda p: p.company_id == self.company_1
+        )
+        parent_c2_prop = self.partner.property_ids.filtered(
+            lambda p: p.company_id == self.company_2
+        )
+        self.partner.write(
+            {
+                "property_ids": [
+                    [
+                        1,
+                        parent_c1_prop.id,
+                        {"property_payment_term_id": self.payment_term_1.id},
+                    ],
+                    [
+                        1,
+                        parent_c2_prop.id,
+                        {"property_payment_term_id": self.payment_term_2.id},
+                    ],
+                ]
+            }
+        )
+        self.assertEqual(
+            self.partner.with_context(
+                force_company=self.company_1.id
+            ).property_payment_term_id,
+            self.payment_term_1,
+        )
+        self.assertEqual(
+            self.partner.with_context(
+                force_company=self.company_2.id
+            ).property_payment_term_id,
+            self.payment_term_2,
+        )
+        self.assertEqual(
+            self.child.with_context(
+                force_company=self.company_1.id
+            ).property_payment_term_id,
+            self.payment_term_1,
+        )
+        self.assertEqual(
+            self.child.with_context(
+                force_company=self.company_2.id
+            ).property_payment_term_id,
+            self.payment_term_2,
+        )
