@@ -13,6 +13,11 @@ class TestMulticompanyProperty(TransactionCase):
         self.partner = self.env["res.partner"].create(
             {"name": "Partner", "company_id": False}
         )
+        self.child = self.env["res.partner"].create(
+            {"name": "Child", "parent_id": self.partner.id}
+        )
+        self.payment_term_1 = self.env["account.payment.term"].create({"name": "PT 1"})
+        self.payment_term_2 = self.env["account.payment.term"].create({"name": "PT 2"})
 
     def create_company(self, name):
         return self.env["res.company"].create({"name": name})
