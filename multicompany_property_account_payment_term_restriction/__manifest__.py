@@ -2,7 +2,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     "name": "Multi Company Account Payment Term Restriction",
-    "version": "13.0.1.0.0",
+    "version": "15.0.1.0.0",
     "summary": "Payment Term Multi-Company Restrictions",
     "author": "ForgeFlow, Odoo Community Association (OCA)",
     "website": "https://github.com/ForgeFlow/multicompany-fixes",
