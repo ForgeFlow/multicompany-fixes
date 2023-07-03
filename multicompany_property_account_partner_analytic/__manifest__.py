@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 {
     "name": "Multi Company Account Partner Analytic",
-    "version": "13.0.1.0.0",
+    "version": "15.0.1.0.0",
     "summary": "Partner Analytic Company Properties",
     "author": "ForgeFlow, Odoo Community Association (OCA)",
     "license": "AGPL-3",

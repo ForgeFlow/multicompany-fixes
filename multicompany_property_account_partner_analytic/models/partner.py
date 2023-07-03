@@ -24,7 +24,7 @@ class ResPartnerProperty(models.TransientModel):
     )
 
     def get_property_fields(self, obj, properties):
-        super(ResPartnerProperty, self).get_property_fields(obj, properties)
+        res = super(ResPartnerProperty, self).get_property_fields(obj, properties)
         for rec in self:
             rec.property_analytic_account_id = rec.get_property_value(
                 "property_analytic_account_id", obj, properties
@@ -32,6 +32,7 @@ class ResPartnerProperty(models.TransientModel):
             rec.property_supplier_analytic_account_id = rec.get_property_value(
                 "property_supplier_analytic_account_id", obj, properties
             )
+        return res
 
     def get_property_fields_list(self):
         res = super(ResPartnerProperty, self).get_property_fields_list()

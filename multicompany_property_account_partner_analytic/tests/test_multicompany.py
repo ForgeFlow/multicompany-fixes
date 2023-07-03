@@ -20,7 +20,7 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
         )
 
     def test_partner(self):
-        super().test_partner()
+        res = super().test_partner()
         self.partner.property_ids.filtered(
             lambda r: r.company_id == self.company_1
         ).property_analytic_account_id = self.an_acc_1
@@ -34,26 +34,23 @@ class TestMulticompanyProperty(test_multicompany.TestMulticompanyProperty):
             lambda r: r.company_id == self.company_2
         ).property_supplier_analytic_account_id = self.an_acc_4
         self.assertEqual(
-            self.partner.with_context(
-                force_company=self.company_1.id
-            ).property_analytic_account_id,
+            self.partner.with_company(self.company_1.id).property_analytic_account_id,
             self.an_acc_1,
         )
         self.assertEqual(
-            self.partner.with_context(
-                force_company=self.company_2.id
-            ).property_analytic_account_id,
+            self.partner.with_company(self.company_2.id).property_analytic_account_id,
             self.an_acc_2,
         )
         self.assertEqual(
-            self.partner.with_context(
-                force_company=self.company_1.id
+            self.partner.with_company(
+                self.company_1.id
             ).property_supplier_analytic_account_id,
             self.an_acc_3,
         )
         self.assertEqual(
-            self.partner.with_context(
-                force_company=self.company_2.id
+            self.partner.with_company(
+                self.company_2.id
             ).property_supplier_analytic_account_id,
             self.an_acc_4,
         )
+        return res
