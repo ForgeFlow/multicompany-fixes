@@ -2,7 +2,7 @@
 # Copyright 2017 ForgeFlow, S.L.
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl.html).
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class Partner(models.Model):
@@ -32,31 +32,43 @@ class Partner(models.Model):
                 values.append(val.id)
             record.property_ids = values
 
+    @api.model
+    def _get_property_value_sanitized(self, p_values):
+        """
+        :return: dict containing the sanitized prorperty_ids value received in the write
+        method
+        The value received should be list, each value being a list or tuple of 3
+        elements, just as in the meth:write format
+        """
+        result = dict()
+        property_obj = self.env["res.partner.property"]
+        for p_value in p_values:
+            is_list = isinstance(p_value, list)
+            is_tuple = isinstance(p_value, tuple)
+            if (not is_list and not is_tuple) or len(p_value) != 3:
+                continue
+            p_id = p_value[1]
+            p_val = p_value[2]
+            prop = property_obj.browse(p_id)
+            if not p_val or not prop.exists():
+                continue
+            company_id = prop.company_id.id
+            result.setdefault(company_id, p_val)
+        return result
+
     def _children_sync(self, values):
         """
         Convert property values to the actual fields set on the partner, so that the
         children contacts inherit the values correctly just as Odoo standard does.
         """
-        if "property_ids" in values:
-            property_obj = self.env["res.partner.property"]
-            comm_fields = set(self._commercial_fields())
-            all_property_vals = values.get("property_ids")
-            for p_vals in all_property_vals:
-                is_list = isinstance(p_vals, list)
-                if not is_list or (is_list and len(p_vals) != 3):
-                    continue
-                p_id = p_vals[1]
-                p_val = p_vals[2]
-                prop = property_obj.browse(p_id)
-                if not p_val or not prop.exists():
-                    continue
-                company_id = prop.company_id.id
-                fields_to_sync = set(p_val.keys()) & comm_fields
-                if fields_to_sync:
-                    vals = {f: p_val.get(f) for f in fields_to_sync}
-                    self.with_context(force_company=company_id)._children_sync(vals)
-            values.pop("property_ids")
-        return super()._children_sync(values)
+        property_ids = values.get("property_ids", False)
+        if property_ids:
+            p_values_dict = self._get_property_value_sanitized(property_ids)
+            for company_id, vals in p_values_dict.items():
+                super(
+                    Partner, self.with_context(force_company=company_id)
+                )._children_sync(vals)
+        return super(Partner, self)._children_sync(values)
 
 
 class PartnerProperty(models.TransientModel):
