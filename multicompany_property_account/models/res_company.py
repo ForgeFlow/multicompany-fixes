@@ -69,7 +69,7 @@ class ResCompany(models.Model):
     )
     categ_account_expense_id = fields.Many2one(
         'account.account',
-        domain="[('internal_type', '=', 'expense'),"
+        domain="[('internal_group', '=', 'expense'),"
                "('deprecated', '=', False),"
                "('company_id', '=', active_id)]",
         compute='_compute_categ_account_expense',
@@ -78,7 +78,7 @@ class ResCompany(models.Model):
     )
     categ_account_income_id = fields.Many2one(
         'account.account',
-        domain="[('internal_type', '=', 'income'),"
+        domain="[('internal_group', '=', 'income'),"
                "('deprecated', '=', False),"
                "('company_id', '=', active_id)]",
         compute='_compute_categ_account_income',
