@@ -65,9 +65,7 @@ class Partner(models.Model):
         if property_ids:
             p_values_dict = self._get_property_value_sanitized(property_ids)
             for company_id, vals in p_values_dict.items():
-                super(
-                    Partner, self.with_context(force_company=company_id)
-                )._children_sync(vals)
+                super(Partner, self.with_company(company_id))._children_sync(vals)
         return super(Partner, self)._children_sync(values)
 
 
