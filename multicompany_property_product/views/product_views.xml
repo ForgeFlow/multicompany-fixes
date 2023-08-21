@@ -19,7 +19,7 @@
     <field name="name">product.property.tree</field>
     <field name="model">product.property</field>
     <field name="arch" type="xml">
-      <tree string="Properties">
+      <tree>
         <field name="product_template_id" invisible="1" />
         <field name="company_id" />
         <field
