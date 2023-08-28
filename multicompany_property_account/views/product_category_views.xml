@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="view_category_property_form" model="ir.ui.view">
+    <field name="name">product.category.property.form.inherit</field>
+    <field name="model">product.category</field>
+    <field name="inherit_id" ref="account.view_category_property_form" />
+    <field name="arch" type="xml">
+      <field name="property_account_income_categ_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+      </field>
+      <field name="property_account_expense_categ_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+      </field>
+    </field>
+  </record>
+  <record id="view_product_category_property_form" model="ir.ui.view">
+    <field name="name">product.category.property.form</field>
+    <field name="model">product.category.property</field>
+    <field
+            name="inherit_id"
+            ref="multicompany_property_product.view_product_category_property_form"
+        />
+    <field name="arch" type="xml">
+      <group name="first" position="after">
+        <group name="account_property" groups="account.group_account_manager">
+          <group string="Account Properties">
+            <field
+                            name="property_account_income_categ_id"
+                            domain="[('internal_type','=','other'),('deprecated', '=', False),('company_id','=',company_id)]"
+                        />
+            <field
+                            name="property_account_expense_categ_id"
+                            domain="[('internal_type','=','other'),('deprecated', '=', False),('company_id','=',company_id)]"
+                        />
+          </group>
+        </group>
+      </group>
+    </field>
+  </record>
+</odoo>
