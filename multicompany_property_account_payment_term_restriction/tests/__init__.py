@@ -1,0 +1,1 @@
+from . import test_multicompany_property_account_payment_term_restriction
