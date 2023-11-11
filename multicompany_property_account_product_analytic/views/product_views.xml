@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <record id="product_template_form_view" model="ir.ui.view">
+    <field name="name">product.template.form</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product_analytic.product_template_form_view" />
+    <field name="arch" type="xml">
+      <field name="income_analytic_account_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+      </field>
+      <field name="expense_analytic_account_id" position="attributes">
+        <attribute name="readonly">True</attribute>
+      </field>
+    </field>
+  </record>
+  <record id="view_product_property_form" model="ir.ui.view">
+    <field name="name">product.property.form</field>
+    <field name="model">product.property</field>
+    <field
+            name="inherit_id"
+            ref="multicompany_property_account.view_product_property_form"
+        />
+    <field name="arch" type="xml">
+      <field name="property_account_income_id" position="after">
+        <field
+                    name="income_analytic_account_id"
+                    domain="[('company_id','=',company_id)]"
+                />
+      </field>
+      <field name="property_account_expense_id" position="after">
+        <field
+                    name="expense_analytic_account_id"
+                    domain="[('company_id','=',company_id)]"
+                />
+      </field>
+    </field>
+  </record>
+</odoo>
