@@ -17,8 +17,7 @@ class StockMove(models.Model):
         # If we did not get the company, try to derive from the picking
         if vals.get('picking_id') and not vals.get('company_id'):
             picking = self.env['stock.picking'].browse(vals['picking_id'])
-            vals['company_id'] = \
-                picking.picking_type_id.warehouse_id.company_id.id
+            vals['company_id'] = picking.picking_type_id.warehouse_id.company_id.id or picking.company_id.id
 
         # If we did not get the company or picking, try to derive
         # from either the source or destination location.
