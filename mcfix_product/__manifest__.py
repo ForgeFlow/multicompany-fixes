@@ -7,6 +7,9 @@
     'website': 'http://www.eficent.com',
     'license': 'LGPL-3',
     'depends': ['product', 'mcfix_mail'],
+    'data': [
+        'security/product_security.xml',
+    ],
     'demo': [
         'data/product_demo.xml',
     ],
