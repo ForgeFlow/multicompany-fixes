@@ -34,14 +34,14 @@ class PosOrder(models.Model):
             session = self.env['pos.session'].browse(session_id)
             vals['company_id'] = session.config_id.company_id.id
 
-        # If we are creating the pos.order with a specific company but
-        # not a session, we propose a default session that is consistent with
-        # the company provided.
-        if company_id and not session_id:
-            session = self.with_context(
-                company_id=company_id)._default_session()
-            if session:
-                vals['session_id'] = session.id
+        # # If we are creating the pos.order with a specific company but
+        # # not a session, we propose a default session that is consistent with
+        # # the company provided.
+        # if company_id and not session_id:
+        #     session = self.with_context(
+        #         company_id=company_id)._default_session()
+        #     if session:
+        #         vals['session_id'] = session.id
         return super(PosOrder, self).create(vals)
 
     @api.onchange('company_id')
